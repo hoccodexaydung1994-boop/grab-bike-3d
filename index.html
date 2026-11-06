@@ -31,6 +31,24 @@
   #speed span{opacity:.8;font-size:14px}
   #toast{position:fixed;top:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);padding:12px 22px;border-radius:14px;font-size:18px;font-weight:700;text-align:center;opacity:0;transition:opacity .3s;z-index:8;pointer-events:none;max-width:90vw}
   #toast.show{opacity:1}
+  #limit{width:38px;height:38px;border-radius:50%;border:5px solid #e53935;background:#fff;color:#111;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;margin-left:auto;margin-bottom:4px}
+  #limit.over{animation:blink .5s infinite}
+  #wanted{position:fixed;top:132px;left:50%;transform:translateX(-50%);z-index:6;font-size:22px;text-shadow:0 2px 6px #000;white-space:nowrap}
+  #wanted small{font-size:13px;background:rgba(0,0,0,.6);padding:2px 8px;border-radius:9px;vertical-align:middle}
+  #lb{position:fixed;right:12px;top:200px;z-index:5;background:rgba(10,20,15,.75);border-radius:12px;padding:8px 12px;font-size:12px;line-height:1.6;max-width:240px}
+  #mp{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:14px}
+  .mpc{background:#fff;color:#1d1d1f;border-radius:20px;width:min(640px,96vw);max-height:88vh;overflow:auto;padding:12px 16px 16px}
+  #mpTabs{display:flex;gap:4px;flex-wrap:wrap;position:sticky;top:-12px;background:#fff;padding:8px 0}
+  #mpTabs button{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:8px 10px;background:#eef2ef;cursor:pointer}
+  #mpTabs button.sel{background:#00b14f;color:#fff}#mpClose{margin-left:auto}
+  #mpBody h3{margin:8px 0}#mpBody h4{margin:12px 0 6px}#mpBody p{line-height:1.6}
+  .kv{width:100%;border-collapse:collapse;font-size:14px}.kv td{padding:5px 4px;border-bottom:1px solid #eee}.kv td:last-child{text-align:right}
+  .pb{display:inline-block;width:110px;height:8px;background:#e6e6e6;border-radius:9px;overflow:hidden;vertical-align:middle}.pb i{display:block;height:100%}
+  .sk{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;background:#f6f8f7;border-radius:12px;padding:10px;margin:6px 0}
+  .sk small{grid-column:1;color:#555}.sk button{grid-row:1/3;grid-column:2;font:inherit;font-weight:800;border:0;border-radius:10px;padding:10px 14px;background:#00b14f;color:#fff;cursor:pointer}
+  .sk button:disabled{background:#ccc;cursor:default}.dots{color:#00b14f;letter-spacing:2px}
+  .chip{font:inherit;font-size:13px;border:0;border-radius:10px;padding:7px 10px;margin:3px 2px;background:#eef2ef;cursor:pointer}.chip.danger{background:#fde2e2;color:#b91c1c}
+  .tg{display:inline-flex;align-items:center;gap:6px;margin:4px 12px 4px 0;font-size:14px}
   #stats{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin:4px 0}
   .st{display:flex;align-items:center;gap:4px;font-size:12px}.st span{width:16px;text-align:center}
   .st b{flex:1;height:7px;background:rgba(255,255,255,.18);border-radius:9px;overflow:hidden;min-width:56px}.st b i{display:block;height:100%;width:50%;transition:width .3s}
@@ -132,6 +150,19 @@
     <button class="big" id="bStart">▶ Bắt đầu ngày làm việc</button>
     <button class="big alt" id="bView">🔄 Xem xe 360°</button>
   </div>
+  <div class="card" style="margin-top:4px">
+    <div style="font-weight:700;margin-bottom:6px">🌐 Chơi online cùng bạn bè</div>
+    <div class="goals"><button class="goal" id="bHost">➕ Tạo phòng</button><input id="joinCode" placeholder="Mã phòng" maxlength="8" style="max-width:120px;font:inherit;padding:6px 10px;border-radius:10px;border:0"><button class="goal" id="bJoin">↪ Vào phòng</button></div>
+    <div id="netStatus" style="font-size:13px;margin-top:6px;opacity:.9">Mỗi người mở game, một người tạo phòng và gửi mã cho bạn.</div>
+    <div id="fbLine" style="font-size:12px;margin-top:6px;opacity:.85"></div>
+    <details style="margin-top:6px;font-size:13px"><summary style="cursor:pointer">⚙️ Cấu hình Firebase (dán firebaseConfig)</summary>
+      <textarea id="fbCfg" rows="5" style="width:100%;margin-top:6px;border-radius:10px;border:0;padding:8px;font:12px monospace" placeholder="const firebaseConfig = { apiKey: '...', authDomain: '...', databaseURL: 'https://...firebasedatabase.app', projectId: '...', appId: '...' };"></textarea>
+      <div class="goals"><button class="goal" id="bFbSave">💾 Lưu</button><button class="goal" id="bFbClear">🗑️ Xoá</button><span id="fbMsg"></span></div>
+    </details>
+    <div class="goals" style="margin-top:6px"><button class="goal" id="bGlb">🏆 Bảng xếp hạng toàn server</button></div>
+    <div id="gLbBox" class="hidden" style="font-size:13px;margin-top:6px;line-height:1.6"><div id="gLb"></div></div>
+  </div>
+  <div class="btns" style="margin-top:6px"><button class="goal" id="bProfile">👤 Hồ sơ · Kỹ năng · Xe · Tài chính · Cài đặt</button></div>
   <button id="bReset">Xoá hồ sơ</button>
 </div>
 
@@ -155,6 +186,7 @@
   <div id="topbtns">
     <button class="sbtn" id="bCam">🎥</button>
     <button class="sbtn" id="bMute">🔊</button>
+    <button class="sbtn" id="bMenu" title="Hồ sơ · Kỹ năng · Xe · Tài chính · Cài đặt (Tab)">☰</button>
     <button class="sbtn" id="bAct" title="Hành động (E)">🛠</button>
     <button class="sbtn" id="bQuest" title="Nhiệm vụ (Q)">📋</button>
     <button class="sbtn" id="bPhone">📱</button>
@@ -169,8 +201,10 @@
   <div id="police" class="hidden"><div id="polText"></div>
     <div class="obtns"><button id="polStop">🛑 Dừng xe (1)</button><button id="polFlee">🏍️ Bỏ chạy (2)</button></div></div>
   <button id="bGo" class="hidden">📍 Tới điểm đón khách</button>
-  <div id="speed"><b id="kmh">0</b><span>km/h</span></div>
-  <div id="help">W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Enter nhận cuốc · N bỏ qua · E hành động (xăng, ăn uống, sửa xe, nghỉ) · Q nhiệm vụ · H còi · G tới điểm đón/trả · P điện thoại · C đổi góc máy · V xem xe 360° · M tắt tiếng · R về nhà</div>
+  <div id="speed"><div id="limit" title="Giới hạn tốc độ">50</div><b id="kmh">0</b><span>km/h</span></div>
+  <div id="wanted"></div>
+  <div id="lb" class="hidden"><div id="lbRows"></div><input id="chatIn" placeholder="💬 Chat… (Enter)" maxlength="120" style="width:100%;margin-top:6px;border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:12px"></div>
+  <div id="help">W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Tab hồ sơ/kỹ năng/xe · Enter nhận cuốc · N bỏ qua · E hành động (xăng, ăn uống, sửa xe, nghỉ) · Q nhiệm vụ · H còi · G tới điểm đón/trả · P điện thoại · C đổi góc máy · V xem xe 360° · M tắt tiếng · R về nhà</div>
   <div id="touch" class="hidden">
     <div class="tb" id="tLeft">◀</div><div class="tb" id="tRight">▶</div>
     <div class="tb" id="tHorn">📯</div>
@@ -179,6 +213,7 @@
 </div>
 <div id="toast"></div>
 <div id="overlay" class="hidden"><div class="ovc"><h2 id="ovTitle"></h2><div id="ovBody"></div><div id="ovOpts"></div><button class="big" id="ovBtn"></button></div></div>
+<div id="mp" class="hidden"><div class="mpc"><div id="mpTabs"><button data-tab="profile">👤 Hồ sơ</button><button data-tab="skills">🌳 Kỹ năng</button><button data-tab="bike">🛵 Xe</button><button data-tab="money">💰 Tài chính</button><button data-tab="settings">⚙️ Cài đặt</button><button id="mpClose">✕</button></div><div id="mpBody"></div></div></div>
 <div id="dlg" class="hidden"><div class="dlgc"><div id="dlgWho"></div><div id="dlgText"></div><div id="dlgOpts"></div></div></div>
 <div id="fade"></div>
 <div id="loading">Đang tải xe Vespa…</div>
@@ -256,10 +291,12 @@ function buildBike() {
         if (o.material.map) o.material.map.anisotropy = 8;
       }
     });
+    bike.model = m;
     bike.frontWheel = m.getObjectByName('wheelFront');
     bike.rearWheel = m.getObjectByName('wheelRear');
     lean.add(m);
     bike.ready = true;
+    applyPaint();
     document.getElementById('loading').classList.add('hidden');
   }, (err) => {
     console.error(err);
@@ -487,12 +524,12 @@ function drawPhone() {
     line('⛔ Tài khoản bị khóa hôm nay', cy + 44, '800 20px system-ui,sans-serif', '#c62828');
     line('Xe đang bị CSGT tạm giữ', cy + 80, '500 16px system-ui,sans-serif', '#555');
   } else if (game.state === 'offer' && game.offer) {
-    const o = game.offer, food = o.type === 'food';
+    const o = game.offer, food = o.type !== 'ride';
     rr(g, 30, cy + 16, 130, 28, 14); g.fillStyle = food ? '#fff1e3' : '#e6f6ec'; g.fill();
     g.font = '800 14px system-ui'; g.fillStyle = food ? '#d76500' : '#0b8f45'; g.fillText(food ? '🍜 GRABFOOD' : '🛵 GRABBIKE', 42, cy + 31);
     g.textAlign = 'right'; g.font = '800 22px system-ui'; g.fillStyle = '#0b8f45'; g.fillText(fmtVND(o.fare), W - 30, cy + 32); g.textAlign = 'left';
-    row(cy + 78, '#00a650', food ? 'Lấy món tại' : 'Điểm đón', food ? o.shop.name : 'Đường ' + o.pickup.name);
-    row(cy + 130, '#ff7a00', 'Giao tới', 'Đường ' + o.drop.name);
+    row(cy + 78, '#00a650', food ? 'Lấy món tại' : 'Điểm đón', o.subs ? o.subs[0].shop.name + ' + ' + o.subs[1].shop.name : food ? o.shop.name : 'Đường ' + o.pickup.name);
+    row(cy + 130, '#ff7a00', 'Giao tới', o.subs ? o.subs[0].drop.name + ' · ' + o.subs[1].drop.name : 'Đường ' + o.drop.name);
     line(`${o.km.toFixed(1)} km${food ? ' · ' + o.items.join(', ') : ''}`, cy + 172, '500 14px system-ui', '#777');
     rr(g, 26, H - 80, W - 52, 50, 25); g.fillStyle = '#00a650'; g.fill();
     g.fillStyle = '#fff'; g.font = '800 19px system-ui'; g.textAlign = 'center'; g.fillText(`NHẬN CUỐC (${Math.ceil(o.expire)}s)`, W / 2, H - 55);
@@ -502,6 +539,17 @@ function drawPhone() {
     for (let i = 0; i < 3; i++) { g.fillStyle = `rgba(0,166,80,${0.3 + 0.7 * ((Math.sin(t - i) + 1) / 2)})`; g.beginPath(); g.arc(40 + i * 22, cy + 80, 7, 0, Math.PI * 2); g.fill(); }
     line(`Chuyến hôm nay: ${profile.trips}   ⭐ ${$('rating').textContent}   Cấp ${profile.level}`, cy + 130, '500 16px system-ui,sans-serif', '#555');
     line(`Mục tiêu: ${fmtVND(Math.max(0, profile.money))} / ${fmtVND(profile.goal)}`, cy + 160, '600 16px system-ui,sans-serif', '#0b8f45');
+  } else if (game.order && game.order.type === 'batch') {
+    const o = game.order;
+    line(L('🍱 ĐƠN GHÉP · 2 túi hàng', '🍱 BATCH · 2 bags'), cy + 34, '800 17px system-ui', '#d76500');
+    if (o.stops) o.stops.forEach((st, i) => {
+      const sub = o.subs[st.s], done = i < o.si, cur = i === o.si;
+      const txt = `${done ? '✅' : cur ? '👉' : '⬜'} ${st.k === 'pick' ? L('Lấy', 'Pick') : L('Giao', 'Drop')} ${st.s + 1}: ${st.k === 'pick' ? sub.shop.name : sub.drop.name}`;
+      line(txt, cy + 66 + i * 28, (cur ? '700 ' : '500 ') + '15px system-ui', done ? '#999' : '#1d1d1f');
+    });
+    o.subs.forEach((sub, i) => { if (sub.picked && !sub.done) line(`${L('Túi', 'Bag')} ${i + 1}: 🔥${Math.round(sub.heat)}% 📦${Math.round(sub.integ)}%`, cy + 186 + i * 22, '600 14px system-ui', sub.heat < 50 ? '#c62828' : '#0b8f45'); });
+    rr(g, 26, H - 80, W - 52, 50, 25); g.fillStyle = game.state === 'ride' ? '#ff7a00' : '#00a650'; g.fill();
+    g.fillStyle = '#fff'; g.font = '800 19px system-ui,sans-serif'; g.textAlign = 'center'; g.fillText(game.state === 'ride' ? L('🏁 TỚI ĐIỂM GIAO', '🏁 GO TO DROP') : L('📍 TỚI QUÁN', '📍 GO TO SHOP'), W / 2, H - 55);
   } else {
     const o = game.order, food = o.type === 'food', pickup = game.state === 'pickup';
     rr(g, 30, cy + 18, 150, 28, 14); g.fillStyle = pickup ? '#e6f6ec' : '#fff1e3'; g.fill();
@@ -1586,6 +1634,7 @@ const dropMarker = makeMarker(0xff8a1f, '🏁');
 const $ = (id) => document.getElementById(id);
 const fmtVND = (n) => Math.round(n).toLocaleString('vi-VN') + 'đ';
 const DAY_START = 6 * 60 + 30, DAY_END = 22 * 60, MIN_PER_SEC = 1;
+const dayEnd = () => unlocked('night') ? 23 * 60 : DAY_END;
 const PROFILE_KEY = 'grabbike.q7.profile.v1';
 const defaultProfile = () => ({ name: 'Tài xế', day: 1, clock: DAY_START, money: 0, trips: 0, goal: 150000, banned: false,
   totalMoney: 0, totalTrips: 0, xp: 0, level: 1, ratings: [], fines: 0, english: false, schema: 2 });
@@ -1639,12 +1688,13 @@ const MENU = {
 };
 function fareFor(type, km) {
   const base = type === 'food' ? 15000 + Math.max(0, km - 3) * 5000 : 12000 + Math.max(0, km - 2) * 4300;
-  return Math.round(base * (1 + (profile.level - 1) * 0.03) * (isPeak() ? 1.3 : 1) * (rain > 0.3 ? 1.2 : 1) / 1000) * 1000;
+  return Math.round(base * fareMul() * (isPeak() ? 1.3 : 1) * (rain > 0.3 ? 1.2 : 1) / 1000) * 1000;
 }
 function isPeak() { const h = profile.clock / 60; return (h >= 7 && h < 9) || (h >= 11 && h < 13) || (h >= 17 && h < 19);
 }
 function makeOffer() {
-  const food = MERCHANTS.length && Math.random() < 0.45;
+  if (unlocked('batch') && Math.random() < 0.25) { const b = makeBatchOffer(); if (b) return b; }
+  const food = unlocked('food') && MERCHANTS.length && Math.random() < 0.45;
   let pickup, shop = null, items = null;
   if (food) {
     const near = MERCHANTS.filter(m => { const d = Math.hypot(m.spot.x - player.x, m.spot.z - player.z); return d > 80 && d < 1300; });
@@ -1657,7 +1707,8 @@ function makeOffer() {
   const len = r ? r.len : Math.hypot(drop.x - pickup.x, drop.z - pickup.z) * 1.35;
   const km = Math.round(len / 100) / 10;
   const type = shop ? 'food' : 'ride';
-  return { type, pickup, drop, shop, items, km, fare: fareFor(type, km), est: len / 8 + 25, expire: 15 };
+  const premium = unlocked('premium') && Math.random() < 0.15;
+  return { type, pickup, drop, shop, items, km, premium, fare: Math.round(fareFor(type, km) * (premium ? 1.5 : 1) / 1000) * 1000, est: len / 8 + 25, expire: 15 };
 }
 
 /* ---- routing (Dijkstra on the street graph) ---- */
@@ -1708,7 +1759,7 @@ function computeRoute(from, TE, Talong) {
 let route = null, routeT = 0, routeMesh = null;
 const routeMatG = new THREE.MeshBasicMaterial({ color: 0x00d26a, transparent: true, opacity: 0.6, depthWrite: false });
 const routeMatO = new THREE.MeshBasicMaterial({ color: 0xff8a1f, transparent: true, opacity: 0.6, depthWrite: false });
-function currentTarget() { if (!game.order) return null; return game.state === 'pickup' ? game.order.pickup : game.state === 'ride' ? game.order.drop : null; }
+function currentTarget() { if (!game.order) return null; if (game.order.type === 'batch') return game.order.stops ? batchTarget(game.order) : null; return game.state === 'pickup' ? game.order.pickup : game.state === 'ride' ? game.order.drop : null; }
 function refreshRoute() {
   const t = currentTarget();
   if (routeMesh) { scene.remove(routeMesh); routeMesh.geometry.dispose(); routeMesh = null; }
@@ -1740,12 +1791,12 @@ const foodBox = new THREE.Group();
 const shopLabel = labelSprite('Quán'); shopLabel.visible = false; scene.add(shopLabel);
 function showOffer(o) {
   game.offer = o; game.state = 'offer';
-  const food = o.type === 'food';
-  $('offType').textContent = food ? '🍜 GrabFood' : '🛵 GrabBike';
+  const food = o.type !== 'ride', batch = o.type === 'batch';
+  $('offType').textContent = (o.premium ? '💎 ' : '') + (batch ? L('🍱 Đơn ghép 2 quán', '🍱 Batched order') : food ? '🍜 GrabFood' : '🛵 GrabBike');
   $('offType').className = food ? 'food' : 'bike';
-  $('offFrom').textContent = food ? `${o.shop.name}` : `Đường ${o.pickup.name}`;
-  $('offItems').textContent = food ? o.items.join(' + ') : '';
-  $('offTo').textContent = `Đường ${o.drop.name}`;
+  $('offFrom').textContent = batch ? `${o.subs[0].shop.name} + ${o.subs[1].shop.name}` : food ? `${o.shop.name}` : `Đường ${o.pickup.name}`;
+  $('offItems').textContent = food ? o.items.join(' + ') + (batch ? L(` · thưởng combo ${fmtVND(o.bonus)}`, ` · combo bonus ${fmtVND(o.bonus)}`) : '') : '';
+  $('offTo').textContent = batch ? `${o.subs[0].drop.name} · ${o.subs[1].drop.name}` : `Đường ${o.drop.name}`;
   $('offFare').textContent = fmtVND(o.fare) + (isPeak() ? ' ⚡' : '');
   $('offKm').textContent = `${o.km.toFixed(1)} km`;
   $('offer').classList.remove('hidden');
@@ -1754,7 +1805,9 @@ function showOffer(o) {
 function hideOffer() { $('offer').classList.add('hidden'); }
 function acceptOffer() {
   const o = game.offer; if (!o || game.state !== 'offer') return;
+  recordOffer(true);
   hideOffer(); game.offer = null; game.order = o; game.state = 'pickup';
+  if (o.type === 'batch') { o.viol = false; o.handling = true; setupBatch(o); return; }
   Object.assign(o, { sat: 80 + (o.type === 'food' && profile.cleanBag ? 5 : 0), heat: 100, integ: 100, code: orderCode(), pay: o.type === 'ride' && Math.random() < 0.6 ? 'cash' : 'wallet', handling: false, talked: false, viol: false });
   const p = o.pickup;
   pickupMarker.position.set(p.x, 0, p.z); pickupMarker.visible = true;
@@ -1766,7 +1819,7 @@ function acceptOffer() {
   refreshRoute();
   toast(o.type === 'food' ? `🍜 Đã nhận đơn GrabFood<br><span style="font-weight:500">Tới ${o.shop.name} lấy món</span>` : `🛵 Đã nhận cuốc<br><span style="font-weight:500">Đón khách tại đường ${p.name}</span>`);
 }
-function declineOffer() { if (game.state !== 'offer') return; hideOffer(); game.offer = null; game.state = 'wait'; game.waitT = 3 + Math.random() * 3; }
+function declineOffer() { if (game.state !== 'offer') return; recordOffer(false); hideOffer(); game.offer = null; game.state = 'wait'; game.waitT = 3 + Math.random() * 3; }
 $('offAccept').onclick = acceptOffer; $('offDecline').onclick = declineOffer;
 function pickUp() {
   const o = game.order;
@@ -1789,7 +1842,8 @@ function dropOff() {
   if (o.type === 'food') { if (o.heat < 50) stars--; if (o.integ < 60) stars--; if (o.wrongItem) stars -= 2; }
   if (profile.st.stress > 80 && Math.random() < 0.3) stars--;
   stars = Math.max(1, Math.min(5, stars));
-  const tip = stars === 5 && Math.random() < (o.sat > 90 ? 0.7 : 0.35) ? pick([5000, 10000, 20000]) : 0;
+  const tip = stars === 5 && Math.random() < (o.sat > 90 ? 0.7 : 0.35) + tipBonus() ? pick([5000, 10000, 20000]) : 0;
+  profile.week.orders++;
   const before = profile.money;
   earn(o.fare, o.type === 'ride' ? o.pay : 'wallet');
   if (tip) earn(tip, 'cash', true);
@@ -1813,33 +1867,40 @@ function dropOff() {
 }
 function cancelOrder() {
   pickupMarker.visible = dropMarker.visible = standPax.visible = seatedPax.visible = foodBox.visible = shopLabel.visible = false;
+  stopSprites.forEach(s => s.visible = false);
   game.order = null; hideOffer(); game.offer = null;
   if (game.state === 'pickup' || game.state === 'ride' || game.state === 'offer') { game.state = 'wait'; game.waitT = 3; }
   refreshRoute();
 }
 function addXP(n) {
   profile.xp += n; if (profile.today) profile.today.xp += n;
-  while (profile.xp >= xpNeed(profile.level)) { profile.xp -= xpNeed(profile.level); profile.level++; setTimeout(() => { toast(`⬆️ Lên cấp ${profile.level}! Giá cuốc +3%`, 3); ding([659, 880, 1318]); }, 600); }
+  while (profile.xp >= xpNeed(profile.level)) { profile.xp -= xpNeed(profile.level); profile.level++; onLevelUp(profile.level); ding([659, 880, 1318]); }
   updateProfileHUD();
 }
 
 let toastTimer = 0;
 function toast(html, t = 3) { const el = $('toast'); el.innerHTML = html; el.classList.add('show'); toastTimer = t; }
 
-/* ================= Police (CSGT) ================= */
-const police = { active: false, mode: '', x: 0, z: 0, h: 0, v: 0, ti: 0, t: 0, farT: 0, choice: null, fine: 0 };
+/* ================= Traffic law: violations, wanted level, CSGT, cameras, licence ================= */
+const LAW = {
+  red: { pts: 4, fine: 200000, name: ['Vượt đèn đỏ', 'Running a red light'], real: 'Ngoài đời: phạt 4–6 triệu đồng (xe máy).' },
+  wrong: { pts: 2, fine: 150000, name: ['Đi ngược chiều đường một chiều', 'Riding the wrong way'] },
+  sidewalk: { pts: 1, fine: 100000, name: ['Chạy xe lên vỉa hè', 'Riding on the sidewalk'] },
+  speed: { pts: 2, fine: 150000, name: ['Chạy quá tốc độ', 'Speeding'] },
+};
+const police = { active: false, mode: '', x: 0, z: 0, h: 0, v: 0, t: 0, escT: 0, choice: null, kind: 'red', path: null, pi: 0, repathT: 0 };
 const playerTrail = []; let trailT = 0;
 const sirenR = new THREE.MeshBasicMaterial({ color: 0xff2020, toneMapped: false }), sirenB = new THREE.MeshBasicMaterial({ color: 0x2060ff, toneMapped: false });
-const policeMesh = (() => {
+function policeBikeMesh(withRider = true) {
   const g = buildUnderbone(0xf4f4f4);
-  addRider(g, { hip: [0, 1.0, -0.3], sh: [0, 1.48, -0.16], head: [0, 1.7, -0.11], el: [0.29, 1.22, 0.12], hand: [0.31, 1.07, 0.44], knee: [0.2, 0.96, 0.15], foot: [0.2, 0.38, -0.02], longSleeve: true },
-    0xd9c46a, 0x2f3d24, 0xf5f5f5, false);
+  if (withRider) addRider(g, { hip: [0, 1.0, -0.3], sh: [0, 1.48, -0.16], head: [0, 1.7, -0.11], el: [0.29, 1.22, 0.12], hand: [0.31, 1.07, 0.44], knee: [0.2, 0.96, 0.15], foot: [0.2, 0.38, -0.02], longSleeve: true }, 0xd9c46a, 0x2f3d24, 0xf5f5f5, false);
   const r = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.09, 0.1), sirenR); r.position.set(-0.09, 1.08, -0.85); g.add(r);
   const b = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.09, 0.1), sirenB); b.position.set(0.09, 1.08, -0.85); g.add(b);
   const board = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.12, 0.02), new THREE.MeshStandardMaterial({ map: canvasTex(128, 48, (c, w, h) => { c.fillStyle = '#c62828'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '900 30px system-ui'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('CSGT', w / 2, h / 2 + 2); }) }));
   board.position.set(0, 0.92, 0.62); g.add(board);
-  shadowAll(g); g.visible = false; scene.add(g); return g;
-})();
+  shadowAll(g); return g;
+}
+const policeMesh = policeBikeMesh(); policeMesh.visible = false; scene.add(policeMesh);
 const towTruck = (() => {
   const t = buildTruck(0xf2f2f2); const g = new THREE.Group(); g.add(t.mesh);
   const r = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, 0.25), sirenR); r.position.set(-0.3, 2.45, 1.9); g.add(r);
@@ -1849,77 +1910,132 @@ const towTruck = (() => {
   g.visible = false; scene.add(g);
   return { g, x: 0, z: 0, h: 0, ti: 0, mode: '' };
 })();
-function trailBack(dist) {
-  let acc = 0, i = playerTrail.length - 1;
-  while (i > 0 && acc < dist) { acc += Math.hypot(playerTrail[i].x - playerTrail[i - 1].x, playerTrail[i].z - playerTrail[i - 1].z); i--; }
-  return acc >= dist * 0.7 ? i : -1;   // -1: not enough driven path behind the player
+
+/* ---- checkpoints (chốt CSGT) at a few real signalised junctions ---- */
+const CHECKPOINTS = [];
+{
+  const sorted = [...SIGNALS].sort((a, b) => a.x - b.x);
+  const pickIdx = sorted.length <= 4 ? sorted.map((_, i) => i) : [0, 1, 2, 3].map(k => Math.round(k * (sorted.length - 1) / 3));
+  for (const i of [...new Set(pickIdx)]) {
+    const s = sorted[i];
+    const px = s.x + s.az * (s.rc + 3), pz = s.z - s.ax * (s.rc + 3);
+    const g = new THREE.Group(); g.position.set(px, 0.06, pz);
+    const bikeP = policeBikeMesh(false); bikeP.position.set(1.4, 0, 0); bikeP.rotation.y = Math.atan2(s.ax, s.az); g.add(bikeP);
+    const off = buildPassengerStanding(); off.userData.shirt.color.setHex(0xd9c46a); g.add(off);
+    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.08, 14), std(0xf5f5f5)); hat.position.y = 1.86; g.add(hat);
+    const tent = new THREE.Mesh(new THREE.ConeGeometry(1.6, 1.2, 4), std(0x1e40af)); tent.position.set(-1.6, 2.6, 0); g.add(tent);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.2, 6), std(0xcccccc)); pole.position.set(-1.6, 1.1, 0); g.add(pole);
+    scene.add(g);
+    const lb = labelSprite('🚔 Chốt CSGT'); lb.position.set(px, 5, pz); lb.scale.set(12, 3, 1); scene.add(lb);
+    CHECKPOINTS.push({ x: px, z: pz, g, lb, officer: off });
+  }
 }
-function behind(dist) { return { x: player.x - Math.sin(player.h) * dist, z: player.z - Math.cos(player.h) * dist }; }
-function onViolation(s) {
-  if (police.active || profile.banned || game.frozen) return;
-  const street = streetNameAt(player.x, player.z) || 'ngã tư';
+function witnessed() {
+  for (const c of CHECKPOINTS) if (Math.hypot(c.x - player.x, c.z - player.z) < 75) return c;
+  if (police.active && Math.hypot(police.x - player.x, police.z - player.z) < 120) return { x: police.x, z: police.z };
+  return null;
+}
+
+/* ---- reporting violations ---- */
+const lawCD = {};
+function reportViolation(kind) {
+  if (game.frozen || profile.banned || game.noViolT > 0 || game.mode !== 'drive') return;
+  if ((lawCD[kind] || 0) > sigClock) return; lawCD[kind] = sigClock + (kind === 'red' ? 20 : 12);
+  const law = LAW[kind];
   profile.today.viol++; if (game.order) game.order.viol = true;
-  police.active = true; police.mode = 'pursue'; police.choice = null; police.t = 0; police.farT = 0;
-  const i = trailBack(45); const tp = i >= 0 ? playerTrail[i] : behind(40);
-  police.x = tp.x; police.z = tp.z; police.ti = Math.max(0, i); police.v = 8; police.h = player.h;
+  profile.st.stress = clamp01(profile.st.stress + 4);
+  const w = witnessed();
+  if (w) {
+    profile.wanted = Math.min(5, profile.wanted + 1);
+    startPursuit(kind, w);
+  } else if (kind === 'red') {
+    (profile.today.cam ||= []).push(kind);
+    loseLicence(law.pts);
+    toast(`📸 ${L('Camera ghi hình', 'Camera caught you')}: ${law.name[profile.english ? 1 : 0]}<br><span style="font-weight:500">${L('Phạt nguội', 'Ticket by mail')} ${fmtVND(law.fine)} ${L('· trừ', '· -')}${law.pts} ${L('điểm GPLX', 'licence pts')}</span>`, 3);
+  } else {
+    toast(`⚠️ ${law.name[profile.english ? 1 : 0]}! ${L('May mà không có CSGT…', 'Lucky no police saw that…')}`, 2);
+  }
+}
+function loseLicence(p) {
+  profile.license = Math.max(0, profile.license - p);
+  if (profile.license <= 0 && !profile.licBan) { profile.licBan = 2; setTimeout(() => toast(L('🪪 Bằng lái hết điểm! Bạn bị cấm chạy 2 ngày.', '🪪 Licence at 0 points! Banned for 2 days.'), 4), 2500); }
+}
+function startPursuit(kind, from) {
+  if (police.active) { toast(`🚨 ${L('Mức truy nã tăng', 'Wanted level up')}: ${'🚨'.repeat(profile.wanted)}`, 1.6); if (police.mode === 'pursue' && police.choice === 'flee') police.escT = 0; return; }
+  const street = streetNameAt(player.x, player.z) || L('ngã tư', 'the junction');
+  Object.assign(police, { active: true, mode: 'pursue', choice: null, kind, t: 0, escT: 0, x: from.x, z: from.z, v: 6, h: Math.atan2(player.x - from.x, player.z - from.z), path: null, pi: 0, repathT: 0 });
   policeMesh.visible = true;
-  $('polText').innerHTML = `🚨 <b>Vượt đèn đỏ</b> tại ${street}!<br>CSGT ra hiệu yêu cầu dừng xe.`;
+  $('polText').innerHTML = `🚨 <b>${LAW[kind].name[profile.english ? 1 : 0]}</b> ${L('tại', 'at')} ${street}!<br>${L('CSGT ra hiệu yêu cầu dừng xe.', 'Police signal you to stop.')}${LAW[kind].real && !profile.english ? `<br><small>${LAW[kind].real}</small>` : ''}`;
   $('police').classList.remove('hidden');
   game.policeAuto = 8;
 }
-function policeStop() { if (!police.active || police.choice) return; police.choice = 'stop'; $('police').classList.add('hidden'); toast('🛑 Bạn dừng xe chấp hành. Chờ CSGT lập biên bản…', 3); }
-function policeFlee() { if (!police.active || police.choice) return; police.choice = 'flee'; $('police').classList.add('hidden'); toast('🏍️ Bỏ chạy! CSGT đang rượt theo — cắt đuôi họ đi!', 2.5); }
+function policeStop() { if (!police.active || police.choice) return; police.choice = 'stop'; $('police').classList.add('hidden'); toast(L('🛑 Bạn dừng xe chấp hành. Chờ CSGT lập biên bản…', '🛑 You pull over and wait for the officer…'), 3); }
+function policeFlee() { if (!police.active || police.choice) return; police.choice = 'flee'; profile.wanted = Math.min(5, profile.wanted + 1); $('police').classList.add('hidden'); toast(L('🏍️ Bỏ chạy! Mức truy nã tăng — ra khỏi tầm nhìn CSGT để thoát!', '🏍️ Fleeing! Get out of sight to escape!'), 2.5); }
 $('polStop').onclick = policeStop; $('polFlee').onclick = policeFlee;
 function endPolice() { police.active = false; policeMesh.visible = false; $('police').classList.add('hidden'); }
-function ticket(fine, msg) {
-  spend(fine, 'fine', true); profile.fines += fine; saveProfile(); updateProfileHUD();
-  toast(msg, 4);
-}
+function ticket(fine, msg) { spend(fine, 'fine', true); profile.fines += fine; saveProfile(); updateProfileHUD(); toast(msg, 4.5); }
+function escapeNeed() { return (6 + 3 * profile.wanted) * (SK().tho >= 3 ? 0.8 : 1); }
+function escapeDist() { return SK().tho >= 4 ? 95 : 115; }
 let sirenT = 0;
 function updatePolice(dt) {
-  if (!police.active) return;
+  if (!police.active) { if (profile.wanted > 0 && !game.frozen) { game.wantDecay = (game.wantDecay || 0) + dt; if (game.wantDecay > 30) { profile.wanted--; game.wantDecay = 0; } } return; }
   police.t += dt;
   if (game.policeAuto > 0 && !police.choice) { game.policeAuto -= dt; if (game.policeAuto <= 0) (Math.abs(player.v) < 4 ? policeStop : policeFlee)(); }
   const blink = Math.floor(police.t * 6) % 2;
   sirenR.color.setHex(blink ? 0xff2020 : 0x330000); sirenB.color.setHex(blink ? 0x110022 : 0x2060ff);
-  sirenT -= dt; if (sirenT <= 0 && police.mode !== 'leave') { sirenT = 0.45; tone(Math.floor(police.t / 0.45) % 2 ? 920 : 680, 0, 0.4, 'square', 0.025); }
+  sirenT -= dt; if (sirenT <= 0 && police.mode !== 'leave' && profile.settings.sound) { sirenT = 0.45; tone(Math.floor(police.t / 0.45) % 2 ? 920 : 680, 0, 0.4, 'square', 0.025); }
   const d = Math.hypot(player.x - police.x, player.z - police.z);
-  if (police.mode === 'pursue' || police.mode === 'tow') {
-    // follow the player's own path (never cuts through buildings)
-    let tx, tz;
-    while (police.ti < playerTrail.length - 1 && Math.hypot(playerTrail[police.ti].x - police.x, playerTrail[police.ti].z - police.z) < 2.5) police.ti++;
-    if (d < 12 || police.ti >= playerTrail.length - 1) { tx = player.x - Math.cos(player.h) * 1.4; tz = player.z + Math.sin(player.h) * 1.4; }
-    else { tx = playerTrail[police.ti].x; tz = playerTrail[police.ti].z; }
-    const vmax = police.mode === 'tow' ? 0 : police.choice === 'flee' ? 18.6 : 16;
-    const want = d < 3 ? Math.max(0, Math.abs(player.v)) : vmax;
+  if (police.mode === 'pursue') {
+    // drive along the street network towards the player, direct when close
+    police.repathT -= dt;
+    if (d > 30 && police.repathT <= 0) {
+      police.repathT = 1.2;
+      const ne = nearestEdge(player.x, player.z, null, 120);
+      const r = ne ? computeRoute({ x: police.x, z: police.z }, ne.E, ne.along) : null;
+      police.path = r ? r.pts : null; police.pi = 2;
+    }
+    let tx = player.x - Math.cos(player.h) * 1.4, tz = player.z + Math.sin(player.h) * 1.4;
+    if (d > 30 && police.path) {
+      while (police.pi < police.path.length - 2 && Math.hypot(police.path[police.pi] - police.x, police.path[police.pi + 1] - police.z) < 3) police.pi += 2;
+      tx = police.path[police.pi]; tz = police.path[police.pi + 1];
+    }
+    const vmax = police.choice === 'flee' ? 17.5 + 0.7 * profile.wanted : 16;
+    const want = d < 3 ? Math.abs(player.v) : vmax;
     police.v += (want - police.v) * Math.min(1, dt * 1.6);
-    const dx = tx - police.x, dz = tz - police.z, L = Math.hypot(dx, dz);
-    if (L > 0.3) { police.x += dx / L * police.v * dt; police.z += dz / L * police.v * dt; police.h = angLerp(police.h, Math.atan2(dx, dz), Math.min(1, dt * 6)); }
-    if (police.choice === 'stop' && d < 3.2 && police.mode === 'pursue') {
+    const dx = tx - police.x, dz = tz - police.z, Ln = Math.hypot(dx, dz);
+    if (Ln > 0.3) { police.x += dx / Ln * police.v * dt; police.z += dz / Ln * police.v * dt; police.h = angLerp(police.h, Math.atan2(dx, dz), Math.min(1, dt * 6)); }
+    if (police.choice === 'stop' && d < 3.4) {
       police.mode = 'ticket'; police.t = 0;
-      ticket(200000, '📝 Biên bản vượt đèn đỏ: trừ 200.000đ trong game<br><span style="font-weight:500">Ngoài đời xe máy vượt đèn đỏ bị phạt 4–6 triệu đồng!</span>');
+      const law = LAW[police.kind]; loseLicence(law.pts); profile.wanted = 0;
+      ticket(law.fine, `📝 ${L('Biên bản', 'Ticket')}: ${law.name[profile.english ? 1 : 0]} — ${fmtVND(law.fine)} · -${law.pts} ${L('điểm GPLX', 'licence pts')}${law.real && !profile.english ? `<br><span style="font-weight:500">${law.real}</span>` : ''}`);
     }
-    if (police.choice === 'flee' && police.mode === 'pursue') {
-      if (d < 2.4) caught();
-      else if (d > 115) { police.farT += dt; if (police.farT > 3) { toast('😅 Bạn đã cắt đuôi CSGT!', 3); police.mode = 'leave'; police.t = 0; } }
-      else police.farT = 0;
-      if (police.t > 80) { toast('😮‍💨 CSGT đã bỏ cuộc truy đuổi', 3); police.mode = 'leave'; police.t = 0; }
+    if (police.choice === 'flee') {
+      if (d < 2.4) return caught();
+      if (d > escapeDist()) { police.escT += dt; if (police.escT > escapeNeed()) { toast(L('😅 Bạn đã cắt đuôi CSGT! Mức truy nã sẽ giảm dần.', '😅 You lost the police! Wanted level will fade.'), 3); police.mode = 'leave'; police.t = 0; } }
+      else police.escT = 0;
+      if (police.t > 90) { toast(L('😮‍💨 CSGT đã bỏ cuộc', '😮‍💨 The police gave up'), 3); police.mode = 'leave'; police.t = 0; }
     }
-  } else if (police.mode === 'ticket') {
-    police.v = 0;
-    if (police.t > 4) { police.mode = 'leave'; police.t = 0; }
-  } else if (police.mode === 'leave') {
+  } else if (police.mode === 'ticket') { police.v = 0; if (police.t > 4) { police.mode = 'leave'; police.t = 0; } }
+  else if (police.mode === 'leave') {
     police.v = Math.min(14, police.v + dt * 5);
     police.x += Math.sin(police.h) * police.v * dt; police.z += Math.cos(police.h) * police.v * dt;
     if (police.t > 6) endPolice();
   }
   policeMesh.position.set(police.x, 0.07, police.z); policeMesh.rotation.y = police.h;
 }
+function trailBack(dist) {
+  let acc = 0, i = playerTrail.length - 1;
+  while (i > 0 && acc < dist) { acc += Math.hypot(playerTrail[i].x - playerTrail[i - 1].x, playerTrail[i].z - playerTrail[i - 1].z); i--; }
+  return acc >= dist * 0.7 ? i : -1;
+}
+function behind(dist) { return { x: player.x - Math.sin(player.h) * dist, z: player.z - Math.cos(player.h) * dist }; }
 function caught() {
   police.mode = 'tow'; police.t = 0; game.frozen = true; player.v = 0;
-  ticket(600000, '🚔 <b>Bị bắt!</b> Bỏ chạy khi CSGT yêu cầu dừng xe.<br><span style="font-weight:500">Trừ 600.000đ · xe bị tạm giữ</span>');
+  const law = LAW[police.kind], fine = law.fine + 150000 * profile.wanted;
+  loseLicence(law.pts + 2);
+  ticket(fine, `🚔 <b>${L('Bị bắt!', 'Caught!')}</b> ${L('Bỏ chạy khi CSGT yêu cầu dừng xe.', 'You fled from the police.')}<br><span style="font-weight:500">${L('Phạt', 'Fine')} ${fmtVND(fine)} · -${law.pts + 2} ${L('điểm GPLX · xe bị tạm giữ', 'licence pts · bike impounded')}</span>`);
+  profile.wanted = 0;
   cancelOrder(); game.state = 'frozen';
-  // tow truck comes along the player's trail
   const i = trailBack(110); const tp = i >= 0 ? playerTrail[i] : behind(70);
   Object.assign(towTruck, { x: tp.x, z: tp.z, ti: Math.max(0, i), mode: 'come', h: player.h, t: 0 });
   towTruck.g.visible = true;
@@ -1931,9 +2047,10 @@ function updateTow(dt) {
     let tx = player.x - Math.sin(player.h) * 5, tz = player.z - Math.cos(player.h) * 5;
     while (T.ti < playerTrail.length - 1 && Math.hypot(playerTrail[T.ti].x - T.x, playerTrail[T.ti].z - T.z) < 3) T.ti++;
     if (T.ti < playerTrail.length - 1 && Math.hypot(tx - T.x, tz - T.z) > 15) { tx = playerTrail[T.ti].x; tz = playerTrail[T.ti].z; }
-    const dx = tx - T.x, dz = tz - T.z, L = Math.hypot(dx, dz);
-    if (L > 1) { T.x += dx / L * 10 * dt; T.z += dz / L * 10 * dt; T.h = angLerp(T.h, Math.atan2(dx, dz), Math.min(1, dt * 3)); }
-    else { T.mode = 'load'; T.t = 0; driver.visible = false; seatedPax.visible = false; toast('🏗️ Xe của bạn đang bị cẩu lên xe CSGT…', 3); }
+    const dx = tx - T.x, dz = tz - T.z, Ln = Math.hypot(dx, dz);
+    if (Ln > 1) { T.x += dx / Ln * 10 * dt; T.z += dz / Ln * 10 * dt; T.h = angLerp(T.h, Math.atan2(dx, dz), Math.min(1, dt * 3)); }
+    else { T.mode = 'load'; T.t = 0; driver.visible = false; seatedPax.visible = false; toast(L('🏗️ Xe của bạn đang bị cẩu lên xe CSGT…', '🏗️ Your bike is being towed…'), 3); }
+    if (T.t > 25) { T.x = tx; T.z = tz; }
   } else if (T.mode === 'load') {
     const k = Math.min(1, T.t / 2);
     const bx = T.x - Math.sin(T.h) * 0.9, bz = T.z - Math.cos(T.h) * 0.9;
@@ -1949,7 +2066,32 @@ function updateTow(dt) {
 }
 function banForDay() {
   profile.banned = true; saveProfile();
-  showOverlay('⛔ Bị khóa ứng dụng', `Xe của bạn đã bị CSGT tạm giữ.<br>Bạn <b>không thể chạy Grab đến hết ngày ${profile.day}</b>.<br><br>Thu nhập hôm nay: <b>${fmtVND(profile.money)}</b><br>Tổng tiền phạt: ${fmtVND(profile.fines)}`, 'Kết thúc ngày →', () => endDay());
+  showOverlay(L('⛔ Bị khóa ứng dụng', '⛔ App suspended'), L(`Xe của bạn đã bị CSGT tạm giữ.<br>Bạn <b>không thể chạy Grab đến hết ngày ${profile.day}</b>.<br><br>Thu nhập hôm nay: <b>${fmtVND(profile.money)}</b><br>Tổng tiền phạt: ${fmtVND(profile.fines)}`, `Your bike was impounded.<br>You <b>cannot drive until the end of day ${profile.day}</b>.`), L('Kết thúc ngày →', 'End the day →'), () => endDay());
+}
+
+/* ---- per-frame checks: speeding, wrong way, sidewalk ---- */
+let lawT = 0, overT = 0, wrongT = 0, walkT = 0, curLimit = 50;
+function speedLimitAt(E) { if (!E) return 50; if (E.c <= 1 && E.o) return 60; if (E.c >= 5) return 40; return 50; }
+function checkLaw(dt) {
+  lawT -= dt; if (lawT > 0) return; lawT = 0.2; const step = 0.2;
+  const ne = nearestEdge(player.x, player.z, null, 20);
+  const onIt = ne && ne.d < ne.E.w / 2 + 0.5;
+  curLimit = speedLimitAt(onIt ? ne.E : null);
+  const kmh = Math.abs(player.v) * 3.6;
+  overT = kmh > curLimit + 5 ? overT + step : 0;
+  if (overT > 3) { overT = 0; reportViolation('speed'); }
+  if (onIt && ne.E.o && ne.E.c <= 4 && player.v > 3) {
+    const p = edgeAt(ne.E, ne.along, true);
+    const dot = p.dx * Math.sin(player.h) + p.dz * Math.cos(player.h);
+    wrongT = dot < -0.5 ? wrongT + step : 0;
+    if (wrongT > 2.5) { wrongT = 0; reportViolation('wrong'); }
+  } else wrongT = 0;
+  let side = false;
+  if (Math.abs(player.v) > 3 && !onRoad(player.x, player.z, 0.3)) {
+    for (const s of segGrid.query(player.x, player.z, 3, _q)) { if (s.c >= 6) continue; const d = segProj(player.x, player.z, s.ax, s.az, s.bx, s.bz).d; if (d < s.w / 2 + 1.9) { side = true; break; } }
+  }
+  walkT = side ? walkT + step : 0;
+  if (walkT > 2) { walkT = 0; reportViolation('sidewalk'); }
 }
 
 /* ================= Day cycle ================= */
@@ -2049,7 +2191,7 @@ function goToTarget() {
   warping = true; $('fade').classList.add('on');
   setTimeout(() => {
     player.h = t.h; player.v = 0; player.steer = 0; player.lean = 0;
-    player.x = t.x - Math.sin(t.h) * 2.0; player.z = t.z - Math.cos(t.h) * 2.0;
+    player.x = t.x - Math.sin(t.h) * 1.0; player.z = t.z - Math.cos(t.h) * 1.0;
     camInit = false; game.noViolT = 2; playerTrail.length = 0;
     $('fade').classList.remove('on'); warping = false; refreshRoute();
   }, 260);
@@ -2093,6 +2235,7 @@ function enterDrive() {
   $('menu').classList.add('hidden'); $('showcaseBar').classList.add('hidden'); $('hud').classList.remove('hidden');
   updateProfileHUD();
   if (profile.banned) { banForDay(); return; }
+  if (profile.licBan > 0) { showOverlay(L('🪪 Bị tước giấy phép lái xe', '🪪 Licence suspended'), L(`Bằng lái của bạn hết điểm. Còn <b>${profile.licBan}</b> ngày nữa mới được chạy lại.<br>Hôm nay bạn ở nhà nghỉ ngơi.`, `Your licence has 0 points. <b>${profile.licBan}</b> more day(s) before you can ride.`), L('😴 Nghỉ hết ngày', '😴 Rest for the day'), () => { profile.licBan--; if (!profile.licBan) profile.license = 12; game.mode = 'home'; sleepNewDay(); }); return; }
   if (!game.running) { game.running = true; game.state = 'wait'; game.waitT = 1.5; toast(`🛵 Chào ${profile.name}! Bật app, chờ cuốc…`, 2); }
 }
 function enterShowcase() {
@@ -2148,7 +2291,7 @@ function updatePlayer(dt) {
   const hand = keys.Space;
   if (game.frozen) { player.v = 0; player.lean *= 0.9; return; }
   const MAX = 19 * speedFactor(), REV = -3.0;
-  if (profile.st.stamina < 8 && Math.random() < dt * 0.5) { player.steer += (Math.random() - 0.5) * 1.6; toast(L('😪 Ngủ gật! Nghỉ ngơi ngay!', '😪 Dozing off! Take a rest!'), 1); }
+  if (profile.st.stamina < 8 && SK().deo < 5 && Math.random() < dt * 0.5) { player.steer += (Math.random() - 0.5) * 1.6; toast(L('😪 Ngủ gật! Nghỉ ngơi ngay!', '😪 Dozing off! Take a rest!'), 1); }
   let a = 0;
   if (gas) a += player.v < 0 ? 14 : 7.5 * (1 - Math.max(0, player.v) / MAX * 0.75);
   if (brake) a -= player.v > 0.2 ? 14 : (locked ? 0 : 4);
@@ -2238,6 +2381,8 @@ function drawMini() {
   if (game.state === 'pickup') dot(game.order.pickup, '#00b14f');
   if (game.state === 'ride') dot(game.order.drop, '#ff7a00');
   if (police.active) dot({ x: police.x, z: police.z }, '#1d4ed8');
+  if (SK().tho >= 2) for (const c of CHECKPOINTS) { const x = X(c.x), y = Z(c.z); if (x > 0 && y > 0 && x < W && y < W) { mg.fillStyle = '#1e40af'; mg.fillRect(x - 7, y - 7, 14, 14); mg.fillStyle = '#fff'; mg.font = '700 12px system-ui'; mg.fillText('P', x, y + 1); } }
+  if (game.order && game.order.stops) for (let i = game.order.si + 1; i < game.order.stops.length; i++) { const p = stopSpot(game.order, game.order.stops[i]); const x = X(p.x), y = Z(p.z); mg.fillStyle = '#ff8a1f'; mg.beginPath(); mg.arc(x, y, 6, 0, 7); mg.fill(); }
   mg.font = '26px system-ui'; mg.textAlign = 'center'; mg.textBaseline = 'middle';
   { const x = X(homeSpot.x), y = Z(homeSpot.z); if (x > 0 && y > 0 && x < W && y < W) mg.fillText('🏠', x, y - 14); }
   mg.save(); mg.translate(W / 2, W / 2); mg.rotate(Math.atan2(Math.cos(player.h), Math.sin(player.h)));
@@ -2251,6 +2396,8 @@ function drawMini() {
 let hudT = 0;
 function updateHUD(dt) {
   $('kmh').textContent = Math.round(Math.abs(player.v) * 3.6);
+  $('limit').textContent = curLimit; $('limit').classList.toggle('over', Math.abs(player.v) * 3.6 > curLimit + 5);
+  $('wanted').innerHTML = profile.wanted ? '🚨'.repeat(profile.wanted) + (police.active && police.choice === 'flee' ? ` <small>${L('thoát', 'escape')} ${Math.min(100, Math.round(police.escT / escapeNeed() * 100))}%</small>` : '') : '';
   hudT -= dt;
   const t = currentTarget();
   if (t) {
@@ -2278,6 +2425,7 @@ function updateHUD(dt) {
     else if (police.active && police.choice === 'flee') st.innerHTML = '🚨 <b>CSGT đang rượt!</b> Chạy xa >115 m để thoát';
     else if (game.state === 'wait') st.textContent = '⏳ Đang tìm cuốc gần bạn…';
     else if (game.state === 'offer') st.textContent = '📲 Có cuốc mới — Nhận hay bỏ qua?';
+    else if (game.order && game.order.type === 'batch') st.innerHTML = game.order.stops ? `🍱 ${L('Đơn ghép', 'Batch')} ${game.order.si + 1}/4: ${game.order.stops[game.order.si].k === 'pick' ? L('lấy túi ', 'pick up bag ') : L('giao túi ', 'deliver bag ')}${game.order.stops[game.order.si].s + 1}` : L('🍱 Chọn thứ tự lấy & giao', '🍱 Choose the route');
     else if (game.state === 'pickup') st.innerHTML = game.order.type === 'food' ? `🍜 Tới lấy món: ${game.order.shop.name}` : `🟢 Đến đón khách<br>đường ${game.order.pickup.name}`;
     else if (game.state === 'ride') st.innerHTML = game.order.type === 'food' ? `🟠 Giao món tới đường ${game.order.drop.name}<br>${fmtVND(game.order.fare)}` : `🟠 Chở khách tới đường ${game.order.drop.name}<br>${game.order.km.toFixed(1)} km · ${fmtVND(game.order.fare)}`;
     const nm = streetNameAt(player.x, player.z);
@@ -2287,7 +2435,8 @@ function updateHUD(dt) {
     $('bAct').classList.toggle('pulse', Math.abs(player.v) < 1.5 && !!(nearest(FUEL, 30) || nearest(REPAIR, 35) || nearest(SHOPS, 30) || nearest(MERCHANTS, 30)));
     drawMini(); drawPhone();
     const bg = $('bGo');
-    if (game.state === 'pickup') { bg.classList.remove('hidden', 'drop'); bg.textContent = game.order.type === 'food' ? '📍 Tới quán lấy món' : '📍 Tới điểm đón khách'; }
+    if (game.order && game.order.type === 'batch') { if (game.order.stops) { bg.classList.remove('hidden'); bg.classList.toggle('drop', game.state === 'ride'); bg.textContent = game.state === 'ride' ? L('🏁 Tới điểm giao tiếp theo', '🏁 Go to next drop') : L('📍 Tới quán tiếp theo', '📍 Go to next shop'); } else bg.classList.add('hidden'); }
+    else if (game.state === 'pickup') { bg.classList.remove('hidden', 'drop'); bg.textContent = game.order.type === 'food' ? '📍 Tới quán lấy món' : '📍 Tới điểm đón khách'; }
     else if (game.state === 'ride') { bg.classList.remove('hidden'); bg.classList.add('drop'); bg.textContent = game.order.type === 'food' ? '🏁 Tới chỗ giao món' : '🏁 Tới điểm trả khách'; }
     else bg.classList.add('hidden');
     if (game.state === 'offer' && game.offer) $('offBar').style.width = (game.offer.expire / 15 * 100) + '%';
@@ -2300,34 +2449,35 @@ function updateGame(dt) {
   game.bumpCD -= dt; game.noViolT -= dt;
   if (!game.dayOver) {
     profile.clock += dt * MIN_PER_SEC;
-    if (profile.clock >= DAY_END && !game.frozen) { profile.clock = DAY_END; endDay(); }
+    if (profile.clock >= dayEnd() && !game.frozen) { profile.clock = dayEnd(); endDay(); }
   }
   applyDaylight(profile.clock);
   saveT -= dt; if (saveT <= 0) { saveT = 5; saveProfile(); }
   tickStats(dt, distAcc); distAcc = 0;
   if (game.paused || game.dayOver) return;
   if (profile.banned || game.dayOver) return;
-  if (game.state === 'wait') { game.waitT -= dt; if (game.waitT <= 0 && !police.active) showOffer(makeOffer()); }
+  if (game.state === 'wait') { game.waitT -= dt * (SK().tho >= 3 ? 1.43 : 1) * (acceptRate() < 0.5 ? 0.66 : 1); if (game.waitT <= 0 && !police.active) showOffer(makeOffer()); }
   else if (game.state === 'offer') { game.offer.expire -= dt; if (game.offer.expire <= 0) { declineOffer(); toast('⌛ Cuốc đã hết hạn', 1.5); } }
   else if (game.state === 'pickup' || game.state === 'ride') {
     if (game.state === 'ride') game.tripT += dt;
     routeT -= dt; if (routeT <= 0) { routeT = 1.2; refreshRoute(); }
-    const t = currentTarget();
+    const t = currentTarget(); if (!t) return;
     const d = Math.hypot(t.x - player.x, t.z - player.z);
     const o = game.order;
-    if (d < 3.2) {
-      if (Math.abs(player.v) < 7) { if (!o.handling) { o.handling = true; game.state === 'pickup' ? arrivePickup() : arriveDrop(); } }
+    if (d < 4.5) {
+      if (Math.abs(player.v) < 7) { if (!o.handling) { o.handling = true; o.type === 'batch' ? batchArrive() : game.state === 'pickup' ? arrivePickup() : arriveDrop(); } }
       else if (toastTimer <= 0) toast('🐢 Chạy chậm lại để ' + (game.state === 'pickup' ? 'đón' : 'giao'), 1.2);
     }
     if (game.state === 'ride' && o.type === 'ride' && !o.talked && game.tripT > 18 && Math.random() < dt / 8) { o.talked = true; smallTalk(); }
   }
-  // red-light violations
+  // traffic law
+  if (!game.frozen) checkLaw(dt);
   if (game.noViolT <= 0 && !game.frozen) {
     for (const s of sigGrid.query(player.x, player.z, 40, _sq)) {
       const d = Math.hypot(s.x - player.x, s.z - player.z), core = s.rc * 0.55;
       if (s.prevD > core && d <= core && Math.abs(player.v) > 2.5 && sigClock - s.lastViol > 25) {
         const [st] = sigState(s, Math.sin(player.h), Math.cos(player.h));
-        if (st === 'R') { s.lastViol = sigClock; onViolation(s); }
+        if (st === 'R') { s.lastViol = sigClock; reportViolation('red'); }
       }
       s.prevD = d;
     }
@@ -2367,6 +2517,8 @@ function animate() {
     const dx = player.x - standPax.position.x, dz = player.z - standPax.position.z;
     if (Math.hypot(dx, dz) < 25) standPax.rotation.y = Math.atan2(dx, dz);
   }
+  netTick(dt);
+  for (const c of CHECKPOINTS) c.lb.visible = Math.hypot(c.x - player.x, c.z - player.z) < (SK().tho >= 2 ? 450 : 90);
   for (const l of labels) l.visible = Math.abs(l.position.x - player.x) < 450 && Math.abs(l.position.z - player.z) < 450;
   if (eng) {
     const on = game.mode === 'drive' && !game.muted && !game.frozen;
@@ -2392,7 +2544,7 @@ const STAT_DEF = [
   ['hunger', '🍚', 'Đói', '#d97706', true], ['thirst', '💧', 'Khát', '#3E9BFF', true], ['stress', '😤', 'Stress', '#a855f7', true],
   ['fuel', '⛽', 'Xăng', '#30A46C', false], ['dura', '🔧', 'Độ bền xe', '#A0A7B4', false]
 ];
-function newToday() { return { bike: 0, food: 0, revenue: 0, tips: 0, xp: 0, costs: { fuel: 0, food: 0, repair: 0, fine: 0, living: 0, other: 0 }, viol: 0, streak: 0, quests: {}, ratings: [], dinner: false, km: 0 }; }
+function newToday() { return { cam: [], bike: 0, food: 0, revenue: 0, tips: 0, xp: 0, costs: { fuel: 0, food: 0, repair: 0, fine: 0, living: 0, other: 0 }, viol: 0, streak: 0, quests: {}, ratings: [], dinner: false, km: 0 }; }
 if (!profile.st) profile.st = { hp: 100, stamina: 100, hunger: 10, thirst: 10, stress: 5, fuel: 80, dura: 100 };
 if (!profile.today) profile.today = newToday();
 if (!profile.totals) profile.totals = { bike: 0, food: 0, revenue: 0, days: 0, fiveStar: 0, perfectFood: 0, returned: 0, english: 0 };
@@ -2441,6 +2593,7 @@ const nearest = (list, r) => { let b = null, bd = r; for (const p of list) { con
 let rain = 0, rainTarget = 0, raincoat = false, slowUntil = 0, fatigueCD = 0, flatCD = 60;
 function speedFactor() {
   const s = profile.st; let f = 1;
+  f *= mulSpeed();
   if (s.stamina < 20) f *= 0.75; if (s.dura < 30) f *= 0.7; if (rain > 0.3) f *= raincoat ? 0.7 : 0.85;
   if (sigClock < slowUntil) f *= 0.6;
   if (s.fuel <= 0) f = 0.08;
@@ -2451,15 +2604,16 @@ function tickStats(dt, distM) {
   const s = profile.st, gm = dt * MIN_PER_SEC, moving = Math.abs(player.v) > 1;
   const h = profile.clock / 60, noon = h >= 11 && h < 14;
   const needy = s.hunger > 80 || s.thirst > 80;
-  s.stamina = clamp01(s.stamina - gm * (moving ? 0.1 : 0.03) * (needy ? 2 : 1) * (s.stress > 80 ? 1.3 : 1));
-  s.hunger = clamp01(s.hunger + gm * 0.13);
-  s.thirst = clamp01(s.thirst + gm * (noon ? 0.3 : 0.2));
+  s.stamina = clamp01(s.stamina - gm * (moving ? 0.1 : 0.03) * (needy ? 2 : 1) * (s.stress > 80 ? 1.3 : 1) * mulStamina());
+  s.hunger = clamp01(s.hunger + gm * 0.13 * mulNeeds());
+  s.thirst = clamp01(s.thirst + gm * (noon ? 0.3 : 0.2) * mulNeeds());
   s.stress = clamp01(s.stress + gm * (moving ? 0.01 : -0.03));
   if (s.hunger > 90 || s.thirst > 90) s.hp = clamp01(s.hp - gm * 0.06);
   if (rain > 0.3 && !raincoat && moving) s.hp = clamp01(s.hp - gm * 0.03);
-  s.fuel = clamp01(s.fuel - distM / 1000 * 3);
+  s.fuel = clamp01(s.fuel - distM / 1000 * 3 * mulFuel());
   profile.today.km += distM / 1000;
-  if (game.order && game.order.type === 'food' && game.state === 'ride') game.order.heat = Math.max(0, game.order.heat - dt * 0.25);
+  if (game.order && game.order.type === 'food' && game.state === 'ride') game.order.heat = Math.max(0, game.order.heat - dt * 0.25 * mulHeat());
+  if (game.order && game.order.subs) for (const b of game.order.subs) if (b.picked && !b.done) b.heat = Math.max(0, b.heat - dt * 0.25 * mulHeat());
   // threshold events
   fatigueCD -= dt; flatCD -= dt;
   if (s.hp <= 0) return hospital();
@@ -2473,9 +2627,10 @@ function tickStats(dt, distM) {
 }
 function onCrash(sp) {
   const s = profile.st;
-  const [dh, dd] = sp < 9 ? [3, 2] : sp < 13 ? [8, 5] : [16, 9];
+  const [dh, dd] = (sp < 9 ? [3, 2] : sp < 13 ? [8, 5] : [16, 9]).map(v => v * mulCrash());
   s.hp = clamp01(s.hp - dh); s.dura = clamp01(s.dura - dd); s.stress = clamp01(s.stress + 6);
-  if (game.order) { game.order.sat -= 12; if (game.order.type === 'food' && game.state === 'ride') game.order.integ = Math.max(0, game.order.integ - 15); }
+  if (game.order && game.order.subs) for (const b of game.order.subs) if (b.picked && !b.done) { b.sat -= 8; b.integ = Math.max(0, b.integ - 15); }
+  if (game.order && !game.order.subs) { game.order.sat -= 12; if (game.order.type === 'food' && game.state === 'ride') game.order.integ = Math.max(0, game.order.integ - 15); }
 }
 
 /* ---- HUD bars ---- */
@@ -2542,12 +2697,11 @@ function greetRide() {
     { t: L('Lên xe đi anh.', 'Get on.'), good: false, why: 'Try a greeting and mention the helmet.', fx: () => o.sat -= 5 },
     { t: L('(Gật đầu, không nói gì)', '(Nod silently)'), good: false, fx: () => o.sat -= 8 }], onPick: () => pickUp() });
 }
-function staffDialog() {
-  const o = game.order;
+function staffDialog(o = game.order, done = pickUp) {
   showDialog({ who: L(`👩‍🍳 Nhân viên ${o.shop.name}`, `👩‍🍳 Staff at ${o.shop.name}`), text: L(`Anh lấy đơn <b>${o.code}</b> phải không ạ? Món đây ạ: ${o.items.join(', ')}.`, `Are you picking up order <b>${o.code}</b>? Here it is: ${o.items.join(', ')}.`), opts: [
     { t: L('Đúng rồi, em kiểm tra món và dán niêm phong giúp anh nhé.', 'Yes. Let me check the items. Could you seal the bag, please?'), good: true, why: 'Checking the order avoids mistakes.', fx: () => { o.sat += 8; passTime(1); } },
     { t: L('Đưa đây, anh đang vội.', "Give it to me, I'm in a hurry."), good: false, why: 'Always confirm the order code and items.', fx: () => { if (Math.random() < 0.3) o.wrongItem = true; } },
-    { t: L('Cho anh xin thêm muỗng đũa với tương ớt nha.', 'Could I get extra cutlery and chili sauce, please?'), good: true, fx: () => { o.sat += 12; passTime(2); } }], onPick: () => pickUp() });
+    { t: L('Cho anh xin thêm muỗng đũa với tương ớt nha.', 'Could I get extra cutlery and chili sauce, please?'), good: true, fx: () => { o.sat += 12; passTime(2); } }], onPick: () => done() });
 }
 function arriveDrop() {
   const o = game.order; player.v = 0;
@@ -2558,11 +2712,14 @@ function arriveDrop() {
       { t: cash ? L(`Dạ ${fare} ạ. Anh nhớ đánh giá 5 sao cho em nha!`, `It's ${fare}. Please rate me five stars!`) : L('Dạ vâng. Anh nhớ đánh giá 5 sao cho em nha!', 'OK. Please rate me five stars!'), good: false, why: 'Asking for stars sounds pushy.', fx: () => o.sat -= 3 },
       { t: cash ? L(`Dạ ${fare} ạ, cảm ơn anh. Anh kiểm tra đồ đạc trước khi xuống nhé.`, `It's ${fare}. Thank you! Please check your belongings.`) : L('Dạ cảm ơn anh, anh kiểm tra đồ đạc trước khi xuống nhé.', 'Thank you! Please check your belongings before you go.'), good: true, why: 'Polite and helpful.', fx: () => o.sat += 10 },
       { t: L('Xem trên app đi.', 'Check the app.'), good: false, fx: () => o.sat -= 10 }], onPick: () => dropOff() });
-  } else {
+  } else handoverDialog(o, dropOff);
+}
+function handoverDialog(o, done) {
+  {
     showDialog({ who: L('🧑 Khách đặt món', '🧑 Customer'), text: L('Đồ ăn của chị tới rồi hả em?', 'Is my food here?'), opts: [
       { t: L(`Dạ đơn ${o.code} của chị đây ạ, chúc chị ngon miệng!`, `Here's your order ${o.code}. Enjoy your meal!`), good: true, why: 'Confirming the order code is good practice.', fx: () => o.sat += 10 },
       { t: L('Dạ của chị, chị nhận giúp em.', 'Here, please take it.'), good: true, fx: () => o.sat += 2 },
-      { t: L('(Đặt túi xuống rồi đi)', '(Leave the bag and go)'), good: false, fx: () => o.sat -= 10 }], onPick: () => dropOff() });
+      { t: L('(Đặt túi xuống rồi đi)', '(Leave the bag and go)'), good: false, fx: () => o.sat -= 10 }], onPick: () => done() });
   }
 }
 const SMALL_TALK = [
@@ -2608,7 +2765,7 @@ function evRain() {
   showDialog({ who: L('🌧️ Mưa lớn bất ngờ', '🌧️ Sudden heavy rain'), text: L('Trời đổ mưa lớn! Đường trơn, tầm nhìn giảm.', 'Heavy rain! The road is slippery and visibility is low.'), opts: [
     { t: L('🏪 Dừng ở nơi an toàn chờ mưa nhỏ (20 phút)', '🏪 Stop somewhere safe until it eases (20 min)'), fx: () => { passTime(20); rainTarget = 0.35; game.rainEnd = sigClock + 60; profile.st.stress = clamp01(profile.st.stress - 5); } },
     { t: profile.inv.raincoat > 0 ? L('🧥 Mặc áo mưa và đi chậm', '🧥 Wear a raincoat and ride slowly') : L('🧥 Mặc áo mưa (bạn không có áo mưa!)', '🧥 Wear a raincoat (you have none!)'), disabled: !(profile.inv.raincoat > 0), fx: () => { raincoat = true; passTime(2); } },
-    { t: L('☎️ Liên hệ hỗ trợ nếu không thể đi', '☎️ Contact support if you cannot continue'), fx: () => { if (game.order) { cancelOrder(); game.state = 'wait'; game.waitT = 30; toast(L('Đơn được hủy an toàn, không bị trừ điểm', 'Order cancelled safely, no penalty'), 2.5); } passTime(5); } }] });
+    { t: L('☎️ Liên hệ hỗ trợ nếu không thể đi', '☎️ Contact support if you cannot continue'), fx: () => { if (game.order) { profile.week.cancels++; cancelOrder(); game.state = 'wait'; game.waitT = 30; toast(L('Đơn được hủy an toàn, không bị trừ điểm', 'Order cancelled safely, no penalty'), 2.5); } passTime(5); } }] });
 }
 function evFatigue() {
   showDialog({ who: L('😮‍💨 Mệt mỏi', '😮‍💨 Tired'), text: L('Bạn thấy mệt sau nhiều giờ chạy xe.', 'You feel tired after many hours of riding.'), opts: [
@@ -2711,13 +2868,14 @@ function reportHTML() {
   return `<table style="width:100%;font-size:14px;border-collapse:collapse">
     ${row('🛵 GrabBike / 🍜 GrabFood', `${t.bike} / ${t.food}`)}${row('⭐ Đánh giá trung bình', avg)}${row('🛣️ Quãng đường', t.km.toFixed(1) + ' km')}
     ${row('💰 Doanh thu (gồm tip)', fmtVND(t.revenue))}${row('🎁 Tiền boa', fmtVND(t.tips))}
-    ${row('⛽ Xăng', '-' + fmtVND(c.fuel))}${row('🍜 Ăn uống', '-' + fmtVND(c.food))}${row('🔧 Sửa xe', '-' + fmtVND(c.repair))}${row('🚔 Tiền phạt', '-' + fmtVND(c.fine))}${row('📦 Khác', '-' + fmtVND(c.other + c.living))}
+    ${row('⛽ Xăng', '-' + fmtVND(c.fuel))}${row('🍜 Ăn uống', '-' + fmtVND(c.food))}${row('🔧 Sửa xe', '-' + fmtVND(c.repair))}${row('🚔 Tiền phạt', '-' + fmtVND(c.fine))}${row('📦 Khác & nâng cấp', '-' + fmtVND(c.other + c.living + (c.upgrade || 0)))}
     ${row('📈 Lợi nhuận', fmtVND(t.revenue - cost))}${row('🎯 Mục tiêu', `${fmtVND(profile.money)} / ${fmtVND(profile.goal)} ${profile.money >= profile.goal ? '✅' : '❌'}`)}
-    ${row('✨ XP hôm nay', '+' + t.xp)}${row('🚦 Vi phạm', t.viol)}</table>`;
+    ${row('✨ XP hôm nay', '+' + t.xp)}${row('🚦 Vi phạm', t.viol)}${row('📸 Phạt nguội (camera)', fmtVND(t.camTotal || 0))}${row('🪪 Điểm GPLX', profile.license + '/12')}</table>`;
 }
 function endDay() {
   if (game.dayOver) return;
-  game.dayOver = true; cancelOrder(); game.state = 'wait'; closeDialog(); $('police').classList.add('hidden');
+  game.dayOver = true; cancelOrder(); game.state = 'wait'; closeDialog(); $('police').classList.add('hidden'); if (typeof closePanel === 'function') $('mp').classList.add('hidden');
+  const cam = (profile.today.cam || []).reduce((a, k) => a + LAW[k].fine, 0); if (cam) spend(cam, 'fine', true); profile.today.camTotal = cam;
   if (profile.today.bike + profile.today.food >= 5 && profile.today.viol === 0) unlock('tuan_thu');
   if (profile.money >= profile.goal) addXP(150);
   showOverlay(L(`📊 Báo cáo cuối ngày ${profile.day}`, `📊 Day ${profile.day} report`), reportHTML(), L('🏠 Về nhà', '🏠 Go home'), () => setTimeout(homeMenu, 50));
@@ -2739,6 +2897,12 @@ function sleepNewDay() {
   s.hp = clamp01(s.hp + (profile.today.dinner ? 45 : 25)); s.stamina = 100; s.stress = clamp01(s.stress - 35);
   s.hunger = profile.today.dinner ? 15 : 45; s.thirst = 20;
   profile.totals.days++; profile.totals.km = (profile.totals.km || 0) + profile.today.km;
+  { const t = profile.today, cost = Object.values(t.costs).reduce((a, b) => a + b, 0);
+    profile.history.push({ day: profile.day, revenue: t.revenue, profit: t.revenue - cost, trips: t.bike + t.food, rating: t.ratings.length ? (t.ratings.reduce((a, b) => a + b, 0) / t.ratings.length).toFixed(1) : '–' });
+    if (profile.history.length > 30) profile.history.shift();
+    if (t.viol === 0 && !profile.licBan) profile.license = Math.min(12, profile.license + 2); }
+  if (fbConfig()) fbSubmitDay();
+  profile.wanted = 0; if (profile.day % 7 === 0) profile.week = { orders: 0, cancels: 0, idx: (profile.week.idx || 0) + 1 };
   profile.day++; profile.clock = DAY_START; profile.money = 0; profile.trips = 0; profile.banned = false; profile.fines = 0;
   profile.goal = Math.max(profile.goal, 100000 + 20000 * (profile.level - 1));
   profile.today = newToday(); raincoat = false; rainTarget = 0; game.dayOver = false; game.frozen = false; game.outOfFuel = false; game.broken = false;
@@ -2770,6 +2934,460 @@ function updateRain(dt) {
   rainGeo.attributes.position.needsUpdate = true;
   scene.fog.far = 680 - 480 * rain; scene.fog.near = 160 - 120 * rain;
 }
+
+/* ================= Progression: skills, unlocks, upgrades, tiers, acceptance, history ================= */
+if (!profile.skills) profile.skills = { lai: 0, deo: 0, tho: 0 };
+if (profile.sp === undefined) profile.sp = Math.max(0, profile.level - 1);
+if (!profile.up) profile.up = { engine: 0, tank: 0, brake: 0, box: 0 };
+if (!profile.acc) profile.acc = [];
+if (!profile.history) profile.history = [];
+if (profile.license === undefined) profile.license = 12;
+if (profile.wanted === undefined) profile.wanted = 0;
+if (!profile.week) profile.week = { orders: 0, cancels: 0, idx: 0 };
+if (!profile.settings) profile.settings = { bars: {}, shadows: true, hiq: true, sound: true };
+if (profile.licBan === undefined) profile.licBan = 0;
+
+const SKILLS = {
+  lai: { name: ['🏍️ Tay lái lụa', '🏍️ Smooth rider'], ranks: ['+3% tốc độ tối đa, -10% sát thương va chạm (mỗi bậc)', '', '', 'Bậc 4: khách hay tip hơn (+5%)', 'Bậc 5: tốc độ +15%, va chạm -50%'] },
+  deo: { name: ['💪 Dẻo dai', '💪 Endurance'], ranks: ['-10% hao thể lực, -6% đói/khát (mỗi bậc)', '', '', '', 'Bậc 5: không bao giờ ngủ gật'] },
+  tho: { name: ['🗺️ Thổ địa Q7', '🗺️ Local expert'], ranks: ['+3% giá cước (mỗi bậc)', 'Bậc 2: thấy chốt CSGT trên minimap', 'Bậc 3: cuốc tới nhanh hơn 30%, thoát truy đuổi nhanh hơn 20%', 'Bậc 4: khoảng cách cần để thoát CSGT ngắn hơn', 'Bậc 5: tiền tip +15%'] },
+};
+const UNLOCKS = [
+  { lv: 2, id: 'food', t: ['🍜 GrabFood', '🍜 GrabFood'] },
+  { lv: 3, id: 'batch', t: ['🍱 Đơn ghép 2 quán – 2 khách', '🍱 Batched orders'] },
+  { lv: 4, id: 'premium', t: ['💎 Đơn giá trị cao (cước ×1,5)', '💎 Premium orders (×1.5 fare)'] },
+  { lv: 6, id: 'night', t: ['🌙 Chạy đêm tới 23:00', '🌙 Night shift until 23:00'] },
+];
+const unlocked = (id) => profile.level >= (UNLOCKS.find(u => u.id === id)?.lv ?? 1);
+const UPGRADES = {
+  engine: { name: ['⚙️ Động cơ', '⚙️ Engine'], cost: [300000, 800000, 2000000], fx: ['+5% tốc độ / cấp', '+5% speed / level'] },
+  tank: { name: ['🛢️ Bình xăng', '🛢️ Fuel tank'], cost: [400000, 1000000], fx: ['-20% hao xăng / cấp', '-20% fuel use / level'] },
+  brake: { name: ['🛞 Phanh & lốp', '🛞 Brakes & tyres'], cost: [250000, 600000], fx: ['-15% hư hại va chạm / cấp', '-15% crash damage / level'] },
+  box: { name: ['📦 Thùng giữ nhiệt', '📦 Thermal box'], cost: [200000, 500000], fx: ['Món nguội chậm hơn 30% / cấp', 'Food cools 30% slower / level'] },
+};
+const PAINTS = [['Xanh rêu (gốc)', 0xffffff], ['Xanh Grab', 0x7dffb0], ['Đỏ', 0xff8a8a], ['Vàng kem', 0xfff1a8], ['Xanh dương', 0x9cc8ff], ['Hồng', 0xffb8de]];
+// multipliers used by the rest of the game
+const SK = () => profile.skills, UP = () => profile.up;
+function mulSpeed() { return (1 + 0.03 * SK().lai) * (1 + 0.05 * UP().engine); }
+function mulCrash() { return (1 - 0.1 * SK().lai) * (1 - 0.15 * UP().brake); }
+function mulStamina() { return 1 - 0.1 * SK().deo; }
+function mulNeeds() { return 1 - 0.06 * SK().deo; }
+function mulFuel() { return 1 - 0.2 * UP().tank; }
+function mulHeat() { return 1 - 0.3 * UP().box; }
+function tierInfo() {
+  const r = profile.ratings.length ? profile.ratings.reduce((a, b) => a + b, 0) / profile.ratings.length : 5;
+  const cr = profile.week.orders ? profile.week.cancels / profile.week.orders : 0;
+  if (r >= 4.9 && profile.level >= 15 && cr <= 0.03) return { id: 'kc', name: '💠 Kim cương', bonus: 0.2 };
+  if (r >= 4.8 && profile.level >= 10 && cr <= 0.05) return { id: 'vang', name: '🥇 Vàng', bonus: 0.1 };
+  if (r >= 4.6 && profile.level >= 5) return { id: 'bac', name: '🥈 Bạc', bonus: 0.05 };
+  return { id: 'thuong', name: '🔰 Thường', bonus: 0 };
+}
+function fareMul() { return (1 + 0.03 * SK().tho) * (1 + tierInfo().bonus); }
+function tipBonus() { return (SK().lai >= 4 ? 0.05 : 0) + (SK().tho >= 5 ? 0.15 : 0); }
+function acceptRate() { return profile.acc.length ? profile.acc.filter(Boolean).length / profile.acc.length : 1; }
+function recordOffer(accepted) { profile.acc.push(!!accepted); if (profile.acc.length > 20) profile.acc.shift(); }
+function onLevelUp(lv) {
+  profile.sp++;
+  const u = UNLOCKS.filter(x => x.lv === lv).map(x => x.t[profile.english ? 1 : 0]);
+  setTimeout(() => toast(`⬆️ ${L('Lên cấp', 'Level up')} ${lv}! +1 ${L('điểm kỹ năng', 'skill point')}${u.length ? `<br><span style="font-weight:500">🔓 ${u.join(', ')}</span>` : ''}`, 3.5), 700);
+}
+function applyPaint() { if (!bike.model) return; bike.model.traverse(o => { if (o.isMesh && o.material && o.material.name === 'body') o.material.color.setHex(profile.paint || 0xffffff); }); }
+
+/* ================= Management panel: Hồ sơ · Kỹ năng · Xe · Tài chính · Cài đặt ================= */
+let panelTab = 'profile';
+function openPanel(tab) {
+  if (game.mode !== 'drive' && game.mode !== 'menu') return;
+  panelTab = tab || panelTab; game.paused = game.mode === 'drive' ? true : game.paused;
+  $('mp').classList.remove('hidden'); renderPanel();
+}
+function closePanel() { $('mp').classList.add('hidden'); if (game.mode === 'drive' && $('dlg').classList.contains('hidden')) game.paused = false; saveProfile(); updateProfileHUD(); }
+function bar(v, max, col) { return `<span class="pb"><i style="width:${Math.max(0, Math.min(100, v / max * 100))}%;background:${col}"></i></span>`; }
+function renderPanel() {
+  document.querySelectorAll('#mpTabs button').forEach(b => b.classList.toggle('sel', b.dataset.tab === panelTab));
+  const P = profile, E = profile.english;
+  let h = '';
+  if (panelTab === 'profile') {
+    const t = tierInfo(), rating = P.ratings.length ? (P.ratings.reduce((a, b) => a + b, 0) / P.ratings.length).toFixed(2) : '5.00';
+    const cr = P.week.orders ? (P.week.cancels / P.week.orders * 100).toFixed(0) : 0;
+    h += `<h3>👤 ${P.name}</h3><p>${L('Cấp', 'Level')} <b>${P.level}</b> ${bar(P.xp, xpNeed(P.level), '#00b14f')} ${P.xp}/${xpNeed(P.level)} XP · ${L('Điểm kỹ năng', 'Skill points')}: <b>${P.sp}</b></p>
+      <table class="kv"><tr><td>${L('Hạng tài xế', 'Driver tier')}</td><td><b>${t.name}</b> ${t.bonus ? `(+${t.bonus * 100}% ${L('cước', 'fare')})` : ''}</td></tr>
+      <tr><td>⭐ ${L('Đánh giá (50 cuốc gần nhất)', 'Rating (last 50)')}</td><td><b>${rating}</b></td></tr>
+      <tr><td>✅ ${L('Tỉ lệ nhận cuốc (20 gần nhất)', 'Acceptance (last 20)')}</td><td><b>${Math.round(acceptRate() * 100)}%</b> ${acceptRate() < 0.5 ? L('⚠️ thấp → ít cuốc hơn', '⚠️ low → fewer offers') : ''}</td></tr>
+      <tr><td>❌ ${L('Tỉ lệ hủy tuần này', 'Cancel rate this week')}</td><td><b>${cr}%</b> (${L('tối đa', 'max')} 10%)</td></tr>
+      <tr><td>🪪 ${L('Điểm giấy phép lái xe', 'Licence points')}</td><td>${bar(P.license, 12, '#3E9BFF')} <b>${P.license}/12</b></td></tr>
+      <tr><td>🚨 ${L('Mức truy nã', 'Wanted level')}</td><td>${'🚨'.repeat(P.wanted) || '—'}</td></tr>
+      <tr><td>📅 ${L('Ngày làm việc', 'Days worked')}</td><td>${P.totals.days} · ${P.totals.bike} GrabBike · ${P.totals.food} GrabFood · ${(P.totals.km || 0).toFixed(1)} km</td></tr>
+      <tr><td>🏅 ${L('Thành tích', 'Achievements')}</td><td>${Object.keys(P.ach).length}/${Object.keys(ACH).length}</td></tr></table>
+      <h4>🔓 ${L('Mở khóa theo cấp', 'Level unlocks')}</h4><p>${UNLOCKS.map(u => `${P.level >= u.lv ? '✅' : '🔒'} Lv${u.lv} ${u.t[E ? 1 : 0]}`).join('<br>')}</p>`;
+  } else if (panelTab === 'skills') {
+    h += `<h3>🌳 ${L('Cây kỹ năng', 'Skill tree')} — ${L('còn', 'available')} <b>${P.sp}</b> ${L('điểm', 'points')}</h3>`;
+    for (const [id, s] of Object.entries(SKILLS)) {
+      const r = P.skills[id];
+      h += `<div class="sk"><div><b>${s.name[E ? 1 : 0]}</b> <span class="dots">${'●'.repeat(r)}${'○'.repeat(5 - r)}</span></div><small>${s.ranks.filter(Boolean).join('<br>')}</small>
+        <button data-act="skill" data-id="${id}" ${P.sp > 0 && r < 5 ? '' : 'disabled'}>+1</button></div>`;
+    }
+  } else if (panelTab === 'bike') {
+    h += `<h3>🛵 ${L('Xe & trang bị', 'Bike & gear')}</h3><p>🔧 ${L('Độ bền', 'Durability')} ${bar(P.st.dura, 100, '#A0A7B4')} · ⛽ ${bar(P.st.fuel, 100, '#30A46C')} · 🧥 ${L('Áo mưa', 'Raincoats')}: ${P.inv.raincoat || 0}</p>`;
+    for (const [id, u] of Object.entries(UPGRADES)) {
+      const lv = P.up[id], max = u.cost.length, cost = u.cost[lv];
+      h += `<div class="sk"><div><b>${u.name[E ? 1 : 0]}</b> <span class="dots">${'●'.repeat(lv)}${'○'.repeat(max - lv)}</span></div><small>${u.fx[E ? 1 : 0]}</small>
+        <button data-act="up" data-id="${id}" ${lv < max ? '' : 'disabled'}>${lv < max ? fmtVND(cost) : 'MAX'}</button></div>`;
+    }
+    h += `<h4>🎨 ${L('Sơn xe (150.000đ)', 'Paint (150,000đ)')}</h4><p>${PAINTS.map(([n, c]) => `<button class="chip" data-act="paint" data-c="${c}" style="border-left:14px solid #${c.toString(16).padStart(6, '0')}">${n}</button>`).join(' ')}</p>`;
+  } else if (panelTab === 'money') {
+    const t = P.today, c = t.costs;
+    h += `<h3>💰 ${L('Tài chính', 'Finance')}</h3><table class="kv">
+      <tr><td>💵 ${L('Tiền mặt', 'Cash')}</td><td><b>${fmtVND(P.cash)}</b></td></tr><tr><td>📱 ${L('Ví ứng dụng', 'App wallet')}</td><td><b>${fmtVND(P.wallet)}</b></td></tr>
+      <tr><td>🏦 ${L('Tiết kiệm', 'Savings')}</td><td><b>${fmtVND(P.savings)}</b></td></tr></table>
+      <p><button class="chip" data-act="w2c">${L('📱→💵 Rút 100k từ ví (phí 1.100đ)', '📱→💵 Withdraw 100k (fee 1,100đ)')}</button>
+      <button class="chip" data-act="s2c">${L('🏦→💵 Rút 100k tiết kiệm', '🏦→💵 Take 100k from savings')}</button>
+      <button class="chip" data-act="c2s">${L('💵→🏦 Gửi 100k vào tiết kiệm', '💵→🏦 Save 100k')}</button></p>
+      <h4>${L('Hôm nay', 'Today')}</h4><table class="kv"><tr><td>${L('Doanh thu', 'Revenue')}</td><td>${fmtVND(t.revenue)} (tip ${fmtVND(t.tips)})</td></tr>
+      <tr><td>${L('Chi phí', 'Costs')}</td><td>⛽ ${fmtVND(c.fuel)} · 🍜 ${fmtVND(c.food)} · 🔧 ${fmtVND(c.repair)} · 🚔 ${fmtVND(c.fine)} · 📦 ${fmtVND(c.other + c.living + (c.upgrade || 0))}</td></tr>
+      <tr><td>${L('Lợi nhuận', 'Profit')}</td><td><b>${fmtVND(t.revenue - Object.values(c).reduce((a, b) => a + b, 0))}</b></td></tr></table>
+      <h4>📈 ${L('Lịch sử 7 ngày', 'Last 7 days')}</h4><table class="kv">${P.history.slice(-7).reverse().map(d => `<tr><td>${L('Ngày', 'Day')} ${d.day}</td><td>${fmtVND(d.revenue)} · ${L('lãi', 'profit')} ${fmtVND(d.profit)} · ${d.trips} ${L('cuốc', 'jobs')} · ⭐${d.rating}</td></tr>`).join('') || `<tr><td>${L('Chưa có', 'None yet')}</td></tr>`}</table>`;
+  } else if (panelTab === 'settings') {
+    const S = P.settings;
+    h += `<h3>⚙️ ${L('Cài đặt', 'Settings')}</h3><h4>${L('Hiện thanh chỉ số', 'Show stat bars')}</h4><p>` +
+      STAT_DEF.map(([k, ic, n]) => `<label class="tg"><input type="checkbox" data-act="bar" data-id="${k}" ${S.bars[k] === false ? '' : 'checked'}> ${ic} ${n}</label>`).join('') + `</p>
+      <h4>${L('Đồ họa & âm thanh', 'Graphics & sound')}</h4><p>
+      <label class="tg"><input type="checkbox" data-act="set" data-id="shadows" ${S.shadows ? 'checked' : ''}> ${L('Đổ bóng', 'Shadows')}</label>
+      <label class="tg"><input type="checkbox" data-act="set" data-id="hiq" ${S.hiq ? 'checked' : ''}> ${L('Độ nét cao (tắt nếu máy yếu)', 'High resolution (off for slow devices)')}</label>
+      <label class="tg"><input type="checkbox" data-act="set" data-id="sound" ${S.sound ? 'checked' : ''}> ${L('Âm thanh', 'Sound')}</label>
+      <label class="tg"><input type="checkbox" data-act="eng" ${P.english ? 'checked' : ''}> 🇬🇧 English Mode</label></p>
+      <p><button class="chip danger" data-act="reset">${L('🗑️ Xoá hồ sơ (bấm 2 lần)', '🗑️ Reset profile (click twice)')}</button></p>`;
+  }
+  $('mpBody').innerHTML = h;
+}
+$('mpTabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { panelTab = b.dataset.tab; renderPanel(); } });
+$('mpClose').onclick = closePanel;
+let resetArm = false;
+$('mpBody').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const P = profile, id = b.dataset.id, act = b.dataset.act;
+  if (act === 'skill' && P.sp > 0 && P.skills[id] < 5) { P.skills[id]++; P.sp--; toast(`🌳 ${SKILLS[id].name[P.english ? 1 : 0]} → ${L('bậc', 'rank')} ${P.skills[id]}`, 1.6); }
+  if (act === 'up') { const u = UPGRADES[id], lv = P.up[id]; if (lv < u.cost.length && spend(u.cost[lv], 'upgrade')) { P.up[id]++; toast(`🛠️ ${u.name[P.english ? 1 : 0]} ${L('cấp', 'level')} ${P.up[id]}`, 1.6); } }
+  if (act === 'paint' && spend(150000, 'upgrade')) { P.paint = +b.dataset.c; applyPaint(); }
+  if (act === 'w2c') { if (P.wallet >= 101100) { P.wallet -= 101100; P.cash += 100000; P.today.costs.other += 1100; } else toast(L('Ví không đủ', 'Not enough in wallet'), 1.4); }
+  if (act === 's2c') { if (P.savings >= 100000) { P.savings -= 100000; P.cash += 100000; } else toast(L('Tiết kiệm không đủ', 'Not enough savings'), 1.4); }
+  if (act === 'c2s') { if (P.cash >= 100000) { P.cash -= 100000; P.savings += 100000; } else toast(L('Tiền mặt không đủ', 'Not enough cash'), 1.4); }
+  if (act === 'reset') { if (!resetArm) { resetArm = true; b.textContent = L('⚠️ Bấm lần nữa để xoá hẳn', '⚠️ Click again to confirm'); return; } localStorage.removeItem(PROFILE_KEY); location.reload(); return; }
+  saveProfile(); updateProfileHUD(); renderPanel();
+});
+$('mpBody').addEventListener('change', (e) => {
+  const b = e.target; if (!b.dataset || !b.dataset.act) return;
+  const S = profile.settings;
+  if (b.dataset.act === 'bar') { S.bars[b.dataset.id] = b.checked; applySettings(); }
+  if (b.dataset.act === 'set') { S[b.dataset.id] = b.checked; applySettings(); }
+  if (b.dataset.act === 'eng') { profile.english = b.checked; renderPanel(); }
+  saveProfile();
+});
+function applySettings() {
+  const S = profile.settings;
+  for (const [k] of STAT_DEF) { const el = $('st_' + k); if (el) el.style.display = S.bars[k] === false ? 'none' : ''; }
+  renderer.shadowMap.enabled = !!S.shadows; scene.traverse(o => { if (o.material) o.material.needsUpdate = true; });
+  renderer.setPixelRatio(S.hiq ? Math.min(devicePixelRatio, 2) : 1);
+  if (!S.sound && !game.muted) toggleMute(); if (S.sound && game.muted) toggleMute();
+}
+addEventListener('keydown', (e) => { if ((e.code === 'Tab' || e.code === 'Escape') && game.mode === 'drive' && !game.dlgKeys) { e.preventDefault(); $('mp').classList.contains('hidden') ? openPanel() : closePanel(); } });
+$('bMenu').onclick = () => openPanel();
+$('bProfile').onclick = () => { panelTab = 'profile'; $('mp').classList.remove('hidden'); renderPanel(); };
+applySettings();
+
+/* ================= Batched GrabFood orders (2 quán – 2 khách) ================= */
+const stopSprites = [];
+for (let i = 0; i < 4; i++) {
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#ff8a1f'; g.beginPath(); g.arc(32, 32, 28, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = '900 34px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(i + 1), 32, 34); }), depthTest: false }));
+  sp.scale.set(3, 3, 1); sp.visible = false; scene.add(sp); stopSprites.push(sp);
+}
+function makeBatchOffer() {
+  const near = MERCHANTS.filter(m => { const d = Math.hypot(m.spot.x - player.x, m.spot.z - player.z); return d > 60 && d < 1300; });
+  if (near.length < 2) return null;
+  const A = near[Math.floor(Math.random() * near.length)];
+  const nearA = near.filter(m => m !== A && Math.hypot(m.spot.x - A.spot.x, m.spot.z - A.spot.z) < 700);
+  const B = nearA.length ? nearA[Math.floor(Math.random() * nearA.length)] : A;
+  const subs = [A, B].map((shop, i) => {
+    const drop = randomRoadPoint(shop.spot, 300, 1400);
+    const r = computeRoute(shop.spot, drop.E, drop.along);
+    const km = Math.round((r ? r.len : 900) / 100) / 10;
+    const menu = MENU[shop.kind] || MENU.restaurant;
+    return { idx: i, shop, drop, km, items: [pick(menu)], fare: fareFor('food', km), code: orderCode(), sat: 80 + (profile.cleanBag ? 5 : 0), heat: 100, integ: 100, picked: false, done: false, wrongItem: false };
+  });
+  return { type: 'batch', subs, shop: A, pickup: A.spot, drop: subs[0].drop, items: subs.map(s => s.items[0]), km: Math.round((subs[0].km + subs[1].km) * 10) / 10,
+    fare: subs[0].fare + subs[1].fare, bonus: 10000, est: 0, expire: 18 };
+}
+// all valid stop orders (each pickup before its drop) with their route length from the player
+function batchSequences(o) {
+  const stops = [{ k: 'pick', s: 0 }, { k: 'pick', s: 1 }, { k: 'drop', s: 0 }, { k: 'drop', s: 1 }];
+  const perms = [];
+  const rec = (cur, left) => {
+    if (!left.length) { perms.push(cur); return; }
+    left.forEach((st, i) => { if (st.k === 'drop' && !cur.some(c => c.k === 'pick' && c.s === st.s)) return; rec([...cur, st], left.filter((_, j) => j !== i)); });
+  };
+  rec([], stops);
+  const spot = (st) => st.k === 'pick' ? o.subs[st.s].shop.spot : o.subs[st.s].drop;
+  return perms.map(seq => {
+    let from = { x: player.x, z: player.z }, len = 0;
+    for (const st of seq) { const t = spot(st); const r = computeRoute(from, t.E, t.along); len += r ? r.len : Math.hypot(t.x - from.x, t.z - from.z) * 1.4; from = t; }
+    return { seq, len };
+  }).sort((a, b) => a.len - b.len);
+}
+function batchLabel(o, seq) {
+  return seq.map(st => st.k === 'pick' ? `🍜${st.s + 1} ${o.subs[st.s].shop.name.slice(0, 16)}` : `🏁${st.s + 1}`).join(' → ');
+}
+function setupBatch(o) {
+  const seqs = batchSequences(o), best = seqs[0];
+  const choices = [best, ...seqs.slice(1).sort(() => Math.random() - 0.5).slice(0, 2)].sort(() => Math.random() - 0.5);
+  showDialog({ who: L('🍱 Đơn ghép — chọn thứ tự lấy & giao', '🍱 Batched order — choose your route'),
+    text: L(`Túi 1: <b>${o.subs[0].items[0]}</b> (${o.subs[0].shop.name}) → ${o.subs[0].drop.name}<br>Túi 2: <b>${o.subs[1].items[0]}</b> (${o.subs[1].shop.name}) → ${o.subs[1].drop.name}<br><small>Chọn tuyến ngắn nhất được thưởng "Tuyến tối ưu" +5.000đ</small>`,
+      `Bag 1: <b>${o.subs[0].items[0]}</b> (${o.subs[0].shop.name}) → ${o.subs[0].drop.name}<br>Bag 2: <b>${o.subs[1].items[0]}</b> (${o.subs[1].shop.name}) → ${o.subs[1].drop.name}<br><small>The shortest route earns an "Optimal route" bonus</small>`),
+    opts: choices.map(c => ({ t: `${batchLabel(o, c.seq)} <b>(${(c.len / 1000).toFixed(1)} km)</b>`, fx: () => startBatch(o, c, best) })) });
+}
+function startBatch(o, choice, best) {
+  o.stops = choice.seq; o.si = 0; o.optimal = choice.len <= best.len * 1.02; o.t0 = sigClock;
+  // per-bag deadline: distance along the chosen route to its drop
+  let acc = 0, from = { x: player.x, z: player.z };
+  for (const st of o.stops) {
+    const t = st.k === 'pick' ? o.subs[st.s].shop.spot : o.subs[st.s].drop;
+    const r = computeRoute(from, t.E, t.along); acc += r ? r.len : 600; from = t;
+    if (st.k === 'drop') o.subs[st.s].est = acc / 8 + 50;
+  }
+  goStop(o);
+}
+function stopSpot(o, st) { return st.k === 'pick' ? o.subs[st.s].shop.spot : o.subs[st.s].drop; }
+function goStop(o) {
+  const st = o.stops[o.si]; const t = stopSpot(o, st);
+  game.state = st.k === 'pick' ? 'pickup' : 'ride';
+  pickupMarker.visible = st.k === 'pick'; dropMarker.visible = st.k === 'drop';
+  (st.k === 'pick' ? pickupMarker : dropMarker).position.set(t.x, 0, t.z);
+  standPax.position.set(t.sx, 0.06, t.sz); standPax.visible = true;
+  standPax.userData.shirt.color.setHex(st.k === 'pick' ? 0xb22222 : pick(shirtColors));
+  shopLabel.visible = st.k === 'pick';
+  if (st.k === 'pick') { shopLabel.material.map = labelSprite(o.subs[st.s].shop.name, L(`🍜 Lấy túi ${st.s + 1}`, `🍜 Pick up bag ${st.s + 1}`)).material.map; shopLabel.position.set(t.sx, 6.5, t.sz); }
+  stopSprites.forEach((sp, i) => {
+    const s2 = o.stops[o.si + 1 + i];
+    if (s2 && i < 3) { const p = stopSpot(o, s2); sp.position.set(p.x, 5, p.z); sp.visible = true; } else sp.visible = false;
+  });
+  o.handling = false; refreshRoute();
+}
+function batchTarget(o) { return stopSpot(o, o.stops[o.si]); }
+function batchArrive() {
+  const o = game.order, st = o.stops[o.si], sub = o.subs[st.s];
+  player.v = 0;
+  if (st.k === 'pick') {
+    staffDialog(sub, () => { sub.picked = true; sub.tPick = sigClock; foodBox.visible = true; toast(L(`✅ Đã lấy túi ${st.s + 1}: ${sub.items[0]}`, `✅ Bag ${st.s + 1} picked up`), 1.6); nextStop(o); });
+  } else {
+    handoverDialog(sub, () => { completeSub(o, sub); nextStop(o); });
+  }
+}
+function nextStop(o) {
+  o.si++;
+  if (o.si >= o.stops.length) return finishBatch(o);
+  goStop(o);
+}
+function completeSub(o, sub) {
+  const tt = sigClock - o.t0;
+  let stars = 5;
+  if (tt > sub.est) stars--; if (tt > sub.est * 1.6) stars--;
+  if (sub.sat < 65) stars--; if (sub.sat < 45) stars--;
+  if (sub.heat < 50) stars--; if (sub.integ < 60) stars--; if (sub.wrongItem) stars -= 2;
+  stars = Math.max(1, Math.min(5, stars));
+  sub.stars = stars; sub.done = true; sub.onTime = tt <= sub.est;
+  earn(sub.fare, 'wallet');
+  const tip = stars === 5 && Math.random() < 0.35 + tipBonus() ? pick([5000, 10000]) : 0;
+  if (tip) earn(tip, 'cash', true);
+  profile.ratings.push(stars); if (profile.ratings.length > 50) profile.ratings.shift();
+  profile.today.ratings.push(stars); profile.today.food++; profile.totals.food++; profile.trips++; profile.totalTrips++; profile.week.orders++;
+  profile.today.streak = stars >= 4 ? profile.today.streak + 1 : 0;
+  if (stars === 5) profile.totals.fiveStar++;
+  if (sub.heat >= 70 && sub.integ >= 90 && sub.onTime) profile.totals.perfectFood++;
+  const xp = Math.round((40 + 8 * sub.km + (stars === 5 ? 15 : 0) + (o.viol ? 0 : 10)) * (sub.heat > 80 ? 1.2 : 1));
+  addXP(xp);
+  toast(`🍱 ${L('Đã giao túi', 'Bag delivered')} ${sub.idx + 1}: +${fmtVND(sub.fare)}<br><span style="font-weight:500">${'⭐'.repeat(stars)} · 🔥${Math.round(sub.heat)}% · 📦${Math.round(sub.integ)}%${tip ? ` · tip ${fmtVND(tip)}` : ''} · +${xp} XP</span>`, 2.8);
+  if (o.subs.every(s => s.done)) foodBox.visible = false;
+  checkQuests(); saveProfile(); updateProfileHUD();
+}
+function finishBatch(o) {
+  stopSprites.forEach(s => s.visible = false); standPax.visible = false; pickupMarker.visible = dropMarker.visible = shopLabel.visible = false;
+  const perfect = o.subs.every(s => s.stars >= 4 && s.onTime);
+  let bonus = 0, msg = [];
+  if (perfect) { bonus += o.bonus; addXP(20); msg.push(L('🔥 Chuỗi giao hoàn hảo', '🔥 Perfect chain')); profile.totals.combo = (profile.totals.combo || 0) + 1; }
+  if (o.optimal) { bonus += 5000; msg.push(L('🧭 Tuyến tối ưu', '🧭 Optimal route')); }
+  if (bonus) earn(bonus, 'wallet');
+  setTimeout(() => toast(`🍱 ${L('Hoàn thành đơn ghép!', 'Batch complete!')}${bonus ? ` +${fmtVND(bonus)}` : ''}<br><span style="font-weight:500">${msg.join(' · ') || L('Lần sau giao đúng giờ để nhận thưởng combo', 'Deliver on time for a combo bonus')}</span>`, 3.2), 3000);
+  ding([784, 988, 1318, 1568]);
+  game.order = null; game.state = 'wait'; game.waitT = 3; refreshRoute(); checkQuests(); saveProfile(); updateProfileHUD();
+}
+
+/* ================= Online: chơi cùng bạn bè (PeerJS, mã phòng) ================= */
+const NET = { peer: null, conns: [], host: false, code: '', remotes: new Map(), sendT: 0, status: 'off', mode: '' };
+/* ---- Firebase (máy chủ riêng). Dán cấu hình vào FIREBASE_CONFIG hoặc nhập trong game. ---- */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAReenNi6S_qfmDfSX21_gNRBHyETx1CZQ",
+  authDomain: "grab-bike-131c2.firebaseapp.com",
+  databaseURL: "https://grab-bike-131c2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "grab-bike-131c2",
+  storageBucket: "grab-bike-131c2.firebasestorage.app",
+  messagingSenderId: "1072629876994",
+  appId: "1:1072629876994:web:cf8cb979ccbc5b683f9a1b"
+};
+const FB_KEY = 'grabbike.firebase';
+function fbConfig() { if (FIREBASE_CONFIG) return FIREBASE_CONFIG; try { return JSON.parse(localStorage.getItem(FB_KEY) || 'null'); } catch (e) { return null; } }
+function parseFbConfig(text) {
+  const o = {}; let m; const re = /(\w+)\s*["']?\s*:\s*["']([^"']+)["']/g;
+  while ((m = re.exec(text))) o[m[1]] = m[2];
+  return o.apiKey && o.databaseURL && o.projectId ? o : null;
+}
+let FB = null;
+async function fbInit() {
+  if (FB) return FB;
+  const cfg = fbConfig(); if (!cfg) return null;
+  const base = 'https://www.gstatic.com/firebasejs/10.12.2/';
+  const [appM, dbM, authM] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-database.js'), import(base + 'firebase-auth.js')]);
+  const app = appM.initializeApp(cfg);
+  const auth = authM.getAuth(app);
+  const cred = await authM.signInAnonymously(auth);
+  FB = { db: dbM.getDatabase(app), api: dbM, uid: cred.user.uid };
+  return FB;
+}
+async function fbRoom(code) {
+  try {
+    netSetStatus('wait', L('⏳ Đang kết nối máy chủ Firebase…', '⏳ Connecting to Firebase…'));
+    const F = await fbInit(); if (!F) return false;
+    const { ref, set, onValue, onDisconnect, onChildAdded, query, limitToLast } = F.api;
+    NET.mode = 'fb'; NET.code = code; NET.myId = F.uid;
+    NET.meRef = ref(F.db, `rooms/${code}/players/${F.uid}`);
+    await onDisconnect(NET.meRef).remove();
+    await set(NET.meRef, netMsg());
+    onValue(ref(F.db, `rooms/${code}/players`), snap => {
+      const v = snap.val() || {};
+      for (const [id, d] of Object.entries(v)) if (id !== F.uid) netRecv(Object.assign({}, d, { t: 's', id }));
+      for (const id of [...NET.remotes.keys()]) if (!v[id]) { scene.remove(NET.remotes.get(id).g); NET.remotes.delete(id); }
+    });
+    NET.chatRef = ref(F.db, `rooms/${code}/chat`);
+    onChildAdded(query(NET.chatRef, limitToLast(15)), s => chatShow(s.val()));
+    netSetStatus('on', L(`✅ Phòng <b>${code}</b> (Firebase) — gửi mã này cho bạn bè`, `✅ Room <b>${code}</b> (Firebase) — share this code`));
+    return true;
+  } catch (e) {
+    console.error(e);
+    netSetStatus('err', '⚠️ Firebase: ' + (e.code || e.message || e) + L('<br><small>Kiểm tra: bật Anonymous Auth, tạo Realtime Database, thêm tên miền github.io vào Authorized domains, dán đúng luật bảo mật.</small>', ''));
+    return false;
+  }
+}
+function netMsg() {
+  return { n: profile.name, lv: profile.level, x: +player.x.toFixed(2), z: +player.z.toFixed(2), h: +player.h.toFixed(3), l: +player.lean.toFixed(3),
+    m: profile.money, st: game.state === 'ride' ? (game.order?.type === 'ride' ? 'bike' : 'food') : game.state, ts: Date.now() };
+}
+const chatLog = [];
+function chatShow(c) { if (!c || !c.text) return; chatLog.push(c); if (chatLog.length > 6) chatLog.shift(); if (c.uid !== NET.myId) toast(`💬 <b>${c.n}</b>: ${String(c.text).slice(0, 80)}`, 2.5); lbT = 0; }
+function chatSend(text) {
+  text = (text || '').trim().slice(0, 120); if (!text || NET.status !== 'on') return;
+  if (NET.mode === 'fb') FB.api.push(NET.chatRef, { uid: NET.myId, n: profile.name, text, ts: Date.now() });
+  else { const c = { t: 'c', uid: NET.peer.id, n: profile.name, text }; chatShow(c); for (const x of NET.conns) if (x.open) x.send(c); }
+}
+async function fbSubmitDay() {
+  try {
+    const F = await fbInit(); if (!F) return;
+    const { ref, set } = F.api;
+    const best = Math.max(profile.bestDay || 0, profile.money); profile.bestDay = best;
+    await set(ref(F.db, `leaderboard/${F.uid}`), { n: profile.name, lv: profile.level, total: profile.totalMoney, days: profile.totals.days + 1, best, ts: Date.now() });
+  } catch (e) { console.warn(e); }
+}
+async function fbLeaderboard() {
+  const box = $('gLb'); box.innerHTML = L('⏳ Đang tải…', '⏳ Loading…');
+  try {
+    const F = await fbInit(); if (!F) { box.innerHTML = L('Chưa cấu hình Firebase.', 'Firebase not configured.'); return; }
+    const { ref, get, query, orderByChild, limitToLast } = F.api;
+    const snap = await get(query(ref(F.db, 'leaderboard'), orderByChild('total'), limitToLast(10)));
+    const rows = []; snap.forEach(c => { rows.push(Object.assign({ uid: c.key }, c.val())); });
+    rows.sort((a, b) => b.total - a.total);
+    box.innerHTML = rows.length ? rows.map((r, i) => `${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${r.uid === F.uid ? '<b>' : ''}${r.n}${r.uid === F.uid ? ' (bạn)</b>' : ''} · Lv${r.lv} · ${fmtVND(r.total)} · ${r.days} ${L('ngày', 'days')}`).join('<br>') : L('Chưa có ai trên bảng — hãy hoàn thành một ngày!', 'Nobody yet — finish a day!');
+  } catch (e) { box.innerHTML = '⚠️ ' + (e.code || e.message); }
+}
+async function netPeerClass() {
+  const m = await import('https://cdn.jsdelivr.net/npm/peerjs@1.5.4/+esm');
+  return m.Peer || m.default;
+}
+function netSetStatus(s, html) { NET.status = s; $('netStatus').innerHTML = html; $('lb').classList.toggle('hidden', s !== 'on'); }
+async function netHost() {
+  if (fbConfig()) return fbRoom(Math.random().toString(36).slice(2, 7).toUpperCase());
+  try {
+    netSetStatus('wait', L('⏳ Đang tạo phòng…', '⏳ Creating room…'));
+    const Peer = await netPeerClass();
+    NET.code = Math.random().toString(36).slice(2, 7).toUpperCase(); NET.host = true;
+    NET.peer = new Peer('grabq7-' + NET.code);
+    NET.peer.on('open', () => netSetStatus('on', L(`✅ Phòng <b>${NET.code}</b> — gửi mã này cho bạn bè`, `✅ Room <b>${NET.code}</b> — share this code`)));
+    NET.peer.on('connection', c => netConn(c));
+    NET.peer.on('error', e => netSetStatus('err', '⚠️ ' + (e.type || e.message || e)));
+  } catch (e) { netSetStatus('err', L('⚠️ Không tải được thư viện online (cần internet)', '⚠️ Could not load the online library')); }
+}
+async function netJoin(code) {
+  code = (code || '').trim().toUpperCase(); if (!code) return;
+  if (fbConfig()) return fbRoom(code);
+  try {
+    netSetStatus('wait', L('⏳ Đang vào phòng…', '⏳ Joining…'));
+    const Peer = await netPeerClass();
+    NET.code = code; NET.host = false;
+    NET.peer = new Peer();
+    NET.peer.on('open', () => netConn(NET.peer.connect('grabq7-' + code, { reliable: false })));
+    NET.peer.on('error', e => netSetStatus('err', '⚠️ ' + (e.type === 'peer-unavailable' ? L('Không tìm thấy phòng', 'Room not found') : (e.type || e))));
+  } catch (e) { netSetStatus('err', L('⚠️ Không tải được thư viện online (cần internet)', '⚠️ Could not load the online library')); }
+}
+function netConn(c) {
+  c.on('open', () => { NET.conns.push(c); netSetStatus('on', L(`✅ Đã kết nối phòng <b>${NET.code}</b>`, `✅ Connected to room <b>${NET.code}</b>`)); toast(L('🌐 Có người chơi kết nối!', '🌐 A player connected!'), 1.8); });
+  c.on('data', d => netRecv(d, c));
+  c.on('close', () => { NET.conns = NET.conns.filter(x => x !== c); });
+}
+function netRecv(d, from) {
+  if (d && d.t === 'c') { if (NET.host) for (const c of NET.conns) if (c !== from && c.open) c.send(d); chatShow(d); return; }
+  if (!d || d.t !== 's') return;
+  if (NET.host) for (const c of NET.conns) if (c !== from && c.open) c.send(d);   // host relays to everyone
+  let r = NET.remotes.get(d.id);
+  if (!r) {
+    const g = new THREE.Group();
+    const model = bike.model ? bike.model.clone(true) : new THREE.Mesh(new THREE.BoxGeometry(0.6, 1, 1.8), std(0x00b14f));
+    const lean = new THREE.Group(); lean.add(model);
+    const rider = buildDriver(); lean.add(rider); g.add(lean);
+    const tag = labelSprite(d.n || 'Tài xế', `Lv${d.lv || 1}`); tag.position.y = 2.6; tag.scale.set(6, 1.5, 1); g.add(tag);
+    scene.add(g);
+    r = { g, lean, x: d.x, z: d.z, h: d.h, data: d }; NET.remotes.set(d.id, r);
+  }
+  r.data = d; r.seen = performance.now();
+}
+function netTick(dt) {
+  if (NET.status !== 'on' || (!NET.peer && NET.mode !== 'fb')) return;
+  NET.sendT -= dt;
+  if (NET.sendT <= 0) {
+    if (NET.mode === 'fb') { NET.sendT = 0.2; FB.api.set(NET.meRef, netMsg()).catch(() => { }); }
+    else { NET.sendT = 0.1; const msg = Object.assign(netMsg(), { t: 's', id: NET.peer.id }); for (const c of NET.conns) if (c.open) c.send(msg); }
+  }
+  const now = performance.now(), k = 1 - Math.exp(-dt * 10);
+  for (const [id, r] of NET.remotes) {
+    if (now - r.seen > 8000) { scene.remove(r.g); NET.remotes.delete(id); continue; }
+    r.x += (r.data.x - r.x) * k; r.z += (r.data.z - r.z) * k; r.h = angLerp(r.h, r.data.h, k);
+    r.g.position.set(r.x, 0.07, r.z); r.g.rotation.y = r.h; r.lean.rotation.z = r.data.l || 0;
+  }
+  netBoard();
+}
+let lbT = 0;
+function netBoard() {
+  if ((lbT -= 1) > 0) return; lbT = 30;
+  const rows = [{ n: profile.name + ' (bạn)', m: profile.money, lv: profile.level, st: game.state }, ...[...NET.remotes.values()].map(r => ({ n: r.data.n, m: r.data.m, lv: r.data.lv, st: r.data.st }))]
+    .sort((a, b) => b.m - a.m);
+  const ic = (s) => s === 'bike' ? '🛵' : s === 'food' ? '🍜' : s === 'pickup' ? '📍' : '⏳';
+  $('lbRows').innerHTML = `<b>🌐 ${L('Phòng', 'Room')} ${NET.code}</b><br>` + rows.map((r, i) => `${i + 1}. ${ic(r.st)} ${r.n} · Lv${r.lv} · <b>${fmtVND(r.m)}</b>`).join('<br>')
+    + (chatLog.length ? '<hr style="opacity:.3">' + chatLog.map(c => `💬 <b>${c.n}</b>: ${String(c.text).replace(/</g, '&lt;')}`).join('<br>') : '');
+}
+$('bHost').onclick = () => netHost();
+$('bJoin').onclick = () => netJoin($('joinCode').value);
+
+$('chatIn').addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') { chatSend(e.target.value); e.target.value = ''; } });
+$('chatIn').addEventListener('keyup', (e) => e.stopPropagation());
+$('bFbSave').onclick = () => { const c = parseFbConfig($('fbCfg').value); if (!c) { $('fbMsg').textContent = L('⚠️ Không đọc được cấu hình — cần có apiKey, databaseURL, projectId.', '⚠️ Invalid config.'); return; } localStorage.setItem(FB_KEY, JSON.stringify(c)); FB = null; $('fbMsg').textContent = L(`✅ Đã lưu cấu hình dự án ${c.projectId}`, `✅ Saved ${c.projectId}`); fbStatusLine(); };
+$('bFbClear').onclick = () => { localStorage.removeItem(FB_KEY); FB = null; $('fbMsg').textContent = L('Đã xoá cấu hình.', 'Cleared.'); fbStatusLine(); };
+$('bGlb').onclick = () => { $('gLbBox').classList.toggle('hidden'); if (!$('gLbBox').classList.contains('hidden')) fbLeaderboard(); };
+function fbStatusLine() { const c = fbConfig(); $('fbLine').innerHTML = c ? L(`🔥 Máy chủ: Firebase <b>${c.projectId}</b>`, `🔥 Server: Firebase <b>${c.projectId}</b>`) : L('🔗 Chưa có Firebase — dùng kết nối trực tiếp (PeerJS)', '🔗 No Firebase — using direct P2P'); }
+fbStatusLine();
 
 updateProfileHUD();
 animate();

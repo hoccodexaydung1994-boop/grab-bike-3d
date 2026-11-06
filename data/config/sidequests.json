@@ -1,0 +1,196 @@
+{
+ "quests": [
+  {
+   "id": "grandma_med",
+   "giver": [
+    "👵 Bà Sáu",
+    "👵 Grandma Sáu"
+   ],
+   "intro": [
+    "Con ơi, bà bị đau lưng mà không đi xa được. Con mua giúp bà hộp thuốc ở cửa hàng/nhà thuốc gần đây nha, bà gửi tiền.",
+    "Dear, my back hurts. Could you buy me some medicine from a nearby store? I'll pay you back."
+   ],
+   "steps": [
+    {
+     "to": "shop",
+     "say": [
+      "🏪 Mua thuốc cho bà Sáu",
+      "🏪 Buy medicine for Grandma"
+     ],
+     "cost": 30000
+    },
+    {
+     "to": "giver",
+     "say": [
+      "👵 Mang thuốc về cho bà",
+      "👵 Bring it back"
+     ]
+    }
+   ],
+   "done": [
+    "Ôi con ngoan quá, bà gửi lại tiền thuốc với chút quà nè.",
+    "Bless you! Here's the money back and a little gift."
+   ],
+   "cash": 60000,
+   "xp": 60
+  },
+  {
+   "id": "docs",
+   "giver": [
+    "👔 Anh Minh (nhân viên văn phòng)",
+    "👔 Minh (office worker)"
+   ],
+   "intro": [
+    "Anh quên tập hồ sơ ký hợp đồng, em chở gấp tới tòa văn phòng này giúp anh trong 10 phút được không?",
+    "I forgot the contract documents — can you rush them to this office in 10 minutes?"
+   ],
+   "steps": [
+    {
+     "to": "tower",
+     "say": [
+      "📄 Giao hồ sơ tới tòa nhà",
+      "📄 Deliver the documents"
+     ],
+     "limit": 10
+    }
+   ],
+   "done": [
+    "Kịp giờ! Cảm ơn em nhiều.",
+    "Just in time! Thanks a lot."
+   ],
+   "cash": 70000,
+   "xp": 70
+  },
+  {
+   "id": "dog",
+   "giver": [
+    "👧 Bé Na",
+    "👧 Little Na"
+   ],
+   "intro": [
+    "Chú ơi, con chó Mực của con chạy ra công viên mất rồi, chú tìm giúp con với!",
+    "My dog Mực ran off to the park, please help me find him!"
+   ],
+   "steps": [
+    {
+     "to": "park",
+     "say": [
+      "🐕 Tìm chó Mực ở công viên",
+      "🐕 Find Mực in the park"
+     ]
+    },
+    {
+     "to": "giver",
+     "say": [
+      "👧 Đưa Mực về cho bé Na",
+      "👧 Bring Mực back"
+     ]
+    }
+   ],
+   "done": [
+    "Mực ơi! Con cảm ơn chú nhiều lắm!",
+    "Mực! Thank you so much!"
+   ],
+   "cash": 40000,
+   "xp": 80,
+   "stress": -10
+  },
+  {
+   "id": "tourist",
+   "giver": [
+    "🧳 Emma (du khách)",
+    "🧳 Emma (tourist)"
+   ],
+   "intro": [
+    "Excuse me! Could you take me to Crescent Mall? I can pay.",
+    "Excuse me! Could you take me to Crescent Mall? I can pay."
+   ],
+   "english": true,
+   "steps": [
+    {
+     "to": "mall",
+     "say": [
+      "🛍️ Chở Emma tới Crescent Mall",
+      "🛍️ Take Emma to Crescent Mall"
+     ],
+     "pax": true
+    }
+   ],
+   "done": [
+    "Thank you so much! Here, keep the change.",
+    "Thank you so much! Here, keep the change."
+   ],
+   "cash": 90000,
+   "xp": 90
+  },
+  {
+   "id": "stranded",
+   "giver": [
+    "🧔 Chú Ba (hết xăng)",
+    "🧔 Uncle Ba (out of fuel)"
+   ],
+   "intro": [
+    "Xe chú hết xăng giữa đường, con chạy ra cây xăng mua giúp chú một chai được không?",
+    "My bike is out of fuel — could you get me a bottle from the station?"
+   ],
+   "steps": [
+    {
+     "to": "fuel",
+     "say": [
+      "⛽ Mua chai xăng ở cây xăng",
+      "⛽ Buy a bottle of fuel"
+     ],
+     "cost": 25000
+    },
+    {
+     "to": "giver",
+     "say": [
+      "🧔 Mang xăng cho chú Ba",
+      "🧔 Bring the fuel back"
+     ]
+    }
+   ],
+   "done": [
+    "Cứu chú một bàn thua! Cầm lấy chút cà phê nha con.",
+    "You saved me! Have a coffee on me."
+   ],
+   "cash": 55000,
+   "xp": 60
+  },
+  {
+   "id": "flowers",
+   "giver": [
+    "💐 Cô dâu Hạnh",
+    "💐 Bride Hạnh"
+   ],
+   "intro": [
+    "Tiệm hoa giao trễ, em lấy giúp chị bó hoa cưới ở quán này rồi mang về đây trước giờ làm lễ nha!",
+    "The florist is late — please pick up my wedding bouquet and bring it here before the ceremony!"
+   ],
+   "steps": [
+    {
+     "to": "merchant",
+     "say": [
+      "💐 Lấy bó hoa cưới",
+      "💐 Pick up the bouquet"
+     ]
+    },
+    {
+     "to": "giver",
+     "say": [
+      "💐 Mang hoa về cho cô dâu",
+      "💐 Bring it to the bride"
+     ],
+     "limit": 20,
+     "fragile": true
+    }
+   ],
+   "done": [
+    "Đẹp quá, kịp giờ luôn! Cảm ơn em, lấy bánh cưới ăn lấy hên nha.",
+    "Beautiful and on time! Thank you — have some wedding cake."
+   ],
+   "cash": 100000,
+   "xp": 100
+  }
+ ]
+}

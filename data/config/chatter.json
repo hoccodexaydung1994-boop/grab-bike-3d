@@ -1,0 +1,64 @@
+{
+ "greet": [
+  [
+   "Ê chú em, ngồi uống ly trà đá đi, chạy hoài mệt lắm!",
+   "Hey, sit down and have some iced tea!"
+  ],
+  [
+   "Hôm nay sao rồi? Có cuốc ngon không?",
+   "How's today? Any good jobs?"
+  ],
+  [
+   "Lại đây ngồi, anh em tài xế với nhau cả mà.",
+   "Come sit, we're all drivers here."
+  ]
+ ],
+ "tips": [
+  [
+   "Giờ này dân văn phòng ra ăn trưa, đứng gần {hot} là nổ cuốc liền.",
+   "Office workers are out for lunch — wait near {hot}."
+  ],
+  [
+   "Chiều tối khu {hot} đơn đồ ăn nhiều lắm, chú qua đó canh thử.",
+   "In the evening {hot} gets lots of food orders."
+  ],
+  [
+   "Nghe nói hôm nay CSGT đứng ở {cp}, né ra mà chạy.",
+   "Heard the police are at {cp} today — avoid it."
+  ],
+  [
+   "Mưa xuống là cước lên, nhớ mang áo mưa theo xe nha.",
+   "When it rains fares go up — keep a raincoat."
+  ],
+  [
+   "Khách nước ngoài tip mạnh lắm, học chút tiếng Anh đi là có lời.",
+   "Foreign customers tip well — learn some English."
+  ],
+  [
+   "Đơn ghép 2 quán thì đi theo thứ tự gần nhất, đừng để món nguội.",
+   "With batched orders take the shortest route, keep it hot."
+  ],
+  [
+   "Đừng để nhiều tiền mặt trong túi khi ngủ bụi, dễ mất lắm.",
+   "Don't carry much cash when napping outside."
+  ],
+  [
+   "Đi Cầu Phú Mỹ nhớ giữ làn, quẹt lan can là té sông đó!",
+   "Keep your lane on Phú Mỹ bridge!"
+  ]
+ ],
+ "gossip": [
+  [
+   "Thằng Hai mới đổi Exciter, giờ chạy như bay mà tốn xăng quá trời.",
+   "Hai just got an Exciter — fast but thirsty."
+  ],
+  [
+   "Chị Lan bên GrabFood được khách tip 100 nghìn vì giao bánh kem nguyên vẹn đó.",
+   "Lan got a 100k tip for delivering a cake intact."
+  ],
+  [
+   "Quán hủ tiếu gõ đầu hẻm ngon mà rẻ, tối ghé ăn thử.",
+   "The noodle cart down the alley is cheap and tasty."
+  ]
+ ]
+}

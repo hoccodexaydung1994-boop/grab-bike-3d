@@ -1,0 +1,270 @@
+{
+ "lessons": [
+  {
+   "id": "greet",
+   "t": [
+    "Chào hỏi khách",
+    "Greeting passengers"
+   ],
+   "vocab": [
+    [
+     "Hello, I'm your Grab driver.",
+     "Xin chào, tôi là tài xế Grab."
+    ],
+    [
+     "Please wear this helmet.",
+     "Anh/chị đội mũ bảo hiểm giúp em."
+    ],
+    [
+     "Are you ready?",
+     "Anh/chị sẵn sàng chưa?"
+    ]
+   ],
+   "quiz": [
+    {
+     "q": "Khách vừa tới, bạn nói gì?",
+     "o": [
+      "Get on.",
+      "Hello! I'm your Grab driver. Please wear this helmet.",
+      "Hurry up."
+     ],
+     "a": 1
+    },
+    {
+     "q": "“Helmet” nghĩa là gì?",
+     "o": [
+      "Mũ bảo hiểm",
+      "Áo mưa",
+      "Điện thoại"
+     ],
+     "a": 0
+    },
+    {
+     "q": "Hỏi khách đã sẵn sàng chưa:",
+     "o": [
+      "You ready or not?",
+      "Are you ready?",
+      "Go now?"
+     ],
+     "a": 1
+    }
+   ]
+  },
+  {
+   "id": "direction",
+   "t": [
+    "Chỉ đường",
+    "Directions"
+   ],
+   "vocab": [
+    [
+     "Turn left / turn right",
+     "Rẽ trái / rẽ phải"
+    ],
+    [
+     "Go straight",
+     "Đi thẳng"
+    ],
+    [
+     "It's next to the mall.",
+     "Nó ở cạnh trung tâm thương mại."
+    ],
+    [
+     "About 5 minutes",
+     "Khoảng 5 phút"
+    ]
+   ],
+   "quiz": [
+    {
+     "q": "“Go straight” là:",
+     "o": [
+      "Quay lại",
+      "Đi thẳng",
+      "Dừng lại"
+     ],
+     "a": 1
+    },
+    {
+     "q": "Khách hỏi còn bao lâu. Bạn trả lời:",
+     "o": [
+      "About 5 minutes.",
+      "I don't know.",
+      "Long time."
+     ],
+     "a": 0
+    },
+    {
+     "q": "“Rẽ phải” trong tiếng Anh:",
+     "o": [
+      "Turn left",
+      "Turn right",
+      "Turn back"
+     ],
+     "a": 1
+    }
+   ]
+  },
+  {
+   "id": "money",
+   "t": [
+    "Thanh toán",
+    "Payment"
+   ],
+   "vocab": [
+    [
+     "That's 45,000 dong.",
+     "Của anh/chị 45.000 đồng."
+    ],
+    [
+     "Cash or card?",
+     "Tiền mặt hay thẻ?"
+    ],
+    [
+     "Here is your change.",
+     "Tiền thối của anh/chị đây."
+    ],
+    [
+     "Thank you, have a nice day!",
+     "Cảm ơn, chúc một ngày tốt lành!"
+    ]
+   ],
+   "quiz": [
+    {
+     "q": "Đưa tiền thối cho khách:",
+     "o": [
+      "Here is your change.",
+      "Give me money.",
+      "No change."
+     ],
+     "a": 0
+    },
+    {
+     "q": "Hỏi khách trả bằng gì:",
+     "o": [
+      "Money now!",
+      "Cash or card?",
+      "Pay pay?"
+     ],
+     "a": 1
+    },
+    {
+     "q": "Chào khách khi kết thúc:",
+     "o": [
+      "Bye, go.",
+      "Thank you, have a nice day!",
+      "Finish."
+     ],
+     "a": 1
+    }
+   ]
+  },
+  {
+   "id": "food",
+   "t": [
+    "Giao đồ ăn",
+    "Food delivery"
+   ],
+   "vocab": [
+    [
+     "Your order has arrived.",
+     "Đơn của anh/chị tới rồi."
+    ],
+    [
+     "I'm waiting at the lobby.",
+     "Em đang đợi ở sảnh."
+    ],
+    [
+     "Could you come down, please?",
+     "Anh/chị xuống nhận giúp em được không?"
+    ],
+    [
+     "Enjoy your meal!",
+     "Chúc ngon miệng!"
+    ]
+   ],
+   "quiz": [
+    {
+     "q": "Bạn đang chờ ở sảnh chung cư:",
+     "o": [
+      "I'm waiting at the lobby.",
+      "Lobby me.",
+      "Where you?"
+     ],
+     "a": 0
+    },
+    {
+     "q": "Nhờ khách xuống nhận lịch sự:",
+     "o": [
+      "Come down now.",
+      "Could you come down, please?",
+      "Down!"
+     ],
+     "a": 1
+    },
+    {
+     "q": "“Enjoy your meal!” nghĩa là:",
+     "o": [
+      "Chúc ngon miệng!",
+      "Món hết rồi",
+      "Trả tiền đi"
+     ],
+     "a": 0
+    }
+   ]
+  },
+  {
+   "id": "problem",
+   "t": [
+    "Xử lý sự cố",
+    "Handling problems"
+   ],
+   "vocab": [
+    [
+     "Sorry for the delay.",
+     "Xin lỗi vì đến trễ."
+    ],
+    [
+     "There is heavy traffic.",
+     "Đường đang kẹt xe."
+    ],
+    [
+     "It's raining, please wear a raincoat.",
+     "Trời mưa, anh/chị mặc áo mưa nhé."
+    ],
+    [
+     "Please hold on tight.",
+     "Anh/chị ngồi vững nhé."
+    ]
+   ],
+   "quiz": [
+    {
+     "q": "Bạn đến trễ vì kẹt xe:",
+     "o": [
+      "Sorry for the delay. There is heavy traffic.",
+      "Not my fault.",
+      "Traffic bad, you wait."
+     ],
+     "a": 0
+    },
+    {
+     "q": "Nhắc khách ngồi chắc:",
+     "o": [
+      "Sit!",
+      "Please hold on tight.",
+      "Don't fall."
+     ],
+     "a": 1
+    },
+    {
+     "q": "“Raincoat” là:",
+     "o": [
+      "Áo mưa",
+      "Áo khoác",
+      "Ô dù"
+     ],
+     "a": 0
+    }
+   ]
+  }
+ ]
+}

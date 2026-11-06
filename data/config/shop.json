@@ -1,0 +1,372 @@
+{
+ "MENU": {
+  "restaurant": [
+   "Cơm tấm sườn bì chả",
+   "Bún bò Huế",
+   "Phở bò tái",
+   "Gà nướng mật ong",
+   "Lẩu thái mini",
+   "Cơm gà xối mỡ"
+  ],
+  "cafe": [
+   "Cà phê sữa đá",
+   "Bạc xỉu",
+   "Trà đào cam sả",
+   "Trà sữa trân châu",
+   "Cold brew"
+  ],
+  "fast_food": [
+   "Combo gà rán",
+   "Burger bò",
+   "Pizza hải sản"
+  ],
+  "bakery": [
+   "Bánh mì thịt",
+   "Bánh croissant",
+   "Bánh kem dâu"
+  ],
+  "ice_cream": [
+   "Kem dừa",
+   "Kem matcha"
+  ],
+  "food_court": [
+   "Cơm văn phòng",
+   "Mì xào bò"
+  ],
+  "bar": [
+   "Cánh gà chiên nước mắm",
+   "Khoai tây chiên"
+  ],
+  "pub": [
+   "Bò lúc lắc",
+   "Khô gà lá chanh"
+  ]
+ },
+ "FOOD_MENU": [
+  [
+   "🥖 Bánh mì thịt",
+   20000,
+   {
+    "hunger": -35,
+    "hp": 3
+   }
+  ],
+  [
+   "🍛 Cơm tấm sườn",
+   40000,
+   {
+    "hunger": -60,
+    "hp": 8,
+    "stamina": 5
+   }
+  ],
+  [
+   "💧 Nước suối",
+   8000,
+   {
+    "thirst": -45
+   }
+  ],
+  [
+   "🧋 Trà đá",
+   5000,
+   {
+    "thirst": -30,
+    "stress": -3
+   }
+  ],
+  [
+   "☕ Cà phê sữa đá",
+   25000,
+   {
+    "thirst": -25,
+    "stamina": 25,
+    "stress": -5
+   }
+  ]
+ ],
+ "VENDOR_KINDS": {
+  "banhmi": {
+   "n": "🥖 Xe bánh mì",
+   "en": "🥖 Bánh mì cart",
+   "open": [
+    5,
+    22
+   ],
+   "col": 15911244,
+   "poison": 0.05,
+   "menu": [
+    [
+     "🥖 Bánh mì thịt",
+     20000,
+     {
+      "hunger": -35,
+      "hp": 3
+     }
+    ],
+    [
+     "🍳 Bánh mì ốp la",
+     18000,
+     {
+      "hunger": -30,
+      "stamina": 4
+     }
+    ],
+    [
+     "🥖 Bánh mì xíu mại",
+     22000,
+     {
+      "hunger": -38,
+      "hp": 2
+     }
+    ]
+   ]
+  },
+  "com": {
+   "n": "🍛 Cơm bình dân",
+   "en": "🍛 Cheap rice stall",
+   "open": [
+    10,
+    21
+   ],
+   "col": 15105570,
+   "poison": 0.04,
+   "menu": [
+    [
+     "🍛 Cơm sườn trứng",
+     35000,
+     {
+      "hunger": -60,
+      "hp": 6,
+      "stamina": 5
+     }
+    ],
+    [
+     "🍗 Cơm gà xối mỡ",
+     38000,
+     {
+      "hunger": -62,
+      "hp": 5,
+      "stamina": 6
+     }
+    ],
+    [
+     "🥬 Cơm rau + canh",
+     25000,
+     {
+      "hunger": -45,
+      "thirst": -10,
+      "hp": 4
+     }
+    ]
+   ]
+  },
+  "mia": {
+   "n": "🥤 Nước mía",
+   "en": "🥤 Sugarcane juice",
+   "open": [
+    8,
+    21
+   ],
+   "col": 8110147,
+   "poison": 0.01,
+   "menu": [
+    [
+     "🥤 Nước mía",
+     12000,
+     {
+      "thirst": -45,
+      "stamina": 5
+     }
+    ],
+    [
+     "🍋 Mía tắc",
+     15000,
+     {
+      "thirst": -50,
+      "stamina": 6,
+      "stress": -3
+     }
+    ]
+   ]
+  },
+  "trada": {
+   "n": "🧋 Trà đá vỉa hè",
+   "en": "🧋 Iced tea corner",
+   "open": [
+    6,
+    23
+   ],
+   "col": 10185539,
+   "poison": 0,
+   "menu": [
+    [
+     "🧋 Trà đá",
+     3000,
+     {
+      "thirst": -30,
+      "stress": -4
+     }
+    ],
+    [
+     "🌻 Hướng dương + trà đá",
+     13000,
+     {
+      "thirst": -25,
+      "stress": -10,
+      "hunger": -5
+     }
+    ]
+   ]
+  },
+  "hutieu": {
+   "n": "🍜 Hủ tiếu gõ",
+   "en": "🍜 Knock-knock noodles",
+   "open": [
+    16,
+    26
+   ],
+   "col": 12597547,
+   "poison": 0.06,
+   "menu": [
+    [
+     "🍜 Hủ tiếu gõ",
+     25000,
+     {
+      "hunger": -45,
+      "thirst": -10,
+      "hp": 4
+     }
+    ],
+    [
+     "🍜 Mì gõ thêm trứng",
+     30000,
+     {
+      "hunger": -52,
+      "thirst": -8,
+      "hp": 4,
+      "stamina": 4
+     }
+    ]
+   ]
+  },
+  "vong": {
+   "n": "☕ Cà phê võng",
+   "en": "☕ Hammock café",
+   "open": [
+    5,
+    22
+   ],
+   "col": 6111287,
+   "poison": 0,
+   "menu": [
+    [
+     "☕ Cà phê sữa đá",
+     15000,
+     {
+      "thirst": -25,
+      "stamina": 25,
+      "stress": -5
+     }
+    ],
+    [
+     "🧊 Bạc xỉu",
+     18000,
+     {
+      "thirst": -30,
+      "stamina": 18,
+      "stress": -6
+     }
+    ],
+    [
+     "🥥 Nước dừa",
+     20000,
+     {
+      "thirst": -50,
+      "stamina": 6
+     }
+    ]
+   ]
+  },
+  "che": {
+   "n": "🍧 Chè",
+   "en": "🍧 Sweet soup",
+   "open": [
+    13,
+    23
+   ],
+   "col": 15277667,
+   "poison": 0.02,
+   "menu": [
+    [
+     "🍧 Chè thập cẩm",
+     15000,
+     {
+      "thirst": -20,
+      "hunger": -15,
+      "stress": -6
+     }
+    ],
+    [
+     "🍮 Rau câu dừa",
+     12000,
+     {
+      "thirst": -15,
+      "hunger": -10,
+      "stress": -5
+     }
+    ]
+   ]
+  }
+ },
+ "RARE_ITEMS": [
+  [
+   "🎂 Bánh kem sinh nhật 3 tầng",
+   "birthday cake"
+  ],
+  [
+   "💐 Bó hoa tươi",
+   "flowers"
+  ],
+  [
+   "🍲 Nồi lẩu Thái nóng",
+   "hotpot"
+  ],
+  [
+   "🍶 Hũ yến sào (dễ vỡ)",
+   "glass jar"
+  ]
+ ],
+ "ZONE_NAME": {
+  "apt": [
+   "🏢 Chung cư",
+   "🏢 Apartment"
+  ],
+  "office": [
+   "🏬 Tòa văn phòng",
+   "🏬 Office tower"
+  ],
+  "house": [
+   "🏠 Nhà riêng",
+   "🏠 House"
+  ]
+ },
+ "CUST_TYPES": {
+  "normal": [
+   "",
+   ""
+  ],
+  "vip": [
+   "💎 Khách VIP",
+   "💎 VIP"
+  ],
+  "hard": [
+   "😤 Khách khó tính",
+   "😤 Picky"
+  ],
+  "kind": [
+   "😊 Khách dễ thương",
+   "😊 Friendly"
+  ]
+ }
+}

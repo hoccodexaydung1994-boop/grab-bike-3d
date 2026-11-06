@@ -1,0 +1,203 @@
+{
+ "SKINS": [
+  14857356,
+  13012578,
+  9263675
+ ],
+ "JACKETS": {
+  "grab": {
+   "n": [
+    "Áo Grab xanh",
+    "Grab green"
+   ],
+   "c": [
+    "#00c45a",
+    "#009a43",
+    "#007a35"
+   ],
+   "sl": 45391,
+   "dk": 33850,
+   "txt": "TÀI XẾ",
+   "cost": 0,
+   "lv": 1
+  },
+  "rain": {
+   "n": [
+    "Áo mưa xanh dương",
+    "Blue raincoat"
+   ],
+   "c": [
+    "#4aa3ff",
+    "#2f7fd6",
+    "#2367b0"
+   ],
+   "sl": 4034544,
+   "dk": 2320304,
+   "txt": "",
+   "cost": 60000,
+   "lv": 1
+  },
+  "white": {
+   "n": [
+    "Áo khoác trắng",
+    "White jacket"
+   ],
+   "c": [
+    "#fafafa",
+    "#e3e3e3",
+    "#cfcfcf"
+   ],
+   "sl": 15921906,
+   "dk": 12434877,
+   "txt": "GRAB",
+   "cost": 80000,
+   "lv": 1
+  },
+  "black": {
+   "n": [
+    "Áo khoác đen",
+    "Black jacket"
+   ],
+   "c": [
+    "#33373d",
+    "#1f2226",
+    "#141619"
+   ],
+   "sl": 2764082,
+   "dk": 1316377,
+   "txt": "RIDER",
+   "cost": 120000,
+   "lv": 2
+  },
+  "pink": {
+   "n": [
+    "Áo hồng GrabFood",
+    "Pink GrabFood"
+   ],
+   "c": [
+    "#ff7eb6",
+    "#e8559a",
+    "#c93d80"
+   ],
+   "sl": 15755944,
+   "dk": 13188480,
+   "txt": "FOOD",
+   "cost": 120000,
+   "lv": 3
+  },
+  "retro": {
+   "n": [
+    "Áo retro cam vàng",
+    "Retro orange"
+   ],
+   "c": [
+    "#ffb02e",
+    "#f07b1d",
+    "#c95f10"
+   ],
+   "sl": 16094751,
+   "dk": 13197072,
+   "txt": "SÀI GÒN",
+   "cost": 250000,
+   "lv": 5
+  }
+ },
+ "HELMET_LOOKS": {
+  "grab": {
+   "n": [
+    "Xanh Grab",
+    "Grab green"
+   ],
+   "c": 45391,
+   "cost": 0,
+   "lv": 1
+  },
+  "white": {
+   "n": [
+    "Trắng",
+    "White"
+   ],
+   "c": 15921906,
+   "cost": 50000,
+   "lv": 1
+  },
+  "black": {
+   "n": [
+    "Đen nhám",
+    "Matte black"
+   ],
+   "c": 1842464,
+   "cost": 70000,
+   "lv": 1
+  },
+  "pink": {
+   "n": [
+    "Hồng",
+    "Pink"
+   ],
+   "c": 16740270,
+   "cost": 70000,
+   "lv": 2
+  },
+  "red": {
+   "n": [
+    "Đỏ",
+    "Red"
+   ],
+   "c": 14034984,
+   "cost": 90000,
+   "lv": 3
+  },
+  "gold": {
+   "n": [
+    "Vàng ánh kim",
+    "Gold"
+   ],
+   "c": 13938487,
+   "cost": 300000,
+   "lv": 8
+  }
+ },
+ "ACCS": {
+  "none": {
+   "n": [
+    "Không",
+    "None"
+   ],
+   "cost": 0,
+   "lv": 1
+  },
+  "mask": {
+   "n": [
+    "Khẩu trang",
+    "Face mask"
+   ],
+   "cost": 10000,
+   "lv": 1
+  },
+  "sleeves": {
+   "n": [
+    "Ống tay chống nắng",
+    "Sun sleeves"
+   ],
+   "cost": 30000,
+   "lv": 1
+  },
+  "bag": {
+   "n": [
+    "Balo",
+    "Backpack"
+   ],
+   "cost": 150000,
+   "lv": 4
+  }
+ },
+ "shirtColors": [
+  15224923,
+  15971133,
+  6000111,
+  16777215,
+  10185686,
+  16747069
+ ]
+}

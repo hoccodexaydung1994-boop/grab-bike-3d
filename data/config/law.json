@@ -1,0 +1,37 @@
+{
+ "LAW": {
+  "red": {
+   "pts": 4,
+   "fine": 200000,
+   "name": [
+    "Vượt đèn đỏ",
+    "Running a red light"
+   ],
+   "real": "Ngoài đời: phạt 4–6 triệu đồng (xe máy)."
+  },
+  "wrong": {
+   "pts": 2,
+   "fine": 150000,
+   "name": [
+    "Đi ngược chiều đường một chiều",
+    "Riding the wrong way"
+   ]
+  },
+  "sidewalk": {
+   "pts": 1,
+   "fine": 100000,
+   "name": [
+    "Chạy xe lên vỉa hè",
+    "Riding on the sidewalk"
+   ]
+  },
+  "speed": {
+   "pts": 2,
+   "fine": 150000,
+   "name": [
+    "Chạy quá tốc độ",
+    "Speeding"
+   ]
+  }
+ }
+}

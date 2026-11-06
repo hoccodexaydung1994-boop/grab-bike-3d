@@ -1,0 +1,77 @@
+{
+ "_note": "Đặt file vào assets/audio/ đúng tên 'file'. Thiếu file nào thì game tự dùng âm thanh tổng hợp cho file đó. 'url' (tuỳ chọn): link trực tiếp tới file trên CDN có CORS.",
+ "sounds": {
+  "engine": {
+   "file": "engine_loop.ogg",
+   "loop": true,
+   "vol": 0.35,
+   "src": "https://opengameart.org/content/racing-car-engine-sound-loops",
+   "license": "CC0",
+   "hint": "loop_0.wav (đổi tên/chuyển sang engine_loop.ogg hoặc sửa 'file' thành engine_loop.wav)"
+  },
+  "rain": {
+   "file": "rain_loop.ogg",
+   "loop": true,
+   "vol": 0.6,
+   "src": "https://opengameart.org/content/rain-loopable",
+   "license": "CC0",
+   "hint": "giải nén Rain OGG.zip, lấy 1 file"
+  },
+  "city": {
+   "file": "city_loop.ogg",
+   "loop": true,
+   "vol": 0.35,
+   "src": "https://mixkit.co/free-sound-effects/car/",
+   "license": "Mixkit SFX License",
+   "hint": "Urban city sounds and light car traffic"
+  },
+  "horn": {
+   "file": "horn.ogg",
+   "loop": false,
+   "vol": 0.7,
+   "src": "https://mixkit.co/free-sound-effects/car/",
+   "license": "Mixkit SFX License",
+   "hint": "Small car horn"
+  },
+  "crash": {
+   "file": "crash.ogg",
+   "loop": false,
+   "vol": 0.7,
+   "src": "https://mixkit.co/free-sound-effects/car/",
+   "license": "Mixkit SFX License",
+   "hint": "Toy car crash (hoặc bất kỳ tiếng va chạm)"
+  },
+  "start": {
+   "file": "engine_start.ogg",
+   "loop": false,
+   "vol": 0.6,
+   "src": "https://opengameart.org/node/93658",
+   "license": "CC0",
+   "hint": "generic_car_startengine_1.wav"
+  },
+  "offer": {
+   "file": "offer.ogg",
+   "loop": false,
+   "vol": 0.6,
+   "src": "",
+   "license": "",
+   "hint": "tiếng ting báo cuốc mới (tuỳ chọn)"
+  },
+  "cash": {
+   "file": "cash.ogg",
+   "loop": false,
+   "vol": 0.6,
+   "src": "",
+   "license": "",
+   "hint": "tiếng tiền về (tuỳ chọn)"
+  },
+  "siren": {
+   "file": "siren.ogg",
+   "loop": true,
+   "vol": 0.45,
+   "src": "",
+   "license": "",
+   "hint": "còi hú CSGT (tuỳ chọn)"
+  }
+ }
+}

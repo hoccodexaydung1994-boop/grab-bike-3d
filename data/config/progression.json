@@ -1,0 +1,192 @@
+{
+ "SKILLS": {
+  "lai": {
+   "name": [
+    "🏍️ Tay lái lụa",
+    "🏍️ Smooth rider"
+   ],
+   "ranks": [
+    "+3% tốc độ tối đa, -10% sát thương va chạm (mỗi bậc)",
+    "",
+    "",
+    "Bậc 4: khách hay tip hơn (+5%)",
+    "Bậc 5: tốc độ +15%, va chạm -50%"
+   ]
+  },
+  "deo": {
+   "name": [
+    "💪 Dẻo dai",
+    "💪 Endurance"
+   ],
+   "ranks": [
+    "-10% hao thể lực, -6% đói/khát (mỗi bậc)",
+    "",
+    "",
+    "",
+    "Bậc 5: không bao giờ ngủ gật"
+   ]
+  },
+  "tho": {
+   "name": [
+    "🗺️ Thổ địa Q7",
+    "🗺️ Local expert"
+   ],
+   "ranks": [
+    "+3% giá cước (mỗi bậc)",
+    "Bậc 2: thấy chốt CSGT trên minimap",
+    "Bậc 3: cuốc tới nhanh hơn 30%, thoát truy đuổi nhanh hơn 20%",
+    "Bậc 4: khoảng cách cần để thoát CSGT ngắn hơn",
+    "Bậc 5: tiền tip +15%"
+   ]
+  }
+ },
+ "UNLOCKS": [
+  {
+   "lv": 2,
+   "id": "food",
+   "t": [
+    "🍜 GrabFood",
+    "🍜 GrabFood"
+   ]
+  },
+  {
+   "lv": 3,
+   "id": "batch",
+   "t": [
+    "🍱 Đơn ghép 2 quán – 2 khách",
+    "🍱 Batched orders"
+   ]
+  },
+  {
+   "lv": 4,
+   "id": "premium",
+   "t": [
+    "💎 Đơn giá trị cao (cước ×1,5)",
+    "💎 Premium orders (×1.5 fare)"
+   ]
+  },
+  {
+   "lv": 6,
+   "id": "night",
+   "t": [
+    "🌙 Chạy đêm tới 23:00",
+    "🌙 Night shift until 23:00"
+   ]
+  }
+ ],
+ "UPGRADES": {
+  "engine": {
+   "name": [
+    "⚙️ Động cơ",
+    "⚙️ Engine"
+   ],
+   "cost": [
+    300000,
+    800000,
+    2000000
+   ],
+   "fx": [
+    "+5% tốc độ / cấp",
+    "+5% speed / level"
+   ]
+  },
+  "tank": {
+   "name": [
+    "🛢️ Bình xăng",
+    "🛢️ Fuel tank"
+   ],
+   "cost": [
+    400000,
+    1000000
+   ],
+   "fx": [
+    "-20% hao xăng / cấp",
+    "-20% fuel use / level"
+   ]
+  },
+  "brake": {
+   "name": [
+    "🛞 Phanh & lốp",
+    "🛞 Brakes & tyres"
+   ],
+   "cost": [
+    250000,
+    600000
+   ],
+   "fx": [
+    "-15% hư hại va chạm / cấp",
+    "-15% crash damage / level"
+   ]
+  },
+  "box": {
+   "name": [
+    "📦 Thùng giữ nhiệt",
+    "📦 Thermal box"
+   ],
+   "cost": [
+    200000,
+    500000
+   ],
+   "fx": [
+    "Món nguội chậm hơn 30% / cấp",
+    "Food cools 30% slower / level"
+   ]
+  }
+ },
+ "PAINTS": [
+  [
+   "Xanh rêu (gốc)",
+   16777215
+  ],
+  [
+   "Xanh Grab",
+   8257456
+  ],
+  [
+   "Đỏ",
+   16747146
+  ],
+  [
+   "Vàng kem",
+   16773544
+  ],
+  [
+   "Xanh dương",
+   10275071
+  ],
+  [
+   "Hồng",
+   16759006
+  ]
+ ],
+ "ACH": {
+  "cham_chi": [
+   "💪 Tài xế chăm chỉ",
+   "10 chuyến trong một ngày"
+  ],
+  "hoan_hao": [
+   "🍱 Giao hàng hoàn hảo",
+   "5 đơn đồ ăn nóng hổi, nguyên vẹn, đúng giờ"
+  ],
+  "nam_sao": [
+   "⭐ Tài xế 5 sao",
+   "Nhận 10 đánh giá 5 sao"
+  ],
+  "nguoi_tot": [
+   "🙏 Người tốt",
+   "Trả lại đồ khách để quên"
+  ],
+  "tuan_thu": [
+   "🚦 Tuân thủ luật",
+   "Một ngày ≥5 chuyến, không vi phạm"
+  ],
+  "english": [
+   "🇬🇧 English Pro",
+   "20 câu trả lời tiếng Anh tốt"
+  ],
+  "dinh_vi": [
+   "🧭 Chuyên gia định vị",
+   "Chạy tổng cộng 50 km"
+  ]
+ }
+}

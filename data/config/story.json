@@ -1,0 +1,101 @@
+{
+ "chapters": [
+  {
+   "t": [
+    "Chương 1 · Cuốc xe đầu tiên",
+    "Ch.1 · First rides"
+   ],
+   "goal": [
+    "Hoàn thành 3 chuyến GrabBike",
+    "Complete 3 GrabBike rides"
+   ],
+   "say": [
+    "Chú em mới chạy hả? Anh là Tư, chạy Grab ở Quận 7 mười năm rồi. Trước hết cứ chạy 3 cuốc GrabBike cho quen đường đã. Nhớ đội mũ cho khách, chào hỏi đàng hoàng!",
+    "New here? I'm Tư, I've driven Grab in District 7 for ten years. Start with 3 GrabBike rides. Helmet for the passenger, and greet them politely!"
+   ],
+   "cash": 50000,
+   "xp": 120
+  },
+  {
+   "t": [
+    "Chương 2 · Mùi đồ ăn",
+    "Ch.2 · Smell of food"
+   ],
+   "goal": [
+    "Giao 2 đơn GrabFood và ghé Crescent Mall",
+    "Deliver 2 GrabFood orders and visit Crescent Mall"
+   ],
+   "say": [
+    "Khá lắm! Giờ thử giao đồ ăn: giữ món nóng, đừng té xe. Xong ghé Crescent Mall một vòng cho biết chỗ, khu đó đơn nhiều lắm.",
+    "Nice! Now try food delivery: keep it hot, don't crash. Then swing by Crescent Mall — lots of orders around there."
+   ],
+   "cash": 60000,
+   "xp": 150,
+   "needLv": 2
+  },
+  {
+   "t": [
+    "Chương 3 · Luật là luật",
+    "Ch.3 · Rules are rules"
+   ],
+   "goal": [
+    "Một ngày chạy ≥5 chuyến, không vi phạm luật",
+    "One day with ≥5 jobs and zero violations"
+   ],
+   "say": [
+    "Tuần trước thằng Hai bị giam xe vì vượt đèn đỏ, mất trắng cả tuần. Chú thử một ngày chạy sạch: ít nhất 5 cuốc, không vi phạm gì nhé.",
+    "Last week Hai had his bike impounded for a red light. Try a clean day: at least 5 jobs, no violations."
+   ],
+   "cash": 80000,
+   "xp": 200
+  },
+  {
+   "t": [
+    "Chương 4 · Mưa Sài Gòn",
+    "Ch.4 · Saigon rain"
+   ],
+   "goal": [
+    "Hoàn thành 2 chuyến trong lúc trời mưa",
+    "Finish 2 jobs while it rains"
+   ],
+   "say": [
+    "Mùa mưa tới rồi. Mưa là cuốc giá cao nhưng đường trơn. Sắm sẵn áo mưa, chạy chậm, hoàn thành 2 cuốc dưới mưa cho anh xem.",
+    "Rainy season is here. Rain means higher fares but slippery roads. Get a raincoat and finish 2 jobs in the rain."
+   ],
+   "cash": 100000,
+   "xp": 250
+  },
+  {
+   "t": [
+    "Chương 5 · Tài xế 5 sao",
+    "Ch.5 · Five-star driver"
+   ],
+   "goal": [
+    "Đạt đánh giá trung bình ≥4,8 sau ≥20 chuyến",
+    "Average rating ≥4.8 with ≥20 jobs"
+   ],
+   "say": [
+    "Khách quen là vốn liếng. Giữ đánh giá từ 4,8 sao trở lên sau ít nhất 20 chuyến, app sẽ ưu tiên đổ cuốc cho chú.",
+    "Regulars are your capital. Keep ≥4.8 stars after at least 20 jobs and the app will favour you."
+   ],
+   "cash": 150000,
+   "xp": 300
+  },
+  {
+   "t": [
+    "Chương 6 · Giấc mơ",
+    "Ch.6 · The dream"
+   ],
+   "goal": [
+    "Tiết kiệm 2.000.000đ",
+    "Save 2,000,000đ"
+   ],
+   "say": [
+    "Anh hỏi thật: chú chạy xe để làm gì? Má ở quê cần tiền sửa nhà phải không. Gom đủ 2 triệu tiết kiệm đi, anh tin chú làm được.",
+    "Why do you ride? Your mum back home needs money to fix the house, right? Save 2 million — I believe in you."
+   ],
+   "cash": 300000,
+   "xp": 500
+  }
+ ]
+}

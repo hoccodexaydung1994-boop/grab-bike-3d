@@ -4,18 +4,32 @@
       "$room": {
         "players": {
           ".read": "auth != null",
-          "$uid": { ".write": "auth != null && auth.uid === $uid" }
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
         },
         "chat": {
           ".read": "auth != null",
-          "$msg": { ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length <= 120" }
+          "$msg": {
+            ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length <= 120"
+          }
         }
       }
     },
     "leaderboard": {
       ".read": "auth != null",
-      ".indexOn": ["total"],
-      "$uid": { ".write": "auth != null && auth.uid === $uid" }
+      ".indexOn": [
+        "total"
+      ],
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
     }
   }
 }

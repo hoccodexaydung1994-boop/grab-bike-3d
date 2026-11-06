@@ -1,40 +1,78 @@
-# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng)
+# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng) · v2.2
 
-Game 3D chạy trên web (Three.js): tài xế xe ôm công nghệ lái Vespa quanh khu phố, đón khách và chở tới nơi.
+Game 3D chạy trên web (Three.js): làm tài xế GrabBike / GrabFood chạy Vespa quanh Phú Mỹ Hưng trên bản đồ OpenStreetMap thật.
 
-## Các file
-- `index.html` – toàn bộ code game (HTML + CSS + JavaScript)
-- `models/vespa.glb` – mô hình xe Vespa đã giảm lưới cho web (~38 nghìn tam giác, texture nằm trong file)
+## Cấu trúc thư mục
+
+```
+grab-bike-3d/
+├── index.html              Khung giao diện (HTML) – không chứa code game
+├── css/style.css           Toàn bộ giao diện (menu, HUD, hội thoại, bảng quản lý)
+├── src/
+│   ├── main.js             Điểm khởi động: nạp three.js → dữ liệu → các file game theo manifest
+│   ├── manifest.json       Phiên bản + THỨ TỰ nạp file + danh sách file cấu hình
+│   ├── boot.js             Chạy cuối cùng: BOOT hooks, bắt đầu vòng lặp
+│   ├── core/               renderer, vật liệu, âm thanh, điều khiển, vòng lặp
+│   ├── models/             Vespa (GLB), người, điện thoại trên xe
+│   ├── world/              bản đồ, xe cộ, đêm, giờ cao điểm, cầu, người đi bộ, điểm nóng, phòng trọ 3D, âm thanh môi trường
+│   ├── game/               đơn hàng, luật giao thông, CSGT, đơn ghép, té xe, khách, khu giao hàng, Story Mode, nhiệm vụ phụ
+│   ├── life/               chỉ số sinh tồn, ăn uống vỉa hè, ngủ bụi, pin điện thoại, học tiếng Anh
+│   ├── player/             tạo nhân vật & trang phục, garage đổi xe
+│   ├── ui/                 HUD, bản đồ nhỏ, bảng quản lý (Tab), cần lái cảm ứng, tối ưu điện thoại
+│   ├── net/online.js       Chơi online (Firebase / PeerJS), bảng xếp hạng
+│   ├── net/friends.js      Bạn bè: thấy đúng xe & độ cao của bạn, danh sách bạn, tìm bạn trên bản đồ
+│   └── data/savedata.js    Quản lý dữ liệu: ô lưu, sao lưu, xuất/nhập file, lưu đám mây Google
+├── data/
+│   ├── map/q7.json         Bản đồ Quận 7 (đường, nhà, cây, đèn, quán) chuyển từ OSM
+│   └── config/             DỮ LIỆU GAME – sửa ở đây, không cần đụng code
+│       ├── shop.json       thực đơn quán, hàng rong, đơn hiếm, loại khách
+│       ├── law.json        lỗi vi phạm, mức phạt, trừ điểm GPLX
+│       ├── progression.json kỹ năng, mở khóa theo cấp, nâng cấp xe, màu sơn, thành tích
+│       ├── outfits.json    màu da, áo khoác, mũ bảo hiểm, phụ kiện (giá, cấp yêu cầu)
+│       ├── bikes.json      các mẫu xe trong garage (giá, tốc độ, hao xăng…)
+│       ├── story.json      lời thoại & phần thưởng 6 chương Story Mode
+│       ├── sidequests.json nhiệm vụ phụ (người nhờ, các bước, thưởng)
+│       ├── english.json    bài học tiếng Anh + câu hỏi
+│       ├── chatter.json    câu tán gẫu, mẹo của tài xế ở quán cóc
+│       └── sounds.json     danh sách file âm thanh, âm lượng
+├── models/vespa.glb        Mô hình xe
+├── assets/audio/           Âm thanh thật (xem assets/audio/README.md: tên file + link tải)
+├── tests/                  Kiểm tra tự động bằng Node (không cần trình duyệt)
+├── firebase-rules.json     Luật bảo mật Realtime Database (dán vào Firebase)
+└── vercel.json             Cấu hình cache cho Vercel
+```
+
+### Thêm một file code mới
+1. Tạo file trong `src/...` (các file dùng chung phạm vi toàn cục, như cùng một chương trình).
+2. Thêm đường dẫn vào `src/manifest.json` → `files` đúng chỗ (sau các file nó cần dùng).
+3. Tăng `version` trong manifest để trình duyệt tải bản mới.
+
+### Thêm/sửa dữ liệu
+Sửa file JSON trong `data/config/`, ví dụ thêm món vào `shop.json`, thêm xe vào `bikes.json`, thêm nhiệm vụ vào `sidequests.json`. File cấu hình mới thì thêm tên vào `config` trong manifest, code đọc bằng `CFG.<tên-file>`.
 
 ## Chạy
-- GitHub Pages: Settings → Pages → Branch `main`, thư mục `/ (root)` → mở `https://<tài-khoản>.github.io/<tên-repo>/`
-- Trên máy: chạy một web server trong thư mục này, ví dụ `python -m http.server 8000`, rồi mở http://localhost:8000
-  (bấm đúp mở thẳng index.html sẽ không tải được mô hình vì trình duyệt chặn file://)
+- **Vercel** (đang dùng): đẩy cả thư mục lên GitHub, Vercel tự triển khai.
+- **Trên máy**: phải chạy qua web server (mở thẳng `index.html` sẽ báo lỗi vì trình duyệt chặn đọc file):
+  `npx serve .` hoặc `python -m http.server 8000` → mở http://localhost:8000
+- **Kiểm tra lỗi**: `node tests/smoke-core.mjs .` · `node tests/smoke-features.mjs .` · `node tests/smoke-world.mjs .` · `node tests/smoke-net.mjs .`
 
-## Tính năng
-- Bản đồ Phú Mỹ Hưng (Q7) thật, đèn giao thông, CSGT (dừng nộp phạt / bỏ chạy → giam xe, khóa app hết ngày)
-- GrabBike & GrabFood (quán thật trên bản đồ), tìm đường theo đường thật
-- Chỉ số: Sức khỏe, Thể lực, Đói, Khát, Stress, Xăng, Độ bền xe; tiền mặt / ví / tiết kiệm
-- Hội thoại & lựa chọn (English Mode), sự kiện ngẫu nhiên, nhiệm vụ ngày, thành tích, báo cáo cuối ca, về nhà
-- Đơn ghép 2 quán – 2 khách (chọn tuyến tối ưu, thưởng combo)
-- Cây kỹ năng 3 nhánh, mở khóa theo cấp, nâng cấp xe, hạng tài xế, tỉ lệ nhận/hủy cuốc
-- Luật giao thông: chốt CSGT, camera phạt nguội, ngược chiều, vỉa hè, quá tốc độ, mức truy nã 0–5, điểm GPLX 12
-- Màn hình Hồ sơ / Kỹ năng / Xe / Tài chính / Cài đặt (phím Tab)
-- Chơi online cùng bạn bè: tạo phòng / nhập mã phòng (PeerJS, cần internet; một số mạng công ty/4G có thể chặn kết nối P2P)
-- Hồ sơ lưu trong trình duyệt (localStorage)
+## Âm thanh
+Tải file theo bảng trong `assets/audio/README.md`, bỏ vào `assets/audio/` rồi đẩy lên GitHub. Thiếu file nào, game dùng âm thanh tổng hợp cho phần đó.
+
+## Dữ liệu người chơi
+Bấm **💾 Dữ liệu** ở menu hoặc tab 💾 trong bảng Tab:
+- 3 ô lưu, sao lưu tự động mỗi ngày mới (giữ 5 bản gần nhất), khôi phục 1 chạm
+- Xuất / nhập file `.json` để chuyển sang máy khác
+- **Đăng nhập Google** → lưu hồ sơ lên đám mây (Firebase) và chơi tiếp ở thiết bị khác
+
+## Firebase
+1. Authentication → Sign-in method: bật **Anonymous** và **Google**.
+2. Authentication → Settings → Authorized domains: thêm `grab-bike-3d.vercel.app`.
+3. Realtime Database → Rules: dán `firebase-rules.json` (có thêm nhánh `users` cho lưu đám mây) → Publish.
+4. Cấu hình Firebase nằm ở đầu `src/net/online.js` (`FIREBASE_CONFIG`).
 
 ## Điều khiển
-Enter nhận cuốc · N bỏ qua · E hành động · Q nhiệm vụ · 1/2/3 chọn hội thoại · W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · H còi · G tới điểm đón/trả · P điện thoại · C đổi góc máy · V xem xe 360° · M tắt tiếng · R về nhà
+W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Enter nhận cuốc · N bỏ qua · E hành động · Q nhiệm vụ · Tab bảng quản lý · 1/2/3 chọn hội thoại · H còi · G tới điểm đón/trả · C đổi góc máy · M tắt tiếng
 
 ## Ghi công
-Bản đồ: © OpenStreetMap contributors (ODbL). Mô hình xe: "Electric scooter" – artgeorg (CGTrader, miễn phí). Thư viện: three.js r160 (tải từ cdn.jsdelivr.net).
-
-## Firebase (chơi online qua máy chủ riêng)
-1. Firebase Console → dự án của bạn → **Build → Authentication → Sign-in method → bật Anonymous**.
-2. **Authentication → Settings → Authorized domains → Add domain**: `<tên-tài-khoản>.github.io`.
-3. **Build → Realtime Database → Create database** (chọn vùng Singapore `asia-southeast1`).
-4. Tab **Rules**: dán nội dung `firebase-rules.json` → Publish.
-5. **Project settings → Your apps → Web app (</>)** → copy `firebaseConfig` (phải có `databaseURL`).
-6. Mở `index.html`, tìm dòng `const FIREBASE_CONFIG = null;` và thay `null` bằng object cấu hình,
-   ví dụ `const FIREBASE_CONFIG = { apiKey: "...", authDomain: "...", databaseURL: "https://....firebasedatabase.app", projectId: "...", appId: "..." };`
-   (hoặc dán cấu hình trong game: menu → 🌐 → ⚙️ Cấu hình Firebase — cách này chỉ lưu trên trình duyệt đó).
+Bản đồ © OpenStreetMap contributors (ODbL) · Mô hình xe "Electric scooter" – artgeorg (CGTrader, miễn phí) · three.js r160.

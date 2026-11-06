@@ -31,6 +31,13 @@
   #speed span{opacity:.8;font-size:14px}
   #toast{position:fixed;top:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);padding:12px 22px;border-radius:14px;font-size:18px;font-weight:700;text-align:center;opacity:0;transition:opacity .3s;z-index:8;pointer-events:none;max-width:90vw}
   #toast.show{opacity:1}
+  #hurt{position:fixed;inset:0;pointer-events:none;z-index:30;box-shadow:inset 0 0 160px 60px rgba(220,0,0,.65);opacity:0;transition:opacity .25s}
+  #hurt.on{opacity:1}
+  #bUp{position:fixed;left:50%;top:58%;transform:translateX(-50%);z-index:31}
+  #joy{position:absolute;left:18px;bottom:20px;width:170px;height:74px;border-radius:40px;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.35);pointer-events:auto;touch-action:none;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+  #joy span{position:absolute;bottom:4px;font-size:10px;opacity:.7;font-weight:700}
+  #joyKnob{width:58px;height:58px;border-radius:50%;background:rgba(0,177,79,.75);border:2px solid #fff;transition:transform .05s}
+  .pb.s{width:60px;height:6px}
   #limit{width:38px;height:38px;border-radius:50%;border:5px solid #e53935;background:#fff;color:#111;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;margin-left:auto;margin-bottom:4px}
   #limit.over{animation:blink .5s infinite}
   #wanted{position:fixed;top:132px;left:50%;transform:translateX(-50%);z-index:6;font-size:22px;text-shadow:0 2px 6px #000;white-space:nowrap}
@@ -163,7 +170,7 @@
     <div id="gLbBox" class="hidden" style="font-size:13px;margin-top:6px;line-height:1.6"><div id="gLb"></div></div>
   </div>
   <div class="btns" style="margin-top:6px"><button class="goal" id="bProfile">👤 Hồ sơ · Kỹ năng · Xe · Tài chính · Cài đặt</button></div>
-  <button id="bReset">Xoá hồ sơ</button>
+  <button id="bReset">🆕 Chơi mới (xoá hồ sơ)</button>
 </div>
 
 <div id="hud" class="hidden">
@@ -171,7 +178,7 @@
     <div class="brand">GRAB · <span id="pnm"></span> · Cấp <b id="lvl">1</b></div>
     <div class="xp"><i id="xpbar"></i></div>
     <div id="clock"></div>
-    <div id="stats"></div><div id="peak" style="font-size:12px;color:#ffd36b;font-weight:700"></div>
+    <div id="stats"></div><div id="food" style="font-size:12px"></div><div id="jam" style="font-size:12px;color:#fca5a5;font-weight:700"></div><div id="peak" style="font-size:12px;color:#ffd36b;font-weight:700"></div>
     <div>💵 <b id="cash">0đ</b> · 📱 <b id="wallet">0đ</b></div>
     <div style="font-size:12px;opacity:.85">Hôm nay <b id="money">0đ</b> · 🛵 <b id="trips">0</b> · ⭐ <b id="rating">5.0</b></div>
     <div class="goalw"><i id="goalbar"></i><span id="goaltxt"></span></div>
@@ -193,7 +200,7 @@
     <button class="sbtn" id="bView2">🔄</button>
   </div>
   <div id="sig" class="sig hidden"></div>
-  <div id="offer" class="hidden"><div class="ohead"><span id="offType"></span><b id="offFare"></b></div>
+  <div id="offer" class="hidden"><div class="ohead"><span id="offType"></span><b id="offFare"></b></div><div id="offCust" style="font-size:13px;margin-top:4px"></div>
     <div class="orow">🟢 <span id="offFrom"></span></div><div class="oitems" id="offItems"></div>
     <div class="orow">🟠 <span id="offTo"></span> · <span id="offKm"></span></div>
     <div class="obar"><i id="offBar"></i></div>
@@ -206,12 +213,14 @@
   <div id="lb" class="hidden"><div id="lbRows"></div><input id="chatIn" placeholder="💬 Chat… (Enter)" maxlength="120" style="width:100%;margin-top:6px;border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:12px"></div>
   <div id="help">W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Tab hồ sơ/kỹ năng/xe · Enter nhận cuốc · N bỏ qua · E hành động (xăng, ăn uống, sửa xe, nghỉ) · Q nhiệm vụ · H còi · G tới điểm đón/trả · P điện thoại · C đổi góc máy · V xem xe 360° · M tắt tiếng · R về nhà</div>
   <div id="touch" class="hidden">
-    <div class="tb" id="tLeft">◀</div><div class="tb" id="tRight">▶</div>
+    <div class="tb" id="tLeft" style="display:none">◀</div><div class="tb" id="tRight" style="display:none">▶</div><div id="joy"><div id="joyKnob"></div><span>◀ LÁI ▶</span></div>
     <div class="tb" id="tHorn">📯</div>
     <div class="tb" id="tBrake">PHANH</div><div class="tb" id="tGas">GA</div>
   </div>
 </div>
 <div id="toast"></div>
+<div id="hurt"></div>
+<button id="bUp" class="big hidden">🛵 Dựng xe dậy (E)</button>
 <div id="overlay" class="hidden"><div class="ovc"><h2 id="ovTitle"></h2><div id="ovBody"></div><div id="ovOpts"></div><button class="big" id="ovBtn"></button></div></div>
 <div id="mp" class="hidden"><div class="mpc"><div id="mpTabs"><button data-tab="profile">👤 Hồ sơ</button><button data-tab="skills">🌳 Kỹ năng</button><button data-tab="bike">🛵 Xe</button><button data-tab="money">💰 Tài chính</button><button data-tab="settings">⚙️ Cài đặt</button><button id="mpClose">✕</button></div><div id="mpBody"></div></div></div>
 <div id="dlg" class="hidden"><div class="dlgc"><div id="dlgWho"></div><div id="dlgText"></div><div id="dlgOpts"></div></div></div>
@@ -480,6 +489,7 @@ function drawPhone() {
   rr(g, W - 132, 42, 112, 32, 16); g.fillStyle = online ? '#ffffff' : '#c9d3cd'; g.fill();
   g.fillStyle = online ? '#0b8f45' : '#555'; g.font = '700 16px system-ui,sans-serif'; g.textAlign = 'center';
   g.fillText(online ? '● Trực tuyến' : '○ Ngoại tuyến', W - 76, 59);
+  if (phoneDead()) { g.fillStyle = '#050505'; g.fillRect(0, 0, W, H); g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = '700 60px system-ui'; g.fillText('📵', W / 2, H / 2 - 30); g.font = '700 22px system-ui'; g.fillText(L('Hết pin', 'Battery dead'), W / 2, H / 2 + 30); g.font = '500 15px system-ui'; g.fillText(L('Sạc ở quán cà phê (phím E)', 'Charge at a café (E)'), W / 2, H / 2 + 60); phoneTex.needsUpdate = true; return; }
   // earnings strip
   g.textAlign = 'left'; g.fillStyle = 'rgba(255,255,255,.85)'; g.font = '500 15px system-ui,sans-serif';
   g.fillText('Thu nhập hôm nay', 20, 92);
@@ -1560,8 +1570,11 @@ const vGrid = new Grid(25); const _vq = [], _sq = [];
 function updateCars(dt) {
   const k = 1 - Math.exp(-dt * 8);
   vGrid.m.clear();
-  for (const v of cars) { const p = v.mesh.position; vGrid.addBox(p.x, p.z, p.x, p.z, v); }
+  const lvl = trafficLevel();
+  for (const v of cars) { if (!v.mesh.visible) continue; const p = v.mesh.position; vGrid.addBox(p.x, p.z, p.x, p.z, v); }
   for (const v of cars) {
+    if (v.rk > lvl.frac) { v.mesh.visible = false; continue; }
+    if (!v.mesh.visible) { v.mesh.visible = true; placeNear(v, 160, 400); }
     const p = v.mesh.position, ry = v.mesh.rotation.y;
     // recycle far-away traffic into the area around the player
     if (Math.hypot(p.x - player.x, p.z - player.z) > 460) { placeNear(v, 160, 400); continue; }
@@ -1576,7 +1589,7 @@ function updateCars(dt) {
       if (ory !== null && Math.cos(ory - ry) < 0.5) return;
       gap = Math.min(gap, ahead - v.hl - ohl);
     };
-    for (const o of vGrid.query(p.x, p.z, look + 6, _vq)) if (o !== v) test(o.mesh.position.x, o.mesh.position.z, o.hl, o.hw, o.mesh.rotation.y);
+    for (const o of vGrid.query(p.x, p.z, look + 6, _vq)) if (o !== v && o.mesh.visible) test(o.mesh.position.x, o.mesh.position.z, o.hl, o.hw, o.mesh.rotation.y);
     test(player.x, player.z, 1.0, 0.45, null);
     if (police.active) test(police.x, police.z, 1.0, 0.45, null);
     // red / yellow lights ahead
@@ -1587,7 +1600,8 @@ function updateCars(dt) {
       const [st] = sigState(s, fx, fz);
       if (st === 'R' || (st === 'Y' && ahead > s.rc + 7)) gap = Math.min(gap, ahead - s.rc - v.hl + 1);
     }
-    const target = gap < 1e8 ? Math.min(v.base, Math.max(0, (gap - 1.0) * 1.4)) : v.base;
+    const vb = v.base * lvl.speed;
+    const target = gap < 1e8 ? Math.min(vb, Math.max(0, (gap - 1.0) * 1.4)) : vb;
     v.speed += (target - v.speed) * Math.min(1, dt * (target < v.speed ? 6 : 1.4));
     if (gap < 0.5) v.speed = 0;
     v.s += v.speed * dt;
@@ -1707,8 +1721,8 @@ function makeOffer() {
   const len = r ? r.len : Math.hypot(drop.x - pickup.x, drop.z - pickup.z) * 1.35;
   const km = Math.round(len / 100) / 10;
   const type = shop ? 'food' : 'ride';
-  const premium = unlocked('premium') && Math.random() < 0.15;
-  return { type, pickup, drop, shop, items, km, premium, fare: Math.round(fareFor(type, km) * (premium ? 1.5 : 1) / 1000) * 1000, est: len / 8 + 25, expire: 15 };
+  const premium = unlocked('premium') && Math.random() < 0.15, cust = makeCustomer();
+  return { type, pickup, drop, shop, items, km, premium, cust, fare: Math.round(fareFor(type, km) * (premium ? 1.5 : 1) * (cust.type === 'vip' ? 1.4 : 1) / 1000) * 1000, est: len / 8 + 25, expire: 15 };
 }
 
 /* ---- routing (Dijkstra on the street graph) ---- */
@@ -1796,6 +1810,7 @@ function showOffer(o) {
   $('offType').className = food ? 'food' : 'bike';
   $('offFrom').textContent = batch ? `${o.subs[0].shop.name} + ${o.subs[1].shop.name}` : food ? `${o.shop.name}` : `Đường ${o.pickup.name}`;
   $('offItems').textContent = food ? o.items.join(' + ') + (batch ? L(` · thưởng combo ${fmtVND(o.bonus)}`, ` · combo bonus ${fmtVND(o.bonus)}`) : '') : '';
+  $('offCust').innerHTML = o.cust ? `👤 <b>${o.cust.name}</b> ⭐${o.cust.rating} ${CUST_TYPES[o.cust.type][profile.english ? 1 : 0]}${o.cust.note ? `<br><small>${o.cust.note}</small>` : ''}` : '';
   $('offTo').textContent = batch ? `${o.subs[0].drop.name} · ${o.subs[1].drop.name}` : `Đường ${o.drop.name}`;
   $('offFare').textContent = fmtVND(o.fare) + (isPeak() ? ' ⚡' : '');
   $('offKm').textContent = `${o.km.toFixed(1)} km`;
@@ -1809,6 +1824,7 @@ function acceptOffer() {
   hideOffer(); game.offer = null; game.order = o; game.state = 'pickup';
   if (o.type === 'batch') { o.viol = false; o.handling = true; setupBatch(o); return; }
   Object.assign(o, { sat: 80 + (o.type === 'food' && profile.cleanBag ? 5 : 0), heat: 100, integ: 100, code: orderCode(), pay: o.type === 'ride' && Math.random() < 0.6 ? 'cash' : 'wallet', handling: false, talked: false, viol: false });
+  applyCustomer(o);
   const p = o.pickup;
   pickupMarker.position.set(p.x, 0, p.z); pickupMarker.visible = true;
   standPax.position.set(p.sx, 0.06, p.sz); standPax.rotation.y = p.h + Math.PI / 2;
@@ -1842,7 +1858,8 @@ function dropOff() {
   if (o.type === 'food') { if (o.heat < 50) stars--; if (o.integ < 60) stars--; if (o.wrongItem) stars -= 2; }
   if (profile.st.stress > 80 && Math.random() < 0.3) stars--;
   stars = Math.max(1, Math.min(5, stars));
-  const tip = stars === 5 && Math.random() < (o.sat > 90 ? 0.7 : 0.35) + tipBonus() ? pick([5000, 10000, 20000]) : 0;
+  const tip = custTip(o, stars) || (stars === 5 && Math.random() < (o.sat > 90 ? 0.7 : 0.35) + tipBonus() ? pick([5000, 10000, 20000]) : 0);
+  noteJob(o.drop.name, game.tripT <= o.est, o.km);
   profile.week.orders++;
   const before = profile.money;
   earn(o.fare, o.type === 'ride' ? o.pay : 'wallet');
@@ -2107,6 +2124,7 @@ function applyDaylight(m) {
   const h = m / 60;
   let k = 1; if (h > 17) k = Math.max(0.25, 1 - (h - 17) / 2.5); if (h < 7) k = Math.max(0.5, 0.5 + (h - 6) * 0.5);
   hemi.intensity = hemiBase * (0.45 + 0.55 * k) * (1 - 0.35 * rain); sun.intensity = sunBase * k * (1 - 0.6 * rain);
+  applyNight(k * (1 - 0.3 * rain));
   const c = k > 0.7 ? skyDay.clone().lerp(skyDusk, (1 - k) / 0.3 * 0.6) : skyDusk.clone().lerp(skyNight, (0.7 - k) / 0.45);
   scene.background.copy(c); scene.fog.color.copy(c);
 }
@@ -2211,11 +2229,12 @@ function fillMenu() {
   $('pStats').innerHTML = `Ngày ${profile.day} · Cấp ${profile.level} · Tổng thu nhập ${fmtVND(profile.totalMoney)} · ${profile.totalTrips} chuyến`;
   document.querySelectorAll('.goal').forEach(b => b.classList.toggle('sel', +b.dataset.v === profile.goal));
   $('pEng').checked = !!profile.english;
+  $('bStart').textContent = profile.totalTrips > 0 || profile.day > 1 ? `▶ Tiếp tục — Ngày ${profile.day}` : '▶ Bắt đầu ngày làm việc';
 }
 document.querySelectorAll('.goal').forEach(b => b.onclick = () => { profile.goal = +b.dataset.v; fillMenu(); saveProfile(); });
 $('pEng').addEventListener('change', () => { profile.english = $('pEng').checked; saveProfile(); });
 $('pName').addEventListener('change', () => { profile.name = $('pName').value.trim().slice(0, 24) || 'Tài xế'; saveProfile(); });
-$('bReset').onclick = () => { $('bReset').textContent = 'Bấm lần nữa để xoá'; $('bReset').onclick = () => { profile = defaultProfile(); saveProfile(); fillMenu(); $('bReset').textContent = 'Xoá hồ sơ'; }; };
+$('bReset').onclick = () => { $('bReset').textContent = '⚠️ Bấm lần nữa để xoá hồ sơ và chơi lại từ đầu'; $('bReset').onclick = () => { try { localStorage.removeItem(PROFILE_KEY); } catch (e) { } location.reload(); }; };
 fillMenu();
 function updateProfileHUD() {
   $('money').textContent = fmtVND(profile.money);
@@ -2259,6 +2278,7 @@ function collide(px0, pz0) {
     if (res.hit) { player.x = res.x - fx; player.z = res.z - fz; hit = true; }
   }
   for (const c of cars) {
+    if (!c.mesh.visible) continue;
     const dx = player.x - c.mesh.position.x, dz = player.z - c.mesh.position.z;
     if (Math.abs(dx) > 8 || Math.abs(dz) > 8) continue;
     const ang = c.mesh.rotation.y;
@@ -2275,7 +2295,8 @@ function collide(px0, pz0) {
   }
   if (inWater(player.x, player.z) && !onRoad(player.x, player.z, 1.0)) { player.x = px0; player.z = pz0; hit = true; }
   if (hit) {
-    if (Math.abs(player.v) > 6 && game.bumpCD <= 0) onCrash(Math.abs(player.v));
+    if (Math.abs(player.v) > 11 && game.bumpCD <= 0) { game.bumpCD = 1.5; triggerFall('crash'); }
+    else if (Math.abs(player.v) > 6 && game.bumpCD <= 0) onCrash(Math.abs(player.v));
     if (Math.abs(player.v) > 4 && game.bumpCD <= 0) { toast('💥 Cẩn thận! Va chạm rồi', 1.2); tone(90, 0, 0.2, 'square', 0.12); game.bumpCD = 1.5; }
     player.v *= -0.25;
   }
@@ -2290,6 +2311,7 @@ function updatePlayer(dt) {
   const right = !game.frozen && (keys.KeyD || keys.ArrowRight || touch.right);
   const hand = keys.Space;
   if (game.frozen) { player.v = 0; player.lean *= 0.9; return; }
+  if (updateFall(dt)) return;
   const MAX = 19 * speedFactor(), REV = -3.0;
   if (profile.st.stamina < 8 && SK().deo < 5 && Math.random() < dt * 0.5) { player.steer += (Math.random() - 0.5) * 1.6; toast(L('😪 Ngủ gật! Nghỉ ngơi ngay!', '😪 Dozing off! Take a rest!'), 1); }
   let a = 0;
@@ -2301,16 +2323,15 @@ function updatePlayer(dt) {
   if (locked && Math.abs(player.v) < 0.5) { player.v = 0; a = 0; }
   player.v = THREE.MathUtils.clamp(player.v + a * dt, REV, Math.max(MAX, Math.min(player.v, 25)));
   if (player.v > MAX) player.v = Math.max(MAX, player.v - 10 * dt);
-  const steerIn = (left ? 1 : 0) - (right ? 1 : 0);
+  const steerIn = Math.max(-1, Math.min(1, (left ? 1 : 0) - (right ? 1 : 0) + (touch.axis || 0)));
   player.steer += (steerIn - player.steer) * Math.min(1, dt * 6);
   const sp = Math.abs(player.v);
   player.h += player.steer * Math.min(1, sp / 3) * (1.9 - 1.0 * Math.min(1, sp / MAX)) * Math.sign(player.v || 1) * dt;
   const px0 = player.x, pz0 = player.z;
   player.x += Math.sin(player.h) * player.v * dt;
   player.z += Math.cos(player.h) * player.v * dt;
-  collide(px0, pz0);
+  if (!deckStep(px0, pz0, dt)) { collide(px0, pz0); checkHazards(dt); player.y = 0.07; }
   distAcc += Math.hypot(player.x - px0, player.z - pz0);
-  player.y = 0.07;
   player.lean += (-player.steer * Math.min(1, sp / 9) * 0.5 - player.lean) * Math.min(1, dt * 5);
   trailT -= dt;
   if (trailT <= 0) { trailT = 0.12; playerTrail.push({ x: player.x, z: player.z }); if (playerTrail.length > 600) { playerTrail.shift(); police.ti = Math.max(0, police.ti - 1); towTruck.ti = Math.max(0, towTruck.ti - 1); } }
@@ -2341,6 +2362,7 @@ function updateCamera(dt) {
   if (!camInit) { camPos.copy(desired); camLook.copy(look); camInit = true; }
   camPos.lerp(desired, k); camLook.lerp(look, game.camMode === 2 ? 1 : 1 - Math.exp(-dt * 8));
   camera.position.copy(camPos); camera.lookAt(camLook);
+  if (fall.on && fall.t < 0.5) { camera.position.x += (Math.random() - 0.5) * 0.35; camera.position.y += (Math.random() - 0.5) * 0.35; }
   if (game.camMode === 2) camera.rotateZ(-player.lean * 0.6);
 }
 
@@ -2372,11 +2394,12 @@ function drawRoutePath(g, toX, toY, w, col) {
 function drawMini() {
   const W = mini.width, R = 260, S = W / (R * 2);
   mg.clearRect(0, 0, W, W);
+  if (phoneDead()) { mg.fillStyle = '#111'; mg.fillRect(0, 0, W, W); mg.fillStyle = '#fff'; mg.font = '700 28px system-ui'; mg.textAlign = 'center'; mg.fillText('📵', W / 2, W / 2 - 10); mg.font = '600 18px system-ui'; mg.fillText(L('Hết pin', 'No battery'), W / 2, W / 2 + 26); return; }
   mg.drawImage(mapCv, (player.x - R - MX0) * PXM, (player.z - R - MZ0) * PXM, R * 2 * PXM, R * 2 * PXM, 0, 0, W, W);
   const X = (x) => (x - player.x + R) * S, Z = (z) => (z - player.z + R) * S;
   drawRoutePath(mg, X, Z, 6, game.state === 'pickup' ? '#00b14f' : '#ff7a00');
   for (const s of SIGNALS) { const x = X(s.x), y = Z(s.z); if (x < 0 || y < 0 || x > W || y > W) continue; const [st] = sigState(s, Math.sin(player.h), Math.cos(player.h)); mg.fillStyle = st === 'G' ? '#22c55e' : st === 'Y' ? '#facc15' : '#ef4444'; mg.beginPath(); mg.arc(x, y, 4, 0, 7); mg.fill(); }
-  for (const c of cars) { const x = X(c.mesh.position.x), y = Z(c.mesh.position.z); if (x < 0 || y < 0 || x > W || y > W) continue; const sz = c.kind === 'bike' ? 3 : 5; mg.fillStyle = c.kind === 'bike' ? '#8a7a40' : '#555'; mg.fillRect(x - sz / 2, y - sz / 2, sz, sz); }
+  for (const c of cars) { if (!c.mesh.visible) continue; const x = X(c.mesh.position.x), y = Z(c.mesh.position.z); if (x < 0 || y < 0 || x > W || y > W) continue; const sz = c.kind === 'bike' ? 3 : 5; mg.fillStyle = c.kind === 'bike' ? '#8a7a40' : '#555'; mg.fillRect(x - sz / 2, y - sz / 2, sz, sz); }
   const dot = (p, c) => { let x = X(p.x), y = Z(p.z); x = Math.max(8, Math.min(W - 8, x)); y = Math.max(8, Math.min(W - 8, y)); mg.fillStyle = c; mg.beginPath(); mg.arc(x, y, 9, 0, Math.PI * 2); mg.fill(); mg.strokeStyle = '#fff'; mg.lineWidth = 3; mg.stroke(); };
   if (game.state === 'pickup') dot(game.order.pickup, '#00b14f');
   if (game.state === 'ride') dot(game.order.drop, '#ff7a00');
@@ -2422,6 +2445,7 @@ function updateHUD(dt) {
     hudT = 0.15;
     const st = $('status');
     if (profile.banned) st.textContent = '⛔ Bị khóa app hôm nay';
+    else if (phoneDead()) st.innerHTML = L('📵 <b>Hết pin điện thoại!</b> Sạc ở quán (E) hoặc dùng sạc dự phòng', '📵 <b>Phone is dead!</b> Charge at a café (E)');
     else if (police.active && police.choice === 'flee') st.innerHTML = '🚨 <b>CSGT đang rượt!</b> Chạy xa >115 m để thoát';
     else if (game.state === 'wait') st.textContent = '⏳ Đang tìm cuốc gần bạn…';
     else if (game.state === 'offer') st.textContent = '📲 Có cuốc mới — Nhận hay bỏ qua?';
@@ -2430,6 +2454,9 @@ function updateHUD(dt) {
     else if (game.state === 'ride') st.innerHTML = game.order.type === 'food' ? `🟠 Giao món tới đường ${game.order.drop.name}<br>${fmtVND(game.order.fare)}` : `🟠 Chở khách tới đường ${game.order.drop.name}<br>${game.order.km.toFixed(1)} km · ${fmtVND(game.order.fare)}`;
     const nm = streetNameAt(player.x, player.z);
     $('street').textContent = nm ? `📍 ${nm}` : '';
+    { const carried = game.order ? (game.order.subs ? game.order.subs.filter(b => b.picked && !b.done) : (game.order.type === 'food' && game.state === 'ride' ? [game.order] : [])) : [];
+      $('food').innerHTML = carried.map((b, i) => `🍱${carried.length > 1 ? i + 1 : ''} 🔥<span class="pb s"><i style="width:${b.heat}%;background:${b.heat < 50 ? '#ef4444' : '#f59e0b'}"></i></span> 📦<span class="pb s"><i style="width:${b.integ}%;background:#3E9BFF"></i></span>`).join('<br>'); }
+    $('jam').textContent = isPeak() ? L('🚗 Giờ cao điểm: đường đông, xe chạy chậm', '🚗 Rush hour: heavy traffic') : '';
     $('clock').textContent = `🕐 ${clockText(profile.clock)} · ${L('Ngày', 'Day')} ${profile.day}${rain > 0.3 ? ' · 🌧️' : ''}`;
     renderStats();
     $('bAct').classList.toggle('pulse', Math.abs(player.v) < 1.5 && !!(nearest(FUEL, 30) || nearest(REPAIR, 35) || nearest(SHOPS, 30) || nearest(MERCHANTS, 30)));
@@ -2445,6 +2472,7 @@ function updateHUD(dt) {
 
 /* ================= Game update ================= */
 let saveT = 0, distAcc = 0;
+const FRAME = [];
 function updateGame(dt) {
   game.bumpCD -= dt; game.noViolT -= dt;
   if (!game.dayOver) {
@@ -2456,7 +2484,8 @@ function updateGame(dt) {
   tickStats(dt, distAcc); distAcc = 0;
   if (game.paused || game.dayOver) return;
   if (profile.banned || game.dayOver) return;
-  if (game.state === 'wait') { game.waitT -= dt * (SK().tho >= 3 ? 1.43 : 1) * (acceptRate() < 0.5 ? 0.66 : 1); if (game.waitT <= 0 && !police.active) showOffer(makeOffer()); }
+  if (game.state === 'wait' && phoneDead()) { }
+  else if (game.state === 'wait') { game.waitT -= dt * (SK().tho >= 3 ? 1.43 : 1) * (acceptRate() < 0.5 ? 0.66 : 1); if (game.waitT <= 0 && !police.active) showOffer(makeOffer()); }
   else if (game.state === 'offer') { game.offer.expire -= dt; if (game.offer.expire <= 0) { declineOffer(); toast('⌛ Cuốc đã hết hạn', 1.5); } }
   else if (game.state === 'pickup' || game.state === 'ride') {
     if (game.state === 'ride') game.tripT += dt;
@@ -2471,8 +2500,8 @@ function updateGame(dt) {
     if (game.state === 'ride' && o.type === 'ride' && !o.talked && game.tripT > 18 && Math.random() < dt / 8) { o.talked = true; smallTalk(); }
   }
   // traffic law
-  if (!game.frozen) checkLaw(dt);
-  if (game.noViolT <= 0 && !game.frozen) {
+  if (!game.frozen && !player.deck) checkLaw(dt);
+  if (game.noViolT <= 0 && !game.frozen && !player.deck) {
     for (const s of sigGrid.query(player.x, player.z, 40, _sq)) {
       const d = Math.hypot(s.x - player.x, s.z - player.z), core = s.rc * 0.55;
       if (s.prevD > core && d <= core && Math.abs(player.v) > 2.5 && sigClock - s.lastViol > 25) {
@@ -2518,6 +2547,7 @@ function animate() {
     if (Math.hypot(dx, dz) < 25) standPax.rotation.y = Math.atan2(dx, dz);
   }
   netTick(dt);
+  for (const f of FRAME) f(dt);
   for (const c of CHECKPOINTS) c.lb.visible = Math.hypot(c.x - player.x, c.z - player.z) < (SK().tho >= 2 ? 450 : 90);
   for (const l of labels) l.visible = Math.abs(l.position.x - player.x) < 450 && Math.abs(l.position.z - player.z) < 450;
   if (eng) {
@@ -2542,7 +2572,7 @@ const clamp01 = (v) => Math.max(0, Math.min(100, v));
 const STAT_DEF = [
   ['hp', '❤️', 'Sức khỏe', '#E5484D', false], ['stamina', '⚡', 'Thể lực', '#F5A524', false],
   ['hunger', '🍚', 'Đói', '#d97706', true], ['thirst', '💧', 'Khát', '#3E9BFF', true], ['stress', '😤', 'Stress', '#a855f7', true],
-  ['fuel', '⛽', 'Xăng', '#30A46C', false], ['dura', '🔧', 'Độ bền xe', '#A0A7B4', false]
+  ['fuel', '⛽', 'Xăng', '#30A46C', false], ['dura', '🔧', 'Độ bền xe', '#A0A7B4', false], ['phone', '🔋', 'Pin điện thoại', '#22d3ee', false]
 ];
 function newToday() { return { cam: [], bike: 0, food: 0, revenue: 0, tips: 0, xp: 0, costs: { fuel: 0, food: 0, repair: 0, fine: 0, living: 0, other: 0 }, viol: 0, streak: 0, quests: {}, ratings: [], dinner: false, km: 0 }; }
 if (!profile.st) profile.st = { hp: 100, stamina: 100, hunger: 10, thirst: 10, stress: 5, fuel: 80, dura: 100 };
@@ -2611,6 +2641,9 @@ function tickStats(dt, distM) {
   if (s.hunger > 90 || s.thirst > 90) s.hp = clamp01(s.hp - gm * 0.06);
   if (rain > 0.3 && !raincoat && moving) s.hp = clamp01(s.hp - gm * 0.03);
   s.fuel = clamp01(s.fuel - distM / 1000 * 3 * mulFuel());
+  s.phone = clamp01((s.phone ?? 100) - gm * (0.083 + (route ? 0.05 : 0)));
+  if (s.phone < 15 && !game.lowBat) { game.lowBat = true; toast(L('🔋 Pin điện thoại yếu! Sạc ở quán cà phê hoặc dùng sạc dự phòng (E)', '🔋 Low phone battery!'), 3); }
+  if (s.phone > 30) game.lowBat = false;
   profile.today.km += distM / 1000;
   if (game.order && game.order.type === 'food' && game.state === 'ride') game.order.heat = Math.max(0, game.order.heat - dt * 0.25 * mulHeat());
   if (game.order && game.order.subs) for (const b of game.order.subs) if (b.picked && !b.done) b.heat = Math.max(0, b.heat - dt * 0.25 * mulHeat());
@@ -2813,6 +2846,7 @@ function buyMenu(where, items) {
     opts: items.map(([n, c, fx]) => ({ t: `${n} — ${fmtVND(c)}`, fx: () => { if (typeof fx === 'function') { if (spend(c, 'other')) fx(); } else if (spend(c, 'food')) { applyFx(fx); passTime(5); toast(`😋 ${n}`, 1.2); } } }))
       .concat([{ t: L('↩️ Thôi', '↩️ Never mind') }]) });
 }
+const ACTION_HOOKS = [];
 function openActions() {
   if (game.mode !== 'drive' || game.paused || game.frozen || Math.abs(player.v) > 1.5) { if (Math.abs(player.v) > 1.5) toast(L('Dừng xe lại để thao tác', 'Stop the bike first'), 1.2); return; }
   const opts = [];
@@ -2820,14 +2854,17 @@ function openActions() {
   if (f) opts.push({ t: L(`⛽ Đổ đầy xăng (${fmtVND(Math.round(100 - profile.st.fuel) * 1000)})`, `⛽ Fill up (${fmtVND(Math.round(100 - profile.st.fuel) * 1000)})`), fx: refuel });
   if (r) { const need = Math.round(100 - profile.st.dura); opts.push({ t: L(`🔧 Sửa xe tại ${r.name} (${fmtVND(need * 1500)})`, `🔧 Repair at ${r.name} (${fmtVND(need * 1500)})`), fx: () => { if (need > 0 && spend(need * 1500, 'repair')) { profile.st.dura = 100; passTime(20); toast(L('🔧 Xe như mới!', '🔧 Good as new!'), 1.6); } } }); }
   if (m) opts.push({ t: L(`🍜 Ăn uống tại ${m.name}`, `🍜 Eat & drink at ${m.name}`), fx: () => setTimeout(() => buyMenu(m.name, FOOD_MENU), 50) });
-  if (sh) opts.push({ t: L(`🏪 Mua đồ tại ${sh.name}`, `🏪 Shop at ${sh.name}`), fx: () => setTimeout(() => buyMenu(sh.name, [FOOD_MENU[0], FOOD_MENU[2], FOOD_MENU[4], [L('🧥 Áo mưa', '🧥 Raincoat'), 35000, () => { profile.inv.raincoat = (profile.inv.raincoat || 0) + 1; toast(L('🧥 Đã mua áo mưa', '🧥 Raincoat bought'), 1.4); }]]), 50) });
+  if (m && profile.st.phone < 95) opts.push({ t: L('🔌 Sạc điện thoại tại quán (20 phút, 10.000đ, +45%)', '🔌 Charge phone here (20 min, 10,000đ, +45%)'), fx: () => chargePhone(45, 20, 10000) });
+  if (profile.inv.powerbank > 0 && profile.st.phone < 95) opts.push({ t: L(`🔋 Dùng sạc dự phòng (+50%, còn ${profile.inv.powerbank})`, `🔋 Use power bank (+50%, ${profile.inv.powerbank} left)`), fx: () => { profile.inv.powerbank--; chargePhone(50, 1); } });
+  if (sh) opts.push({ t: L(`🏪 Mua đồ tại ${sh.name}`, `🏪 Shop at ${sh.name}`), fx: () => setTimeout(() => buyMenu(sh.name, [FOOD_MENU[0], FOOD_MENU[2], FOOD_MENU[4], [L('🧥 Áo mưa', '🧥 Raincoat'), 35000, () => { profile.inv.raincoat = (profile.inv.raincoat || 0) + 1; toast(L('🧥 Đã mua áo mưa', '🧥 Raincoat bought'), 1.4); }], [L('🔋 Sạc dự phòng (3 lần sạc)', '🔋 Power bank (3 charges)'), 80000, () => { profile.inv.powerbank = (profile.inv.powerbank || 0) + 3; toast(L('🔋 Đã mua sạc dự phòng', '🔋 Power bank bought'), 1.4); }]]), 50) });
   if (home) opts.push({ t: L('🏠 Về nhà, kết thúc ca', '🏠 Go home and end the shift'), fx: () => endDay() });
+  for (const hk of ACTION_HOOKS) hk(opts);
   opts.push({ t: L('😴 Nghỉ 15 phút bên đường', '😴 Rest 15 minutes'), fx: () => { passTime(15); profile.st.stamina = clamp01(profile.st.stamina + 12); profile.st.stress = clamp01(profile.st.stress - 6); } });
   opts.push({ t: L('📋 Nhiệm vụ & thành tích', '📋 Quests & achievements'), fx: () => setTimeout(showQuests, 50) });
   opts.push({ t: L('↩️ Đóng', '↩️ Close') });
   showDialog({ who: L('🛠 Bạn muốn làm gì?', '🛠 What do you want to do?'), text: L(`🕐 ${clockText(profile.clock)} · 💵 ${fmtVND(profile.cash)} · 📱 ${fmtVND(profile.wallet)}`, `🕐 ${clockText(profile.clock)} · 💵 ${fmtVND(profile.cash)} · 📱 ${fmtVND(profile.wallet)}`), opts });
 }
-addEventListener('keydown', (e) => { if (e.code === 'KeyE' && !game.dlgKeys && game.mode === 'drive') openActions(); if (e.code === 'KeyQ' && !game.dlgKeys && game.mode === 'drive') showQuests(); });
+addEventListener('keydown', (e) => { if (e.code === 'KeyE' && fall.on) { if (fall.canUp) standUp(); return; } if (e.code === 'KeyE' && !game.dlgKeys && game.mode === 'drive') openActions(); if (e.code === 'KeyQ' && !game.dlgKeys && game.mode === 'drive') showQuests(); });
 $('bAct').onclick = openActions; $('bQuest').onclick = () => game.mode === 'drive' && showQuests();
 
 /* ---- quests & achievements ---- */
@@ -2854,9 +2891,10 @@ function checkQuests() {
   if ((profile.totals.km || 0) + profile.today.km >= 50) unlock('dinh_vi');
 }
 function showQuests() {
+  const wk = WEEKLY.map(q => `${profile.week.done[q.id] ? '✅' : '⬜'} ${q.t[profile.english ? 1 : 0]} — <b>${Math.min(q.cur(), q.goal)}/${q.goal}</b> <small>(+${fmtVND(q.cash)}, +${q.xp} XP)</small>`).join('<br>');
   const qs = QUESTS.map(q => `${profile.today.quests[q.id] ? '✅' : '⬜'} ${q.t[profile.english ? 1 : 0]} — <b>${Math.min(q.cur(), q.goal)}/${q.goal}</b> <small>(+${fmtVND(q.cash)}, +${q.xp} XP)</small>`).join('<br>');
   const ach = Object.entries(ACH).map(([id, [n, d]]) => `${profile.ach[id] ? '🏅' : '🔒'} <b>${n}</b> <small>${d}</small>`).join('<br>');
-  showDialog({ who: L('📋 Nhiệm vụ hôm nay', "📋 Today's quests"), text: `${qs}<hr>${ach}<hr><small>${L('Cấp', 'Level')} ${profile.level} · XP ${profile.xp}/${xpNeed(profile.level)} · ${L('Tiết kiệm', 'Savings')} ${fmtVND(profile.savings)}</small>`, opts: [{ t: L('Đóng', 'Close') }] });
+  showDialog({ who: L('📋 Nhiệm vụ hôm nay', "📋 Today's quests"), text: `${qs}<hr><b>🗓️ ${L('Nhiệm vụ tuần', 'Weekly')}</b><br>${wk}<hr>${ach}<hr><small>${L('Cấp', 'Level')} ${profile.level} · XP ${profile.xp}/${xpNeed(profile.level)} · ${L('Tiết kiệm', 'Savings')} ${fmtVND(profile.savings)}</small>`, opts: [{ t: L('Đóng', 'Close') }] });
 }
 
 /* ---- end of day report + home ---- */
@@ -2878,7 +2916,8 @@ function endDay() {
   const cam = (profile.today.cam || []).reduce((a, k) => a + LAW[k].fine, 0); if (cam) spend(cam, 'fine', true); profile.today.camTotal = cam;
   if (profile.today.bike + profile.today.food >= 5 && profile.today.viol === 0) unlock('tuan_thu');
   if (profile.money >= profile.goal) addXP(150);
-  showOverlay(L(`📊 Báo cáo cuối ngày ${profile.day}`, `📊 Day ${profile.day} report`), reportHTML(), L('🏠 Về nhà', '🏠 Go home'), () => setTimeout(homeMenu, 50));
+  const recs = checkDayRecords();
+  showOverlay(L(`📊 Báo cáo cuối ngày ${profile.day}`, `📊 Day ${profile.day} report`), reportHTML() + (recs.length ? `<p style="margin:10px 0 0;font-weight:700;color:#b45309">${recs.join('<br>')}</p>` : '') + `<p style="font-size:13px;margin:6px 0 0">${L('Té xe hôm nay', 'Falls today')}: ${profile.today.falls || 0}</p>`, L('🏠 Về nhà', '🏠 Go home'), () => setTimeout(homeMenu, 50));
 }
 function homeMenu() {
   game.mode = 'home'; $('hud').classList.add('hidden'); resetHome(); driver.visible = true; player.y = 0.07;
@@ -2895,14 +2934,14 @@ function sleepNewDay() {
   const s = profile.st;
   spend(60000, 'living', true);
   s.hp = clamp01(s.hp + (profile.today.dinner ? 45 : 25)); s.stamina = 100; s.stress = clamp01(s.stress - 35);
-  s.hunger = profile.today.dinner ? 15 : 45; s.thirst = 20;
+  s.hunger = profile.today.dinner ? 15 : 45; s.thirst = 20; s.phone = 100;
   profile.totals.days++; profile.totals.km = (profile.totals.km || 0) + profile.today.km;
   { const t = profile.today, cost = Object.values(t.costs).reduce((a, b) => a + b, 0);
     profile.history.push({ day: profile.day, revenue: t.revenue, profit: t.revenue - cost, trips: t.bike + t.food, rating: t.ratings.length ? (t.ratings.reduce((a, b) => a + b, 0) / t.ratings.length).toFixed(1) : '–' });
     if (profile.history.length > 30) profile.history.shift();
     if (t.viol === 0 && !profile.licBan) profile.license = Math.min(12, profile.license + 2); }
   if (fbConfig()) fbSubmitDay();
-  profile.wanted = 0; if (profile.day % 7 === 0) profile.week = { orders: 0, cancels: 0, idx: (profile.week.idx || 0) + 1 };
+  profile.wanted = 0; if (profile.day % 7 === 0) profile.week = { orders: 0, cancels: 0, idx: (profile.week.idx || 0) + 1, trips: 0, ontime: 0, streets: [], done: {} };
   profile.day++; profile.clock = DAY_START; profile.money = 0; profile.trips = 0; profile.banned = false; profile.fines = 0;
   profile.goal = Math.max(profile.goal, 100000 + 20000 * (profile.level - 1));
   profile.today = newToday(); raincoat = false; rainTarget = 0; game.dayOver = false; game.frozen = false; game.outOfFuel = false; game.broken = false;
@@ -3017,7 +3056,9 @@ function renderPanel() {
       <tr><td>🪪 ${L('Điểm giấy phép lái xe', 'Licence points')}</td><td>${bar(P.license, 12, '#3E9BFF')} <b>${P.license}/12</b></td></tr>
       <tr><td>🚨 ${L('Mức truy nã', 'Wanted level')}</td><td>${'🚨'.repeat(P.wanted) || '—'}</td></tr>
       <tr><td>📅 ${L('Ngày làm việc', 'Days worked')}</td><td>${P.totals.days} · ${P.totals.bike} GrabBike · ${P.totals.food} GrabFood · ${(P.totals.km || 0).toFixed(1)} km</td></tr>
-      <tr><td>🏅 ${L('Thành tích', 'Achievements')}</td><td>${Object.keys(P.ach).length}/${Object.keys(ACH).length}</td></tr></table>
+      <tr><td>🏅 ${L('Thành tích', 'Achievements')}</td><td>${Object.keys(P.ach).length}/${Object.keys(ACH).length}</td></tr>
+      <tr><td>🏆 ${L('Kỷ lục', 'Records')}</td><td>${L('ngày cao nhất', 'best day')} ${fmtVND(P.rec?.bestDay || 0)} · ${P.rec?.maxTrips || 0} ${L('chuyến/ngày', 'jobs/day')} · ${(P.rec?.longest || 0).toFixed(1)} km</td></tr>
+      <tr><td>🎒 ${L('Túi đồ', 'Inventory')}</td><td>🧥 ${P.inv.raincoat || 0} · 🔋 ${P.inv.powerbank || 0}</td></tr></table>
       <h4>🔓 ${L('Mở khóa theo cấp', 'Level unlocks')}</h4><p>${UNLOCKS.map(u => `${P.level >= u.lv ? '✅' : '🔒'} Lv${u.lv} ${u.t[E ? 1 : 0]}`).join('<br>')}</p>`;
   } else if (panelTab === 'skills') {
     h += `<h3>🌳 ${L('Cây kỹ năng', 'Skill tree')} — ${L('còn', 'available')} <b>${P.sp}</b> ${L('điểm', 'points')}</h3>`;
@@ -3054,6 +3095,7 @@ function renderPanel() {
       <label class="tg"><input type="checkbox" data-act="set" data-id="shadows" ${S.shadows ? 'checked' : ''}> ${L('Đổ bóng', 'Shadows')}</label>
       <label class="tg"><input type="checkbox" data-act="set" data-id="hiq" ${S.hiq ? 'checked' : ''}> ${L('Độ nét cao (tắt nếu máy yếu)', 'High resolution (off for slow devices)')}</label>
       <label class="tg"><input type="checkbox" data-act="set" data-id="sound" ${S.sound ? 'checked' : ''}> ${L('Âm thanh', 'Sound')}</label>
+      <label class="tg"><input type="checkbox" data-act="set" data-id="autoQ" ${S.autoQ !== false ? 'checked' : ''}> ${L('Tự giảm đồ họa khi giật', 'Auto-lower graphics when laggy')}</label>
       <label class="tg"><input type="checkbox" data-act="eng" ${P.english ? 'checked' : ''}> 🇬🇧 English Mode</label></p>
       <p><button class="chip danger" data-act="reset">${L('🗑️ Xoá hồ sơ (bấm 2 lần)', '🗑️ Reset profile (click twice)')}</button></p>`;
   }
@@ -3193,6 +3235,7 @@ function completeSub(o, sub) {
   if (sub.heat < 50) stars--; if (sub.integ < 60) stars--; if (sub.wrongItem) stars -= 2;
   stars = Math.max(1, Math.min(5, stars));
   sub.stars = stars; sub.done = true; sub.onTime = tt <= sub.est;
+  noteJob(sub.drop.name, sub.onTime, sub.km);
   earn(sub.fare, 'wallet');
   const tip = stars === 5 && Math.random() < 0.35 + tipBonus() ? pick([5000, 10000]) : 0;
   if (tip) earn(tip, 'cash', true);
@@ -3218,6 +3261,802 @@ function finishBatch(o) {
   ding([784, 988, 1318, 1568]);
   game.order = null; game.state = 'wait'; game.waitT = 3; refreshRoute(); checkQuests(); saveProfile(); updateProfileHUD();
 }
+
+/* ================= Té xe (falls) & road hazards ================= */
+const fall = { on: false, t: 0, side: 1, canUp: false, slide: 0, cancelRide: false };
+function triggerFall(reason) {
+  if (fall.on || game.frozen || game.paused || game.mode !== 'drive') return;
+  const sp = Math.abs(player.v);
+  Object.assign(fall, { on: true, t: 0, side: Math.random() < 0.5 ? -1 : 1, canUp: false, slide: Math.min(sp, 14), cancelRide: false });
+  const s = profile.st, m = mulCrash();
+  const dh = (8 + sp * 1.2) * m, dd = (6 + sp * 0.8) * m;
+  s.hp = clamp01(s.hp - dh); s.dura = clamp01(s.dura - dd); s.stress = clamp01(s.stress + 15);
+  const o = game.order; let extra = '';
+  if (o) {
+    if (o.subs) for (const b of o.subs) if (b.picked && !b.done) { b.integ = Math.max(0, b.integ - 40); b.sat -= 15; }
+    if (!o.subs) { o.sat -= 30; if (o.type === 'food' && game.state === 'ride') o.integ = Math.max(0, o.integ - 40); }
+    if (o.type === 'ride' && game.state === 'ride') { extra = L('<br>Khách bị trầy xước và rất bực!', '<br>Your passenger is hurt and upset!'); if (Math.random() < 0.3) fall.cancelRide = true; }
+  }
+  profile.today.falls = (profile.today.falls || 0) + 1;
+  const msg = { crash: L('💥 Té xe do va chạm mạnh!', '💥 You crashed!'), slip: L('🌧️ Trượt bánh trên đường ướt!', '🌧️ Skidded on the wet road!'),
+    pothole: L('🕳️ Sập ổ gà, té xe!', '🕳️ Pothole! You fell!'), doze: L('😪 Ngủ gật, té xe!', '😪 Dozed off and fell!') }[reason] || '💥';
+  toast(`${msg}<br><span style="font-weight:500">❤️ -${Math.round(dh)} · 🔧 -${Math.round(dd)}${extra}</span>`, 3);
+  tone(70, 0, 0.35, 'sawtooth', 0.15); tone(140, 0.05, 0.25, 'square', 0.08);
+  $('hurt').classList.add('on'); setTimeout(() => $('hurt').classList.remove('on'), 650);
+}
+function updateFall(dt) {
+  if (!fall.on) return false;
+  fall.t += dt;
+  fall.slide = Math.max(0, fall.slide - dt * 9);
+  const px0 = player.x, pz0 = player.z;
+  player.x += Math.sin(player.h) * fall.slide * dt; player.z += Math.cos(player.h) * fall.slide * dt;
+  const r = pushOut(player.x, player.z, 0.5); player.x = r.x; player.z = r.z;
+  if (inWater(player.x, player.z) && !onRoad(player.x, player.z, 1)) { player.x = px0; player.z = pz0; }
+  player.v = 0;
+  const k = Math.min(1, fall.t / 0.35);
+  player.lean = fall.side * 1.35 * k * k;
+  const rk = Math.min(1, fall.t / 0.6);
+  driver.position.set(fall.side * -0.6 * rk, -0.35 * rk, -0.4 * rk); driver.rotation.set(-1.2 * rk, 0, fall.side * 0.4 * rk);
+  if (seatedPax.visible) { seatedPax.position.set(fall.side * -0.9 * rk, -0.4 * rk, -0.8 * rk); seatedPax.rotation.set(-1.0 * rk, 0, fall.side * 0.5 * rk); }
+  if (fall.t > 2.2 && !fall.canUp) { fall.canUp = true; $('bUp').classList.remove('hidden'); }
+  if (fall.t > 7) standUp();
+  return true;
+}
+function standUp() {
+  if (!fall.on) return;
+  fall.on = false; player.lean = 0;
+  driver.position.set(0, 0, 0); driver.rotation.set(0, 0, 0); seatedPax.position.set(0, 0, 0); seatedPax.rotation.set(0, 0, 0);
+  $('bUp').classList.add('hidden'); passTime(2);
+  if (fall.cancelRide && game.order) { fall.cancelRide = false; toast(L('😠 Khách hủy chuyến sau cú té và đi xe khác.', '😠 The passenger cancelled and left.'), 3); profile.week.cancels++; cancelOrder(); }
+  else toast(L('🛵 Dựng xe dậy — chạy cẩn thận nhé!', '🛵 Back on the bike — ride carefully!'), 1.6);
+}
+$('bUp').onclick = () => { if (fall.canUp) standUp(); };
+
+// potholes (always) and puddles (visible when it rains)
+const HAZ = [], hazGrid = new Grid(20);
+{
+  const rs = MAP.roads.filter(r => !r.e && r.c >= 2 && r.c <= 5);
+  for (let i = 0; i < 360; i++) {
+    const r = rs[Math.floor(rand() * rs.length)]; const n = r.p.length / 2; if (n < 2) continue;
+    const k = Math.floor(rand() * (n - 1)) * 2, t = rand();
+    const ax = r.p[k], az = r.p[k + 1], bx = r.p[k + 2], bz = r.p[k + 3], Ln = Math.hypot(bx - ax, bz - az); if (Ln < 4) continue;
+    const off = (rand() - 0.5) * r.w * 0.6;
+    const x = ax + (bx - ax) * t - (bz - az) / Ln * off, z = az + (bz - az) * t + (bx - ax) / Ln * off;
+    const kind = i < 240 ? 'pot' : 'pud';
+    HAZ.push({ x, z, r: kind === 'pot' ? 0.35 + rand() * 0.35 : 1.2 + rand() * 1.6, kind });
+  }
+  HAZ.forEach(h => hazGrid.addBox(h.x - h.r, h.z - h.r, h.x + h.r, h.z + h.r, h));
+  const mk = (list, mat, y) => {
+    const m = new THREE.InstancedMesh(new THREE.CircleGeometry(1, 14).rotateX(-Math.PI / 2), mat, list.length);
+    const o = new THREE.Object3D();
+    list.forEach((h, i) => { o.position.set(h.x, y, h.z); o.scale.set(h.r, 1, h.r * (0.7 + (i % 5) * 0.08)); o.rotation.set(0, i, 0); o.updateMatrix(); m.setMatrixAt(i, o.matrix); });
+    m.receiveShadow = true; scene.add(m); return m;
+  };
+  mk(HAZ.filter(h => h.kind === 'pot'), std(0x26282c, { roughness: 1 }), 0.095);
+  var puddleMesh = mk(HAZ.filter(h => h.kind === 'pud'), new THREE.MeshStandardMaterial({ color: 0x5d7f99, roughness: 0.05, metalness: 0.4, transparent: true, opacity: 0.75 }), 0.096);
+  puddleMesh.visible = false;
+}
+const _hq = [];
+function checkHazards(dt) {
+  puddleMesh.visible = rain > 0.2;
+  if (fall.on || game.frozen) return;
+  const sp = Math.abs(player.v);
+  for (const h of hazGrid.query(player.x, player.z, 2, _hq)) {
+    if (Math.hypot(h.x - player.x, h.z - player.z) > h.r + 0.2) continue;
+    if (h.kind === 'pot' && sp > 6 && (h.hitT || 0) < sigClock) {
+      h.hitT = sigClock + 2;
+      if (SK().lai >= 5) continue;                      // skill: immune to potholes
+      profile.st.dura = clamp01(profile.st.dura - 1); if (game.order && !game.order.subs) game.order.sat -= 3;
+      player.steer += (Math.random() - 0.5) * 1.2; tone(90, 0, 0.12, 'square', 0.08);
+      if (sp > 13 && Math.random() < 0.4) triggerFall('pothole'); else toast('🕳️ ' + L('Ổ gà!', 'Pothole!'), 0.9);
+    }
+    if (h.kind === 'pud' && rain > 0.2 && sp > 5) {
+      player.v *= 1 - dt * 1.5;
+      if (sp > 12 && Math.random() < dt * 0.8 * (1 - 0.25 * UP().brake)) triggerFall('slip');
+    }
+  }
+  // skidding on wet roads when turning hard at speed
+  if (rain > 0.3 && sp > 12 && Math.abs(player.steer) > 0.7 && Math.random() < dt * 0.35 * (raincoat ? 0.8 : 1) * (SK().lai >= 3 ? 0.5 : 1) * (1 - 0.25 * UP().brake)) triggerFall('slip');
+  if (profile.st.stamina < 4 && SK().deo < 5 && sp > 5 && Math.random() < dt * 0.15) triggerFall('doze');
+}
+
+/* ================= Customers with personalities ================= */
+const VN_NAMES = ['Anh Minh', 'Chị Lan', 'Anh Tuấn', 'Chị Hương', 'Bạn Khoa', 'Cô Mai', 'Chú Hải', 'Chị Thảo', 'Anh Phúc', 'Bạn Vy', 'Mr. John', 'Ms. Sakura', 'Anh Đức', 'Chị Ngọc', 'Bạn Long', 'Cô Hạnh'];
+const CUST_TYPES = { normal: ['', ''], vip: ['💎 Khách VIP', '💎 VIP'], hard: ['😤 Khách khó tính', '😤 Picky'], kind: ['😊 Khách dễ thương', '😊 Friendly'] };
+function makeCustomer() {
+  const r = Math.random(), type = r < 0.1 ? 'vip' : r < 0.25 ? 'hard' : r < 0.42 ? 'kind' : 'normal';
+  return { name: pick(VN_NAMES), rating: (4.2 + Math.random() * 0.8).toFixed(1), type, note: type === 'hard' ? L('Ghi chú: "Đến nhanh giùm!"', 'Note: "Hurry up!"') : type === 'vip' ? L('Ghi chú: "Đi êm, cẩn thận giúp em"', 'Note: "Smooth ride please"') : '' };
+}
+function applyCustomer(o) {
+  const c = o.cust; if (!c) return;
+  if (c.type === 'vip') o.sat -= 10;
+  if (c.type === 'hard') { o.sat -= 20; o.est *= 0.85; }
+  if (c.type === 'kind') o.sat += 15;
+}
+function custTip(o, stars) {
+  const c = o.cust; if (!c || stars < 5) return 0;
+  if (c.type === 'vip' && Math.random() < 0.8) return pick([30000, 50000]);
+  if (c.type === 'kind' && Math.random() < 0.7) return pick([10000, 20000]);
+  return 0;
+}
+
+/* ================= Weekly quests & personal records ================= */
+if (!profile.rec) profile.rec = { bestDay: 0, maxTrips: 0, longest: 0 };
+for (const k of ['trips', 'ontime']) if (profile.week[k] === undefined) profile.week[k] = 0;
+if (!profile.week.streets) profile.week.streets = [];
+if (!profile.week.done) profile.week.done = {};
+const WEEKLY = [
+  { id: 'w_trips', t: ['Hoàn thành 50 chuyến trong tuần', 'Complete 50 jobs this week'], cur: () => profile.week.trips, goal: 50, cash: 300000, xp: 300 },
+  { id: 'w_streets', t: ['Giao ở 8 tuyến đường khác nhau', 'Deliver on 8 different streets'], cur: () => profile.week.streets.length, goal: 8, cash: 80000, xp: 100 },
+  { id: 'w_ontime', t: ['25 chuyến đúng giờ', '25 on-time jobs'], cur: () => profile.week.ontime, goal: 25, cash: 120000, xp: 150 },
+];
+function noteJob(streetName, onTime, km) {
+  const w = profile.week; w.trips++; if (onTime) w.ontime++;
+  if (streetName && !w.streets.includes(streetName)) { w.streets.push(streetName); if (w.streets.length > 40) w.streets.shift(); }
+  if (km > profile.rec.longest) { profile.rec.longest = km; if (km > 1) setTimeout(() => toast(L(`🏆 Kỷ lục mới: cuốc dài nhất ${km.toFixed(1)} km`, `🏆 New record: longest job ${km.toFixed(1)} km`), 2.5), 4200); }
+  for (const q of WEEKLY) if (!w.done[q.id] && q.cur() >= q.goal) {
+    w.done[q.id] = true; earn(q.cash, 'wallet'); addXP(q.xp);
+    setTimeout(() => toast(`🗓️ ${L('Nhiệm vụ tuần hoàn thành', 'Weekly quest complete')}: ${q.t[profile.english ? 1 : 0]}<br><span style="font-weight:500">+${fmtVND(q.cash)} · +${q.xp} XP</span>`, 3.2), 1500);
+  }
+}
+function checkDayRecords() {
+  const out = [];
+  if (profile.money > profile.rec.bestDay) { profile.rec.bestDay = profile.money; if (profile.money > 0) out.push(L(`🏆 Kỷ lục thu nhập/ngày: ${fmtVND(profile.money)}`, `🏆 Best day: ${fmtVND(profile.money)}`)); }
+  const n = profile.today.bike + profile.today.food;
+  if (n > profile.rec.maxTrips) { profile.rec.maxTrips = n; if (n > 0) out.push(L(`🏆 Kỷ lục số chuyến/ngày: ${n}`, `🏆 Most jobs in a day: ${n}`)); }
+  return out;
+}
+
+/* ================= Night: lit windows, street lamps, headlight ================= */
+const winEmTex = tileTex(128, 128, (g, w, h) => {
+  g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+  const cell = (cx, cy, col) => { if (!col) return; g.fillStyle = col; g.fillRect(cx + 12, cy + 14, 40, 30); };
+  cell(0, 0, '#ffd27a'); cell(64, 0, '#cfe3ff'); cell(0, 64, null); cell(64, 64, '#ffe2a8');
+});
+winEmTex.repeat.set(0.5, 0.5);
+MAT_WIN.emissive = new THREE.Color(0xffffff); MAT_WIN.emissiveMap = winEmTex; MAT_WIN.emissiveIntensity = 0;
+MAT_GLASS.emissive = new THREE.Color(0xffffff); MAT_GLASS.emissiveMap = winEmTex; MAT_GLASS.emissiveIntensity = 0;
+MAT_SHOP.emissive = new THREE.Color(0xffffff); MAT_SHOP.emissiveMap = shopTex; MAT_SHOP.emissiveIntensity = 0;
+[MAT_WIN, MAT_GLASS, MAT_SHOP].forEach(m => m.needsUpdate = true);
+const LAMPS = [];
+for (const r of MAP.roads) {
+  if (r.e || r.c > 3) continue;
+  let acc = 0, side = 1;
+  for (let i = 0; i < r.p.length - 2; i += 2) {
+    const ax = r.p[i], az = r.p[i + 1], bx = r.p[i + 2], bz = r.p[i + 3], Ln = Math.hypot(bx - ax, bz - az); if (Ln < 1) continue;
+    let t = (40 - acc % 40);
+    while (t < Ln) {
+      const x = ax + (bx - ax) * t / Ln, z = az + (bz - az) * t / Ln, nx = -(bz - az) / Ln * side, nz = (bx - ax) / Ln * side, off = r.w / 2 + 1.2;
+      LAMPS.push([x + nx * off, z + nz * off, Math.atan2(-nx, -nz)]); side = -side; t += 40;
+    }
+    acc += Ln;
+  }
+}
+const lampHeadMat = new THREE.MeshBasicMaterial({ color: 0x333333, toneMapped: false });
+{
+  const o = new THREE.Object3D();
+  const poles = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.07, 0.1, 7, 6), std(0x6b7076, { metalness: 0.6, roughness: 0.4 }), LAMPS.length);
+  const heads = new THREE.InstancedMesh(new THREE.BoxGeometry(0.35, 0.18, 0.8), lampHeadMat, LAMPS.length);
+  LAMPS.forEach(([x, z, ry], i) => {
+    o.position.set(x, 3.5, z); o.rotation.set(0, ry, 0); o.scale.set(1, 1, 1); o.updateMatrix(); poles.setMatrixAt(i, o.matrix);
+    o.position.set(x + Math.sin(ry) * 0.5, 7, z + Math.cos(ry) * 0.5); o.updateMatrix(); heads.setMatrixAt(i, o.matrix);
+  });
+  poles.computeBoundingSphere(); heads.computeBoundingSphere();
+  scene.add(poles, heads);
+}
+const headlight = new THREE.SpotLight(0xfff4e0, 0, 45, 0.55, 0.6, 1.2);
+headlight.position.set(0, 1.05, 0.7); headlight.target.position.set(0, 0, 12);
+bike.lean.add(headlight, headlight.target);
+let nightK = 0;
+function applyNight(k) {
+  nightK = Math.max(0, Math.min(1, (0.85 - k) / 0.55));
+  MAT_WIN.emissiveIntensity = nightK * 0.9; MAT_GLASS.emissiveIntensity = nightK * 0.55; MAT_SHOP.emissiveIntensity = nightK * 0.35;
+  lampHeadMat.color.setRGB(0.2 + nightK * 2.8, 0.2 + nightK * 2.2, 0.2 + nightK * 1.2);
+  headlight.intensity = nightK * 40;
+}
+
+/* ================= Rush hour traffic ================= */
+cars.forEach(v => v.rk = Math.random());
+function trafficLevel() {
+  const h = profile.clock / 60;
+  if (isPeak()) return { frac: 1, speed: 0.72 };
+  if (h >= 21 || h < 6.6) return { frac: 0.35, speed: 1.1 };
+  return { frac: 0.65, speed: 1 };
+}
+
+/* ================= Phone battery ================= */
+if (profile.st.phone === undefined) profile.st.phone = 100;
+if (profile.inv.powerbank === undefined) profile.inv.powerbank = 0;
+const phoneDead = () => profile.st.phone <= 0;
+function chargePhone(amount, min, cost, cat) {
+  if (cost && !spend(cost, cat || 'other')) return;
+  if (min) passTime(min);
+  profile.st.phone = clamp01(profile.st.phone + amount);
+  toast(`🔋 ${L('Pin điện thoại', 'Phone battery')}: ${Math.round(profile.st.phone)}%`, 1.6);
+}
+
+/* ================= Mobile joystick ================= */
+{
+  const joy = $('joy'), knob = $('joyKnob'); let pid = null, cx = 0;
+  joy.addEventListener('pointerdown', (e) => { e.preventDefault(); pid = e.pointerId; const r = joy.getBoundingClientRect(); cx = r.left + r.width / 2; joy.setPointerCapture && joy.setPointerCapture(pid); move(e); });
+  const move = (e) => { if (e.pointerId !== pid) return; const r = joy.getBoundingClientRect(); const dx = Math.max(-1, Math.min(1, (e.clientX - cx) / (r.width / 2))); touch.axis = -dx; knob.style.transform = `translateX(${dx * r.width / 2 * 0.7}px)`; };
+  const up = (e) => { if (e.pointerId !== pid) return; pid = null; touch.axis = 0; knob.style.transform = ''; };
+  joy.addEventListener('pointermove', move); joy.addEventListener('pointerup', up); joy.addEventListener('pointercancel', up);
+}
+
+/* ================= Ăn uống vỉa hè · ngủ bụi · đau bụng ================= */
+const VENDOR_KINDS = {
+  banhmi: { n: '🥖 Xe bánh mì', en: '🥖 Bánh mì cart', open: [5, 22], col: 0xf2c94c, poison: 0.05, menu: [
+    ['🥖 Bánh mì thịt', 20000, { hunger: -35, hp: 3 }], ['🍳 Bánh mì ốp la', 18000, { hunger: -30, stamina: 4 }], ['🥖 Bánh mì xíu mại', 22000, { hunger: -38, hp: 2 }]] },
+  com: { n: '🍛 Cơm bình dân', en: '🍛 Cheap rice stall', open: [10, 21], col: 0xe67e22, poison: 0.04, menu: [
+    ['🍛 Cơm sườn trứng', 35000, { hunger: -60, hp: 6, stamina: 5 }], ['🍗 Cơm gà xối mỡ', 38000, { hunger: -62, hp: 5, stamina: 6 }], ['🥬 Cơm rau + canh', 25000, { hunger: -45, thirst: -10, hp: 4 }]] },
+  mia: { n: '🥤 Nước mía', en: '🥤 Sugarcane juice', open: [8, 21], col: 0x7bc043, poison: 0.01, menu: [
+    ['🥤 Nước mía', 12000, { thirst: -45, stamina: 5 }], ['🍋 Mía tắc', 15000, { thirst: -50, stamina: 6, stress: -3 }]] },
+  trada: { n: '🧋 Trà đá vỉa hè', en: '🧋 Iced tea corner', open: [6, 23], col: 0x9b6b43, poison: 0, menu: [
+    ['🧋 Trà đá', 3000, { thirst: -30, stress: -4 }], ['🌻 Hướng dương + trà đá', 13000, { thirst: -25, stress: -10, hunger: -5 }]] },
+  hutieu: { n: '🍜 Hủ tiếu gõ', en: '🍜 Knock-knock noodles', open: [16, 26], col: 0xc0392b, poison: 0.06, menu: [
+    ['🍜 Hủ tiếu gõ', 25000, { hunger: -45, thirst: -10, hp: 4 }], ['🍜 Mì gõ thêm trứng', 30000, { hunger: -52, thirst: -8, hp: 4, stamina: 4 }]] },
+  vong: { n: '☕ Cà phê võng', en: '☕ Hammock café', open: [5, 22], col: 0x5d4037, poison: 0, menu: [
+    ['☕ Cà phê sữa đá', 15000, { thirst: -25, stamina: 25, stress: -5 }], ['🧊 Bạc xỉu', 18000, { thirst: -30, stamina: 18, stress: -6 }], ['🥥 Nước dừa', 20000, { thirst: -50, stamina: 6 }]] },
+  che: { n: '🍧 Chè', en: '🍧 Sweet soup', open: [13, 23], col: 0xe91e63, poison: 0.02, menu: [
+    ['🍧 Chè thập cẩm', 15000, { thirst: -20, hunger: -15, stress: -6 }], ['🍮 Rau câu dừa', 12000, { thirst: -15, hunger: -10, stress: -5 }]] },
+};
+const VENDORS = [];
+{
+  const kinds = Object.keys(VENDOR_KINDS), cand = EDGES.filter(E => E.c >= 2 && E.c <= 5 && E.L > 40);
+  const props = new THREE.Group(), M = {};
+  const mat = (c) => M[c] || (M[c] = std(c, { roughness: 0.7 }));
+  const glass = std(0xcfe8ff, { roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.5 });
+  const steel = std(0xb0b6bc, { metalness: 0.6, roughness: 0.35 });
+  const N = isTouch ? 40 : 64;
+  for (let t = 0; t < 900 && VENDORS.length < N; t++) {
+    const E = cand[Math.floor(rand() * cand.length)], s = E.L * (0.15 + rand() * 0.7);
+    const p = edgeAt(E, s, true), side = rand() < 0.5 ? 1 : -1, off = E.w / 2 + 2.3;
+    const x = p.x - p.dz * off * side, z = p.z + p.dx * off * side;
+    if (x < BX0 + 40 || x > BX1 - 40 || z < BZ0 + 40 || z > BZ1 - 40) continue;
+    if (inWater(x, z) || pushOut(x, z, 1.2).hit || onRoad(x, z, 0.1)) continue;
+    if (VENDORS.some(v => Math.hypot(v.x - x, v.z - z) < 70)) continue;
+    const kind = kinds[VENDORS.length % kinds.length], K = VENDOR_KINDS[kind];
+    const v = { x, z, kind, K, name: K.n }; VENDORS.push(v);
+    const g = new THREE.Group(); g.position.set(x, 0.06, z); g.rotation.y = Math.atan2(p.dz * side, -p.dx * side);   // +z faces the road
+    if (kind === 'banhmi' || kind === 'mia' || kind === 'hutieu' || kind === 'che') {
+      const cart = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.9, 0.8), mat(K.col)); cart.position.y = 0.75; g.add(cart);
+      const top = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.55, 0.7), glass); top.position.y = 1.48; g.add(top);
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.06, 0.9), mat(0xffffff)); roof.position.y = 1.78; g.add(roof);
+      for (const sx of [-0.6, 0.6]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.08, 12), mat(0x222222)); w.rotation.x = Math.PI / 2; w.position.set(sx, 0.22, 0.42); g.add(w); }
+      if (kind === 'hutieu') { const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.4, 14), steel); pot.position.set(0.45, 1.4, 0); g.add(pot); }
+    } else if (kind === 'vong') {
+      for (let i = 0; i < 3; i++) {
+        for (const sx of [-0.9, 0.9]) { const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.6, 6), steel); post.position.set(sx, 0.8, i * 1.3 - 1.3); g.add(post); }
+        const ham = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.7, 10, 1, true, Math.PI, Math.PI), std([0x2e86de, 0xe74c3c, 0x27ae60][i], { side: THREE.DoubleSide, roughness: 0.9 }));
+        ham.rotation.z = Math.PI / 2; ham.position.set(0, 0.95, i * 1.3 - 1.3); g.add(ham);
+      }
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.08, 4.2), mat(0x8d6e63)); roof.position.y = 2.1; g.add(roof);
+      for (const [sx, sz] of [[-1.25, -2], [1.25, -2], [-1.25, 2], [1.25, 2]]) { const pp = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.1, 0.1), mat(0x6d4c41)); pp.position.set(sx, 1.05, sz); g.add(pp); }
+    } else {
+      const tb = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.06, 0.7), mat(K.col)); tb.position.y = 0.55; g.add(tb);
+      for (const lx of [-0.5, 0.5]) for (const lz of [-0.3, 0.3]) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.55, 0.05), steel); l.position.set(lx, 0.27, lz); g.add(l); }
+    }
+    // umbrella + plastic stools for everyone except the hammock café
+    if (kind !== 'vong') {
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 2.4, 6), steel); pole.position.set(-0.9, 1.2, -0.6); g.add(pole);
+      const um = new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.5, 10, 1, true), std(pick([0xe74c3c, 0x2e86de, 0xf1c40f, 0x16a085]), { side: THREE.DoubleSide, roughness: 0.8 }));
+      um.position.set(-0.9, 2.45, -0.6); g.add(um);
+      for (let i = 0; i < 3; i++) { const st = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.13, 0.32, 8), mat(pick([0xd32f2f, 0x1976d2, 0x388e3c]))); st.position.set(-0.4 + i * 0.6, 0.16, -1.25); g.add(st); }
+    }
+    props.add(g);
+    const lb = labelSprite(K.n, L('Bán vỉa hè', 'Street food')); lb.position.set(x, 3.6, z); lb.scale.set(10, 2.5, 1); lb.visible = false; scene.add(lb); v.lb = lb;
+  }
+  scene.add(bake(props));
+}
+const vendorOpen = (v) => { const h = profile.clock / 60; return h >= v.K.open[0] && h < v.K.open[1]; };
+FRAME.push(() => { for (const v of VENDORS) { const d = Math.abs(v.x - player.x) + Math.abs(v.z - player.z); v.lb.visible = d < 110 && vendorOpen(v); } });
+
+/* ---- food poisoning ---- */
+function eatStreet(v, item) {
+  const [n, c, fx] = item;
+  if (!spend(c, 'food')) return;
+  applyFx(fx); passTime(v.kind === 'com' || v.kind === 'hutieu' ? 12 : 5); toast(`😋 ${n}`, 1.2);
+  const rate = v.K.poison * (profile.st.hunger > 85 ? 1.3 : 1) * (rain > 0.3 ? 1.5 : 1);
+  if (Math.random() < rate && !profile.sick) setTimeout(() => {
+    profile.sick = { until: profile.clock + 90, from: v.K.n };
+    toast(L(`🤢 Đau bụng! Có lẽ do ${v.K.n}.<br><span style="font-weight:500">Thể lực tụt nhanh. Mua thuốc ở cửa hàng tiện lợi/nhà thuốc (E).</span>`, `🤢 Stomach ache from ${v.K.en}!<br><span style="font-weight:500">Stamina drains faster. Buy medicine at a store (E).</span>`), 4);
+  }, 6000);
+}
+let sickT = 0;
+FRAME.push((dt) => {
+  const S = profile.sick; if (!S || game.paused || game.mode !== 'drive') return;
+  if (profile.clock > S.until) { profile.sick = null; toast(L('😌 Hết đau bụng rồi', '😌 Your stomach feels better'), 2); return; }
+  const gm = dt * MIN_PER_SEC, s = profile.st;
+  s.stamina = clamp01(s.stamina - gm * 0.12); s.stress = clamp01(s.stress + gm * 0.03); s.hp = clamp01(s.hp - gm * 0.015);
+  sickT -= dt; if (sickT <= 0) { sickT = 40 + Math.random() * 30; if (Math.random() < 0.5) { toast(L('🤢 Bụng quặn đau… phải tấp vào lề', '🤢 Cramps… pull over!'), 1.8); player.v *= 0.4; } }
+});
+const PHARMA = MAP.pois.filter(p => p.k === 'pharmacy').map(p => ({ x: p.x, z: p.z, name: p.t }));
+
+/* ---- ngủ bụi (napping rough) ---- */
+const sleepFx = { on: false, t: 0 };
+let fadeEl = document.createElement('div');
+fadeEl.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .8s;z-index:30;display:flex;align-items:center;justify-content:center;color:#fff;font:800 42px system-ui';
+document.body.appendChild(fadeEl);
+const zzz = labelSprite('💤 Zzz'); zzz.scale.set(3, 0.75, 1); zzz.visible = false; scene.add(zzz);
+function inPark(x, z) { for (const g of MAP.green) { if (g.length > 6 && pip(x, z, g)) return true; } return false; }
+function napSpot() {
+  const v = VENDORS.find(v => v.kind === 'vong' && Math.hypot(v.x - player.x, v.z - player.z) < 25);
+  if (v) return { k: 'vong', q: 1.35, risk: 0.02, txt: L('trên võng ở quán cà phê', 'in a café hammock') };
+  if (inPark(player.x, player.z)) return { k: 'park', q: 1.0, risk: 0.06, txt: L('trên ghế đá công viên', 'on a park bench') };
+  return { k: 'bike', q: 0.75, risk: 0.08, txt: L('nằm trên yên xe bên lề đường', 'lying on the bike seat by the road') };
+}
+function napMenu() {
+  if (game.order) return toast(L('Đang có đơn, không ngủ được!', 'You have an active order!'), 1.6);
+  const sp = napSpot();
+  showDialog({ who: L('😴 Ngủ bụi', '😴 Nap rough'), text: L(`Chỗ ngủ: <b>${sp.txt}</b>. Tắt app trong lúc ngủ (không nhận cuốc).<br><small>Ngủ trưa dưới nắng, mưa hay đêm khuya sẽ kém hơn; để nhiều tiền mặt dễ bị móc túi.</small>`, `Spot: <b>${sp.txt}</b>. The app is off while you sleep.<br><small>Sun, rain and late nights make it worse; carrying lots of cash is risky.</small>`),
+    opts: [[30, '30 phút', '30 min'], [60, '1 tiếng', '1 hour'], [120, '2 tiếng', '2 hours']].map(([m, vi, en]) => ({ t: `💤 ${L(vi, en)}${sp.k === 'vong' ? ' (' + fmtVND(15000) + ')' : ''}`, fx: () => startNap(m, sp) }))
+      .concat([{ t: L('↩️ Thôi', '↩️ Never mind') }]) });
+}
+function startNap(min, sp) {
+  if (sp.k === 'vong' && !spend(15000, 'food')) return;
+  game.frozen = true; game.waitT = 99; sleepFx.on = true; sleepFx.t = 0;
+  driver.rotation.set(-1.25, 0, 0); driver.position.set(0, 0.25, -0.55);
+  zzz.visible = true;
+  fadeEl.textContent = '💤'; fadeEl.style.opacity = '0.85';
+  setTimeout(() => finishNap(min, sp), 2600);
+}
+FRAME.push((dt) => { if (!sleepFx.on) return; sleepFx.t += dt; zzz.position.set(player.x, 2.3 + Math.sin(sleepFx.t * 2) * 0.2, player.z); });
+function finishNap(min, sp) {
+  const s = profile.st, h = profile.clock / 60;
+  let q = sp.q; const notes = [];
+  if (h >= 11 && h < 14.5 && sp.k !== 'vong') { q *= 0.65; s.thirst = clamp01(s.thirst + 15); notes.push(L('☀️ Nắng trưa gay gắt, ngủ không ngon', '☀️ Harsh noon sun')); }
+  if (rain > 0.3 && sp.k !== 'vong') { q *= raincoat ? 0.7 : 0.4; if (!raincoat) s.hp = clamp01(s.hp - 6); notes.push(L('🌧️ Mưa ướt hết người', '🌧️ Soaked by the rain')); }
+  if (h >= 21 || h < 5) { q *= 0.85; notes.push(L('🦟 Muỗi đốt cả đêm', '🦟 Mosquitoes all night')); }
+  let realMin = min;
+  if (sp.k === 'park' && Math.random() < 0.12) { realMin = Math.round(min / 2); notes.push(L('👮 Bảo vệ công viên đánh thức, đuổi đi', '👮 A park guard woke you up')); }
+  passTime(realMin);
+  s.stamina = clamp01(s.stamina + realMin * 0.55 * q); s.stress = clamp01(s.stress - realMin * 0.15 * q); s.hp = clamp01(s.hp + realMin * 0.04 * q);
+  s.hunger = clamp01(s.hunger + realMin * 0.05); s.thirst = clamp01(s.thirst + realMin * 0.06);
+  if (profile.sick) profile.sick.until -= realMin * 0.5;
+  // theft
+  const hrs = realMin / 60, risk = sp.risk * (h >= 21 || h < 5 ? 2 : 1) * hrs;
+  if (profile.cash > 200000 && Math.random() < risk) {
+    const lost = Math.round(profile.cash * (0.3 + Math.random() * 0.2) / 1000) * 1000; profile.cash -= lost; profile.today.costs.other += lost; s.stress = clamp01(s.stress + 25);
+    notes.push(L(`🕵️ Bị móc túi mất <b>${fmtVND(lost)}</b>! Lần sau gửi bớt tiền vào ví/tiết kiệm.`, `🕵️ Pickpocketed: <b>${fmtVND(lost)}</b>!`));
+  } else if (Math.random() < 0.03 * hrs && (profile.inv.raincoat || 0) > 0) { profile.inv.raincoat--; notes.push(L('🧥 Bị lấy mất áo mưa trong cốp', '🧥 Someone stole your raincoat')); }
+  sleepFx.on = false; zzz.visible = false; driver.rotation.set(0, 0, 0); driver.position.set(0, 0, 0);
+  fadeEl.style.opacity = '0'; game.frozen = false; game.waitT = 3;
+  showDialog({ who: L('⏰ Thức dậy', '⏰ Awake'), text: L(`Bạn đã ngủ ${realMin} phút ${sp.txt}. Bây giờ là ${clockText(profile.clock)}.<br>⚡ Thể lực: <b>${Math.round(s.stamina)}</b> · 😤 Stress: <b>${Math.round(s.stress)}</b>`, `You slept ${realMin} min ${sp.txt}. It is now ${clockText(profile.clock)}.<br>⚡ Stamina <b>${Math.round(s.stamina)}</b> · 😤 Stress <b>${Math.round(s.stress)}</b>`) + (notes.length ? '<br><br>' + notes.join('<br>') : ''), opts: [{ t: L('🛵 Chạy tiếp', '🛵 Back to work') }] });
+  saveProfile();
+}
+
+/* ---- action-menu entries ---- */
+ACTION_HOOKS.push((opts) => {
+  const v = nearest(VENDORS, 18);
+  if (v) {
+    if (vendorOpen(v)) opts.unshift({ t: L(`${v.K.n} — ăn uống vỉa hè`, `${v.K.en} — street food`), fx: () => setTimeout(() => showDialog({ who: v.K.n, text: L(`Tiền mặt: <b>${fmtVND(profile.cash)}</b> (quán vỉa hè chỉ nhận tiền mặt, thiếu thì trừ ví)`, `Cash: <b>${fmtVND(profile.cash)}</b>`),
+      opts: v.K.menu.map(it => ({ t: `${it[0]} — ${fmtVND(it[1])}`, fx: () => eatStreet(v, it) })).concat([{ t: L('↩️ Thôi', '↩️ Never mind') }]) }), 50) });
+    else opts.unshift({ t: L(`${v.K.n} — đã dọn hàng (mở ${v.K.open[0]}h–${v.K.open[1] % 24}h)`, `${v.K.en} — closed`), disabled: true });
+  }
+  const sh = nearest(SHOPS, 30) || nearest(PHARMA, 30);
+  if (sh && profile.sick) opts.unshift({ t: L('💊 Mua thuốc đau bụng (20.000đ)', '💊 Buy stomach medicine (20,000đ)'), fx: () => { if (spend(20000, 'other')) { profile.sick = null; profile.st.stamina = clamp01(profile.st.stamina + 5); toast(L('💊 Uống thuốc xong, đỡ hẳn', '💊 Much better now'), 2); } } });
+  opts.push({ t: L('💤 Ngủ bụi (30 phút – 2 tiếng)', '💤 Nap rough (30 min – 2 h)'), fx: () => setTimeout(napMenu, 50) });
+});
+
+/* ================= Tối ưu điện thoại / máy yếu ================= */
+const PERF = { lvl: 3, acc: 0, n: 0, t: 0, traffic: 1, warm: 4 };
+if (isTouch && !profile.settings.mobileInit) { profile.settings.mobileInit = true; profile.settings.hiq = false; profile.settings.shadows = false; applySettings(); saveProfile(); }
+if (isTouch) PERF.lvl = 2;
+{ const _tl = trafficLevel; trafficLevel = () => { const r = _tl(); return { frac: r.frac * PERF.traffic, speed: r.speed }; }; }
+function perfStepDown() {
+  const S = profile.settings;
+  if (PERF.lvl === 3) { S.hiq = false; applySettings(); toast(L('⚙️ Máy hơi giật → giảm độ nét', '⚙️ Lowering resolution for smoother play'), 2); }
+  else if (PERF.lvl === 2) { S.shadows = false; applySettings(); toast(L('⚙️ Tắt đổ bóng để mượt hơn', '⚙️ Shadows off for performance'), 2); }
+  else if (PERF.lvl === 1) { PERF.traffic = 0.55; camera.far = 700; camera.updateProjectionMatrix(); renderer.setPixelRatio(Math.min(1, devicePixelRatio) * 0.8); toast(L('⚙️ Giảm xe cộ & tầm nhìn xa', '⚙️ Less traffic & draw distance'), 2); }
+  else return;
+  PERF.lvl--; saveProfile();
+}
+FRAME.push((dt) => {
+  if (game.paused || document.hidden) return;
+  if (PERF.warm > 0) { PERF.warm -= dt; return; }
+  PERF.acc += dt; PERF.n++; PERF.t += dt;
+  if (PERF.t >= 3) { const avg = PERF.acc / PERF.n; PERF.acc = PERF.n = PERF.t = 0; if (avg > 0.04 && profile.settings.autoQ !== false) { perfStepDown(); PERF.warm = 3; } }
+});
+// collapsible HUD + portrait hint
+{
+  const st = document.createElement('style');
+  st.textContent = `body.mini #stats,body.mini #food,body.mini #phoneUI,body.mini #lb,body.mini .xp,body.mini .goalw{display:none!important}
+  #bMini{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8;border:0;border-radius:99px;background:rgba(0,0,0,.45);color:#fff;font:700 12px system-ui;padding:4px 10px;cursor:pointer}
+  #rotHint{position:fixed;inset:0;z-index:60;background:rgba(5,10,20,.88);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:700 18px system-ui;padding:30px;gap:14px}
+  #rotHint b{font-size:64px;animation:rot 1.6s infinite ease-in-out}@keyframes rot{50%{transform:rotate(-90deg)}}
+  body.touch #hud{font-size:13px}`;
+  document.head.appendChild(st);
+  const b = document.createElement('button'); b.id = 'bMini'; b.textContent = '▴ HUD'; document.body.appendChild(b);
+  b.onclick = () => { document.body.classList.toggle('mini'); b.textContent = document.body.classList.contains('mini') ? '▾ HUD' : '▴ HUD'; profile.settings.mini = document.body.classList.contains('mini'); saveProfile(); };
+  if (profile.settings.mini || (isTouch && profile.settings.mini === undefined && innerWidth < 800)) { document.body.classList.add('mini'); b.textContent = '▾ HUD'; }
+  const r = document.createElement('div'); r.id = 'rotHint'; r.innerHTML = `<b>📱</b>${L('Xoay ngang điện thoại để chơi dễ hơn', 'Rotate your phone to landscape')}<small style="opacity:.7">${L('(chạm để bỏ qua)', '(tap to dismiss)')}</small>`;
+  document.body.appendChild(r); let dismissed = false;
+  r.onclick = () => { dismissed = true; r.style.display = 'none'; };
+  const chk = () => { r.style.display = isTouch && !dismissed && innerHeight > innerWidth * 1.1 ? 'flex' : 'none'; };
+  addEventListener('resize', chk); chk();
+}
+
+/* ================= Tạo nhân vật & trang phục ================= */
+const SKINS = [0xe2b48c, 0xc68e62, 0x8d5a3b];
+const JACKETS = {
+  grab: { n: ['Áo Grab xanh', 'Grab green'], c: ['#00c45a', '#009a43', '#007a35'], sl: 0x00b14f, dk: 0x00843a, txt: 'TÀI XẾ', cost: 0, lv: 1 },
+  rain: { n: ['Áo mưa xanh dương', 'Blue raincoat'], c: ['#4aa3ff', '#2f7fd6', '#2367b0'], sl: 0x3d8ff0, dk: 0x2367b0, txt: '', cost: 60000, lv: 1 },
+  white: { n: ['Áo khoác trắng', 'White jacket'], c: ['#fafafa', '#e3e3e3', '#cfcfcf'], sl: 0xf2f2f2, dk: 0xbdbdbd, txt: 'GRAB', cost: 80000, lv: 1 },
+  black: { n: ['Áo khoác đen', 'Black jacket'], c: ['#33373d', '#1f2226', '#141619'], sl: 0x2a2d32, dk: 0x141619, txt: 'RIDER', cost: 120000, lv: 2 },
+  pink: { n: ['Áo hồng GrabFood', 'Pink GrabFood'], c: ['#ff7eb6', '#e8559a', '#c93d80'], sl: 0xf06aa8, dk: 0xc93d80, txt: 'FOOD', cost: 120000, lv: 3 },
+  retro: { n: ['Áo retro cam vàng', 'Retro orange'], c: ['#ffb02e', '#f07b1d', '#c95f10'], sl: 0xf5961f, dk: 0xc95f10, txt: 'SÀI GÒN', cost: 250000, lv: 5 },
+};
+const HELMET_LOOKS = {
+  grab: { n: ['Xanh Grab', 'Grab green'], c: 0x00b14f, cost: 0, lv: 1 }, white: { n: ['Trắng', 'White'], c: 0xf2f2f2, cost: 50000, lv: 1 },
+  black: { n: ['Đen nhám', 'Matte black'], c: 0x1c1d20, cost: 70000, lv: 1 }, pink: { n: ['Hồng', 'Pink'], c: 0xff6fae, cost: 70000, lv: 2 },
+  red: { n: ['Đỏ', 'Red'], c: 0xd62828, cost: 90000, lv: 3 }, gold: { n: ['Vàng ánh kim', 'Gold'], c: 0xd4af37, cost: 300000, lv: 8 },
+};
+const ACCS = {
+  none: { n: ['Không', 'None'], cost: 0, lv: 1 }, mask: { n: ['Khẩu trang', 'Face mask'], cost: 10000, lv: 1 },
+  sleeves: { n: ['Ống tay chống nắng', 'Sun sleeves'], cost: 30000, lv: 1 }, bag: { n: ['Balo', 'Backpack'], cost: 150000, lv: 4 },
+};
+if (!profile.look) profile.look = { g: 'm', skin: 0, jacket: 'grab', helmet: 'grab', acc: 'none' };
+if (!profile.wardrobe) profile.wardrobe = { jacket: ['grab'], helmet: ['grab'], acc: ['none'] };
+const _jtex = {};
+function jacketTexFor(id) {
+  if (_jtex[id]) return _jtex[id];
+  const J = JACKETS[id];
+  return _jtex[id] = canvasTex2(512, 256, (g, w, h) => {
+    const grd = g.createLinearGradient(0, 0, 0, h); grd.addColorStop(0, J.c[0]); grd.addColorStop(1, J.c[1]);
+    g.fillStyle = grd; g.fillRect(0, 0, w, h);
+    g.fillStyle = J.c[2]; g.fillRect(w * 0.2, 0, w * 0.1, h); g.fillRect(w * 0.7, 0, w * 0.1, h); g.fillRect(0, 0, w, h * 0.16);
+    const refl = (y, th) => { const gg = g.createLinearGradient(0, y, 0, y + th); gg.addColorStop(0, '#d9dde0'); gg.addColorStop(0.5, '#fff'); gg.addColorStop(1, '#b9bec2'); g.fillStyle = gg; g.fillRect(0, y, w, th); };
+    if (id !== 'rain') { refl(h * 0.36, h * 0.07); refl(h * 0.78, h * 0.05); }
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, 10, h); g.fillRect(w - 10, 0, 10, h);
+    if (J.txt) { g.fillStyle = id === 'white' ? '#00a650' : '#fff'; g.font = '900 34px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(J.txt, w * 0.5, h * 0.6); }
+    for (let i = 0; i < 1500; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.05})`; g.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
+  });
+}
+function buildDriver2(look) {
+  look = Object.assign({ g: 'm', skin: 0, jacket: 'grab', helmet: 'grab', acc: 'none' }, look || {});
+  const J = JACKETS[look.jacket] || JACKETS.grab, H = HELMET_LOOKS[look.helmet] || HELMET_LOOKS.grab, fem = look.g === 'f';
+  const g = new THREE.Group();
+  const skinM = std(SKINS[look.skin] || SKINS[0], { roughness: 0.7 });
+  const jacket = std(0xffffff, { map: jacketTexFor(look.jacket in JACKETS ? look.jacket : 'grab'), roughness: look.jacket === 'rain' ? 0.25 : 0.75 });
+  const sleeve = std(look.acc === 'sleeves' ? 0xf4f4f4 : J.sl, { roughness: 0.75 }), dark = std(J.dk, { roughness: 0.75 });
+  const pants = std(fem ? 0x3b3f58 : 0x232a36, { roughness: 0.9 }), glove = std(0x151515, { roughness: 0.6 });
+  const torso = limb([0, 0.92, -0.42], [0, 1.34, -0.33], fem ? 0.15 : 0.165, jacket); torso.scale.set(fem ? 1.08 : 1.18, 1, 0.82); g.add(torso);
+  g.add(limb([0, 1.47, -0.31], [0, 1.55, -0.29], 0.055, skinM));
+  g.add(helmet([0, 1.67, -0.27], H.c));
+  if (fem) { const tail = limb([0, 1.6, -0.43], [0, 1.4, -0.5], 0.045, std(0x1a1310, { roughness: 0.8 })); g.add(tail); }
+  if (look.acc === 'mask') { const m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 10, 0, Math.PI * 2, Math.PI * 0.45, Math.PI * 0.35), std(0x5aa9e6, { roughness: 0.9, side: THREE.DoubleSide })); m.position.set(0, 1.6, -0.2); m.scale.set(1, 0.9, 0.9); g.add(m); }
+  if (look.acc === 'bag') { const b = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.4, 0.16), std(0x2b2f36, { roughness: 0.8 })); b.position.set(0, 1.15, -0.56); b.rotation.x = 0.2; g.add(b); }
+  const hem = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.025, 8, 24), dark); hem.rotation.x = Math.PI / 2 - 0.2; hem.position.set(0, 0.86, -0.43); hem.scale.set(1.15, 0.85, 1); g.add(hem);
+  for (const s of [-1, 1]) {
+    const sh = [s * (fem ? 0.19 : 0.21), 1.32, -0.33], el = [s * 0.29, 1.13, -0.04], wr = [s * 0.31, 1.1, 0.2];
+    g.add(joint(sh, 0.075, sleeve)); g.add(limb(sh, el, 0.056, sleeve)); g.add(joint(el, 0.053, sleeve)); g.add(limb(el, wr, 0.048, sleeve));
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 10), glove); hand.scale.set(1, 0.9, 1.25); hand.position.set(s * 0.32, 1.1, 0.26); g.add(hand);
+    const hip = [s * 0.1, 0.87, -0.4], kn = [s * 0.17, 0.8, -0.02], an = [s * 0.14, 0.37, 0.06];
+    g.add(joint(hip, 0.08, pants)); g.add(limb(hip, kn, fem ? 0.072 : 0.078, pants)); g.add(joint(kn, 0.07, pants)); g.add(limb(kn, an, 0.06, pants));
+    const shoe = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.14, 4, 10), std(fem ? 0xf5f5f5 : 0x1d1d1f, { roughness: 0.6 })); shoe.rotation.x = Math.PI / 2; shoe.position.set(s * 0.14, 0.31, 0.11); g.add(shoe);
+  }
+  shadowAll(g);
+  return g;
+}
+function rebuildDriver() {
+  const ng = buildDriver2(profile.look);
+  driver.clear(); for (const c of [...ng.children]) driver.add(c);
+}
+rebuildDriver();
+
+/* ---- panel tab ---- */
+{
+  const b = document.createElement('button'); b.dataset.tab = 'char'; b.textContent = '👕 Nhân vật';
+  $('mpTabs').insertBefore(b, $('mpClose'));
+}
+const _renderPanel = renderPanel;
+renderPanel = function () {
+  _renderPanel();
+  if (panelTab !== 'char') return;
+  const P = profile, E = P.english ? 1 : 0, lk = P.look, W = P.wardrobe;
+  const row = (slot, DEF) => Object.entries(DEF).map(([id, d]) => {
+    const own = W[slot].includes(id), wear = lk[slot] === id, lock = P.level < d.lv;
+    const col = slot === 'jacket' ? d.c[0] : slot === 'helmet' ? '#' + d.c.toString(16).padStart(6, '0') : '#888';
+    return `<button class="chip${wear ? ' sel' : ''}" data-act="wear" data-slot="${slot}" data-id="${id}" ${lock ? 'disabled' : ''} style="border-left:12px solid ${col}">${d.n[E]}${wear ? ' ✓' : own ? '' : lock ? ` 🔒Lv${d.lv}` : ` · ${fmtVND(d.cost)}`}</button>`;
+  }).join(' ');
+  $('mpBody').innerHTML = `<h3>👕 ${L('Nhân vật & trang phục', 'Character & outfits')}</h3>
+    <p>${L('Giới tính', 'Gender')}: <button class="chip${lk.g === 'm' ? ' sel' : ''}" data-act="look" data-k="g" data-v="m">👨 ${L('Nam', 'Male')}</button> <button class="chip${lk.g === 'f' ? ' sel' : ''}" data-act="look" data-k="g" data-v="f">👩 ${L('Nữ', 'Female')}</button></p>
+    <p>${L('Màu da', 'Skin')}: ${SKINS.map((c, i) => `<button class="chip${lk.skin === i ? ' sel' : ''}" data-act="look" data-k="skin" data-v="${i}" style="background:#${c.toString(16)};width:34px">&nbsp;</button>`).join(' ')}</p>
+    <h4>🧥 ${L('Áo khoác', 'Jacket')}</h4><p>${row('jacket', JACKETS)}</p>
+    <h4>⛑️ ${L('Mũ bảo hiểm', 'Helmet')}</h4><p>${row('helmet', HELMET_LOOKS)}</p>
+    <h4>🎒 ${L('Phụ kiện', 'Accessory')}</h4><p>${row('acc', ACCS)}</p>
+    <p><small>${L('Mua bằng tiền mặt/ví. Bạn bè online sẽ thấy trang phục của bạn.', 'Paid from cash/wallet. Online friends see your outfit.')} ${L('Mẹo: đổi trang phục khi đứng ở menu để xem xe xoay 360°.', '')}</small></p>`;
+};
+$('mpBody').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const P = profile, act = b.dataset.act;
+  if (act === 'look') { P.look[b.dataset.k] = b.dataset.k === 'skin' ? +b.dataset.v : b.dataset.v; rebuildDriver(); }
+  else if (act === 'wear') {
+    const slot = b.dataset.slot, id = b.dataset.id, D = { jacket: JACKETS, helmet: HELMET_LOOKS, acc: ACCS }[slot][id];
+    if (!P.wardrobe[slot].includes(id)) { if (!spend(D.cost, 'other')) return; P.wardrobe[slot].push(id); toast(`🛍️ ${L('Đã mua', 'Bought')} ${D.n[P.english ? 1 : 0]}`, 1.6); }
+    P.look[slot] = id; rebuildDriver();
+  } else return;
+  saveProfile(); renderPanel();
+});
+// online: send & show looks
+{
+  const _nm = netMsg; netMsg = () => Object.assign(_nm(), { lk: profile.look });
+  FRAME.push(() => {
+    for (const r of NET.remotes.values()) {
+      const lk = r.data && r.data.lk; if (!lk) continue;
+      const key = JSON.stringify(lk); if (r.lkKey === key) continue;
+      r.lkKey = key; const old = r.lean.children[1]; if (old) r.lean.remove(old);
+      r.lean.add(buildDriver2(lk));
+    }
+  });
+}
+{ const st = document.createElement('style'); st.textContent = '.chip.sel{background:#00b14f!important;color:#fff}.chip:disabled{opacity:.45;cursor:default}'; document.head.appendChild(st); }
+
+/* ================= Khu giao hàng (chung cư / văn phòng / nhà riêng) + đơn gấp / đơn hiếm ================= */
+function classifyDrop(d) {
+  if (d.zone) return d.zone;
+  const x = d.sx ?? d.x, z = d.sz ?? d.z; let best = null, bd = 45;
+  for (const b of bColliders.query(x, z, 45, [])) {
+    const cx = (b.bb[0] + b.bb[2]) / 2, cz = (b.bb[1] + b.bb[3]) / 2, dd = Math.hypot(cx - x, cz - z) - Math.min(b.bb[2] - b.bb[0], b.bb[3] - b.bb[1]) / 2;
+    if (dd < bd) { bd = dd; best = b; }
+  }
+  const hsh = Math.abs(Math.sin(x * 12.9898 + z * 78.233) * 43758.5453) % 1;
+  return d.zone = !best ? 'house' : best.h >= 25 ? 'apt' : best.h >= 12 && hsh < 0.55 ? 'office' : 'house';
+}
+const ZONE_NAME = { apt: ['🏢 Chung cư', '🏢 Apartment'], office: ['🏬 Tòa văn phòng', '🏬 Office tower'], house: ['🏠 Nhà riêng', '🏠 House'] };
+function zoneDialog(o, next) {
+  const z = classifyDrop(o.drop), s = profile.st, peak = isPeak();
+  const go = (min, sat, extra) => () => { passTime(min); o.sat += sat; if (o.heat !== undefined) o.heat = Math.max(0, o.heat - min * 1.5); extra && extra(); setTimeout(() => next(), 350); };
+  if (z === 'apt') showDialog({ who: ZONE_NAME.apt[profile.english ? 1 : 0], text: L('Bảo vệ: “Shipper không được lên tầng nha em, gửi ở sảnh hoặc gọi khách xuống.”', 'Guard: "Couriers can\'t go upstairs. Leave it in the lobby or call the customer down."'), opts: [
+    { t: L('📞 Gọi khách xuống sảnh nhận (~5 phút)', '📞 Call the customer down (~5 min)'), good: true, fx: go(5, -2) },
+    { t: L('📦 Gửi quầy lễ tân, chụp ảnh báo khách (1 phút)', '📦 Leave it at reception and send a photo (1 min)'), good: true, why: 'Always send a photo as proof.', fx: go(1, -6) },
+    { t: L('🪪 Gửi CCCD, đăng ký thẻ khách để lên tận cửa (~7 phút)', '🪪 Register a visitor pass to deliver to the door (~7 min)'), good: true, fx: go(7, 12, () => s.stamina = clamp01(s.stamina - 3)) }] });
+  else if (z === 'office') showDialog({ who: ZONE_NAME.office[profile.english ? 1 : 0], text: L(`Tòa nhà văn phòng${peak ? ' đang giờ cao điểm, thang máy kẹt cứng' : ''}. Khách ghi chú: “Giao tầng 12 giúp em”.`, `Office building${peak ? ' at rush hour, lifts are packed' : ''}. Note: "Please bring it to floor 12".`), opts: [
+    { t: L(`🛗 Đi thang máy lên tầng 12 (~${peak ? 12 : 7} phút)`, `🛗 Take the lift to floor 12 (~${peak ? 12 : 7} min)`), good: true, fx: go(peak ? 12 : 7, 12) },
+    { t: L('💬 Nhắn khách xuống quầy lễ tân (~4 phút)', '💬 Ask them to come to reception (~4 min)'), good: true, why: 'Polite request: "Could you come down to the lobby, please?"', fx: go(4, -3) },
+    { t: L('📦 Để ở quầy rồi đi luôn', '📦 Drop it at the desk and leave'), good: false, why: 'Tell the customer before leaving the order.', fx: go(1, -12) }] });
+  else {
+    const dog = Math.random() < 0.25;
+    showDialog({ who: ZONE_NAME.house[profile.english ? 1 : 0], text: dog ? L('Nhà trong hẻm, cổng đóng. 🐕 Một con chó sủa ầm ĩ sau cổng!', 'A house down an alley, gate closed. 🐕 A dog is barking behind the gate!') : L('Nhà trong hẻm nhỏ, cổng đóng.', 'A house down a small alley, gate closed.'), opts: [
+      { t: L('🔔 Bấm chuông và chờ (~2 phút)', '🔔 Ring the bell and wait (~2 min)'), good: true, fx: go(2, 3, () => dog && (s.stress = clamp01(s.stress + 5))) },
+      { t: L('📞 Gọi điện cho khách ra mở cổng (1 phút)', '📞 Call the customer to open the gate (1 min)'), good: true, fx: go(1, 2) },
+      { t: L('🪝 Treo túi lên cổng rồi đi', '🪝 Hang the bag on the gate and leave'), good: false, why: 'Hand it over in person or confirm with the customer.', fx: go(0, -15) }] });
+  }
+}
+{
+  const _hd = handoverDialog;
+  handoverDialog = function (o, done) {
+    if (o.zoned) return _hd(o, done);
+    o.zoned = true; zoneDialog(o, () => _hd(o, done));
+  };
+}
+
+/* ---- special orders ---- */
+const RARE_ITEMS = [['🎂 Bánh kem sinh nhật 3 tầng', 'birthday cake'], ['💐 Bó hoa tươi', 'flowers'], ['🍲 Nồi lẩu Thái nóng', 'hotpot'], ['🍶 Hũ yến sào (dễ vỡ)', 'glass jar']];
+{
+  const _mo = makeOffer;
+  makeOffer = function () {
+    const o = _mo();
+    if (o.type !== 'food') return o;
+    const r = Math.random();
+    if (r < 0.12) { o.urgent = true; o.est *= 0.7; o.fare = Math.round(o.fare * 1.5 / 1000) * 1000; }
+    else if (r < 0.2 && profile.level >= 2) { const it = pick(RARE_ITEMS); o.rare = it[1]; o.items = [it[0]]; o.fare = Math.round(o.fare * 1.3 / 1000) * 1000; }
+    return o;
+  };
+  const _so = showOffer;
+  showOffer = function (o) {
+    _so(o);
+    if (o.urgent) { $('offType').textContent = L('⚡ GIAO GẤP · ', '⚡ URGENT · ') + $('offType').textContent; $('offItems').textContent += L(' · ⏱️ thời gian ngắn, cước ×1,5', ' · ⏱️ tight deadline, fare ×1.5'); }
+    if (o.rare) { $('offType').textContent = L('🌟 ĐƠN HIẾM · ', '🌟 RARE · ') + $('offType').textContent; $('offItems').textContent += L(' · ⚠️ dễ vỡ: té/va chạm hỏng gấp đôi', ' · ⚠️ fragile: crashes do double damage'); }
+  };
+  const fragile = (fn) => function (...a) {
+    const o = game.order, before = o && o.rare && o.integ !== undefined ? o.integ : null;
+    const r = fn.apply(this, a);
+    if (before !== null && game.order === o && o.integ < before) { o.integ = Math.max(0, o.integ - (before - o.integ)); toast(L(`💔 ${o.items[0]} bị ảnh hưởng! Nguyên vẹn ${Math.round(o.integ)}%`, `💔 The ${o.rare} took damage! ${Math.round(o.integ)}% intact`), 2); }
+    return r;
+  };
+  onCrash = fragile(onCrash); triggerFall = fragile(triggerFall);
+  const _do = dropOff;
+  dropOff = function () {
+    const o = game.order; if (!o) return _do();
+    let bonus = 0, msg = '';
+    if (o.urgent) { if (game.tripT <= o.est) { o.sat += 10; bonus = 15000; msg = L('⚡ Thưởng giao gấp đúng giờ', '⚡ Urgent on-time bonus'); } else { o.sat -= 25; msg = L('⚡ Đơn gấp bị trễ, khách không vui', '⚡ Urgent order was late'); } }
+    if (o.rare) { if (o.integ >= 85) { bonus += 30000; msg = L('🌟 Khách khen giữ hàng cẩn thận, tip thêm', '🌟 Careful delivery, extra tip'); } else if (o.integ < 60) { spend(50000, 'other', true); msg = L('💔 Hàng hư hỏng — bồi thường 50.000đ', '💔 Damaged — 50,000đ compensation'); } }
+    _do();
+    if (bonus) earn(bonus, 'cash', true);
+    if (msg) setTimeout(() => toast(`${msg}${bonus ? ' +' + fmtVND(bonus) : ''}`, 2.6), 3700);
+    profile.totals.special = (profile.totals.special || 0) + ((o.urgent || o.rare) ? 1 : 0);
+  };
+}
+
+/* ================= Chạy lên cầu (Cầu Phú Mỹ, cầu vượt) + người đi bộ ================= */
+const DECKS = MAP.deck.map(d => { const cum = [0]; for (let i = 2; i < d.p.length; i += 2) cum.push(cum[cum.length - 1] + Math.hypot(d.p[i] - d.p[i - 2], d.p[i + 1] - d.p[i - 1])); return { ...d, cum, n: d.p.length / 2 }; });
+const deckGrid = new Grid(30);
+DECKS.forEach((d, di) => { for (let k = 0; k < d.n - 1; k++) { const ax = d.p[k * 2], az = d.p[k * 2 + 1], bx = d.p[k * 2 + 2], bz = d.p[k * 2 + 3]; deckGrid.addBox(Math.min(ax, bx) - d.w, Math.min(az, bz) - d.w, Math.max(ax, bx) + d.w, Math.max(az, bz) + d.w, { di, k }); } });
+player.deck = null;
+function deckProj(d, k, x, z) {
+  const ax = d.p[k * 2], az = d.p[k * 2 + 1], bx = d.p[k * 2 + 2], bz = d.p[k * 2 + 3];
+  const dx = bx - ax, dz = bz - az, L2 = dx * dx + dz * dz || 1e-6, L = Math.sqrt(L2);
+  const tr = ((x - ax) * dx + (z - az) * dz) / L2, t = Math.max(0, Math.min(1, tr));
+  const lat = ((x - ax) * dz - (z - az) * dx) / L;   // signed distance from the centre line
+  return { k, t, tr, lat, y: d.h[k] + (d.h[k + 1] - d.h[k]) * t, dx: dx / L, dz: dz / L, cx: ax + dx * t, cz: az + dz * t };
+}
+const _dq = [];
+function deckStep(px0, pz0, dt) {
+  const hx = Math.sin(player.h), hz = Math.cos(player.h);
+  if (!player.deck) {
+    if (fall.on) return false;
+    for (const it of deckGrid.query(player.x, player.z, 6, _dq)) {
+      const d = DECKS[it.di]; if (it.k > 1 && it.k < d.n - 3) continue;
+      const q = deckProj(d, it.k, player.x, player.z);
+      if (q.tr < -0.05 || q.tr > 1.05 || Math.abs(q.lat) > d.w / 2 - 0.3 || q.y > 0.9) continue;
+      if (Math.abs(hx * q.dx + hz * q.dz) < 0.55) continue;
+      player.deck = { di: it.di, k: it.k }; toast(L('🌉 Lên cầu — giữ làn, đừng dừng đỗ!', '🌉 On the bridge — keep your lane!'), 1.6);
+      break;
+    }
+    if (!player.deck) return false;
+  }
+  const D = DECKS[player.deck.di]; let best = null;
+  for (let k = Math.max(0, player.deck.k - 3); k <= Math.min(D.n - 2, player.deck.k + 3); k++) {
+    const q = deckProj(D, k, player.x, player.z), dd = Math.hypot(player.x - q.cx, player.z - q.cz);
+    if (!best || dd < best.dd) { best = q; best.dd = dd; }
+  }
+  player.deck.k = best.k;
+  const atStart = best.k === 0 && best.tr < 0, atEnd = best.k === D.n - 2 && best.tr > 1;
+  if ((atStart || atEnd) && best.y < 1.3) { player.deck = null; player.y = 0.07; return false; }
+  const lim = D.w / 2 - 0.45;
+  if (Math.abs(best.lat) > lim) {
+    const s = Math.sign(best.lat); player.x = best.cx + best.dz * lim * s; player.z = best.cz - best.dx * lim * s;
+    if (Math.abs(player.v) > 6 && game.bumpCD <= 0) { game.bumpCD = 1.2; onCrash(Math.abs(player.v) * 0.6); toast(L('💥 Quẹt lan can cầu!', '💥 Scraped the bridge rail!'), 1.2); tone(90, 0, 0.2, 'square', 0.1); }
+    player.v *= 1 - Math.min(1, dt * 2);
+  }
+  const ty = best.y + 0.15;
+  player.y += (ty - player.y) * Math.min(1, dt * 12);
+  // gravity on the slope: harder going up
+  const slope = (D.h[best.k + 1] - D.h[best.k]) / Math.max(1, D.cum[best.k + 1] - D.cum[best.k]);
+  const dir = hx * best.dx + hz * best.dz;
+  player.v -= slope * Math.sign(dir) * 9.8 * 0.35 * dt;
+  if (player.y > 18 && !profile.today.bridge) { profile.today.bridge = true; profile.totals.bridges = (profile.totals.bridges || 0) + 1; toast(L('🌉 View sông Sài Gòn từ trên cầu thật đẹp!', '🌉 Great view of the Saigon River!'), 2.4); }
+  return true;
+}
+{ const _tp = teleportTo; teleportTo = (x, z) => { player.deck = null; player.y = 0.07; _tp(x, z); }; }
+
+/* ---- pedestrians ---- */
+const PED_N = isTouch ? 14 : 30, PEDS = [];
+const inB = (E) => E.mx > BX0 + 30 && E.mx < BX1 - 30 && E.mz > BZ0 + 30 && E.mz < BZ1 - 30;
+const pedEdges = EDGES.filter(E => E.c >= 2 && E.c <= 5 && E.L > 30 && inB(E));
+const pedMats = { skin: std(0xd9a77c), dark: std(0x2b2f36, { roughness: 0.9 }), hat: std(0xe8d9a8, { roughness: 0.9 }), shirts: [0xe74c3c, 0x3498db, 0xf1c40f, 0xffffff, 0x9b59b6, 0x16a085].map(c => std(c, { roughness: 0.85 })) };
+function makePed(i) {
+  const g = new THREE.Group(), sh = pedMats.shirts[i % pedMats.shirts.length];
+  for (const s of [-1, 1]) g.add(limb([s * 0.09, 0.05, 0], [s * 0.09, 0.8, 0], 0.07, pedMats.dark));
+  const body = limb([0, 0.9, 0], [0, 1.35, 0], 0.17, sh); g.add(body);
+  for (const s of [-1, 1]) g.add(limb([s * 0.23, 1.35, 0], [s * 0.26, 0.92, 0.02], 0.05, sh));
+  g.add(joint([0, 1.6, 0], 0.12, pedMats.skin));
+  if (i % 3 === 0) { const hat = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.2, 14), pedMats.hat); hat.position.y = 1.78; g.add(hat); }
+  const out = bake(g); out.children.forEach(m => { m.castShadow = false; }); return out;
+}
+function placePed(p, near) {
+  let E;
+  if (near) { const cands = edgeGrid.query(player.x + (Math.random() - 0.5) * 300, player.z + (Math.random() - 0.5) * 300, 60, []).map(it => it.E).filter(E => E.c >= 2 && E.c <= 5 && inB(E)); E = cands.length ? pick(cands) : pick(pedEdges); }
+  else E = pick(pedEdges);
+  p.E = E; p.s = Math.random() * E.L; p.side = Math.random() < 0.5 ? 1 : -1; p.dir = Math.random() < 0.5 ? 1 : -1; p.sp = 1.1 + Math.random() * 0.5; p.down = 0; p.t = Math.random() * 6;
+}
+for (let i = 0; i < PED_N; i++) { const m = makePed(i); scene.add(m); const p = { m }; placePed(p, false); PEDS.push(p); }
+let pedHitCD = 0;
+function hitPed(p, sp) {
+  p.down = 4; pedHitCD = 4;
+  const comp = 200000, s = profile.st;
+  spend(comp, 'other', true); s.stress = clamp01(s.stress + 20); s.hp = clamp01(s.hp - 4);
+  if (game.order) { if (game.order.subs) game.order.subs.forEach(b => b.sat -= 20); else game.order.sat -= 20; }
+  profile.license = Math.max(0, profile.license - 2); profile.today.viol++;
+  player.v *= 0.2; tone(80, 0, 0.3, 'sawtooth', 0.15);
+  setTimeout(() => showDialog({ who: L('🚶 Va chạm người đi bộ!', '🚶 You hit a pedestrian!'), text: L(`Bạn tông trúng người đi bộ ở tốc độ ${Math.round(sp * 3.6)} km/h. Người dân xung quanh tụ lại…<br>Bồi thường <b>${fmtVND(comp)}</b>, trừ 2 điểm GPLX.`, `You hit a pedestrian at ${Math.round(sp * 3.6)} km/h.<br>Compensation <b>${fmtVND(comp)}</b>, −2 licence points.`), opts: [
+    { t: L('🙇 Xin lỗi, đưa người ta đi kiểm tra (15 phút)', '🙇 Apologise and help them get checked (15 min)'), good: true, fx: () => { passTime(15); s.stress = clamp01(s.stress - 5); addXP(5); } },
+    { t: L('💸 Gửi tiền rồi đi nhanh', '💸 Pay and leave quickly'), good: false, fx: () => { s.stress = clamp01(s.stress + 5); } }] }), 300);
+}
+FRAME.push((dt) => {
+  pedHitCD -= dt;
+  const live = game.mode === 'drive' && !game.paused;
+  for (const p of PEDS) {
+    const E = p.E;
+    if (live && !p.down) { p.s += p.dir * p.sp * dt; if (p.s < 0 || p.s > E.L) { p.dir = -p.dir; p.s = Math.max(0, Math.min(E.L, p.s)); } }
+    p.t += dt;
+    const q = edgeAt(E, p.s, true), off = (E.w / 2 + 1.6) * p.side;
+    const x = q.x - q.dz * off, z = q.z + q.dx * off;
+    if (Math.abs(x - player.x) > 280 || Math.abs(z - player.z) > 280) { if (Math.random() < 0.05) placePed(p, true); p.m.visible = false; continue; }
+    p.m.visible = true;
+    p.m.position.set(x, 0.06 + (p.down ? 0 : Math.abs(Math.sin(p.t * 6)) * 0.04), z);
+    p.m.rotation.set(p.down ? -1.45 : 0, Math.atan2(q.dx * p.dir, q.dz * p.dir), 0);
+    if (p.down) { p.down = Math.max(0, p.down - dt); if (p.down > 0) p.m.position.y = 0.2; continue; }
+    if (!live || player.deck) continue;
+    const d = Math.hypot(x - player.x, z - player.z), sp = Math.abs(player.v);
+    if (d < 0.85 && pedHitCD <= 0) {
+      if (sp > 7) hitPed(p, sp);
+      else if (sp > 2.5) { pedHitCD = 3; profile.st.stress = clamp01(profile.st.stress + 3); toast(L('😱 Suýt tông người đi bộ! Chạy chậm trên vỉa hè/hẻm', '😱 Nearly hit a pedestrian!'), 1.6); p.s += p.dir * 2; }
+      else { p.s += p.dir * 1.2; }
+    }
+  }
+});
+
+/* ================= Story Mode: “Giấc mơ Quận 7” với anh Tư ================= */
+if (!profile.story) profile.story = { ch: 0, base: null, rain: 0, mall: false, intro: false, done: false };
+const MALL = (() => {
+  const cm = MAP.buildings.find(b => b.n !== undefined && NAMES[b.n] === 'Crescent Mall');
+  if (cm) { let x = 0, z = 0; for (let i = 0; i < cm.p.length; i += 2) { x += cm.p[i]; z += cm.p[i + 1]; } return { x: x / (cm.p.length / 2), z: z / (cm.p.length / 2), r: 110 }; }
+  const p = MAP.pois.find(p => /crescent/i.test(p.t)); return p ? { x: p.x, z: p.z, r: 80 } : { x: homeSpot.x, z: homeSpot.z, r: 150 };
+})();
+const avgRating = () => profile.ratings.length ? profile.ratings.reduce((a, b) => a + b, 0) / profile.ratings.length : 5;
+const STORY = [
+  { t: ['Chương 1 · Cuốc xe đầu tiên', 'Ch.1 · First rides'], goal: ['Hoàn thành 3 chuyến GrabBike', 'Complete 3 GrabBike rides'],
+    say: ['Chú em mới chạy hả? Anh là Tư, chạy Grab ở Quận 7 mười năm rồi. Trước hết cứ chạy 3 cuốc GrabBike cho quen đường đã. Nhớ đội mũ cho khách, chào hỏi đàng hoàng!', "New here? I'm Tư, I've driven Grab in District 7 for ten years. Start with 3 GrabBike rides. Helmet for the passenger, and greet them politely!"],
+    prog: (S) => [profile.totals.bike - S.base.bike, 3], cash: 50000, xp: 120 },
+  { t: ['Chương 2 · Mùi đồ ăn', 'Ch.2 · Smell of food'], goal: ['Giao 2 đơn GrabFood và ghé Crescent Mall', 'Deliver 2 GrabFood orders and visit Crescent Mall'],
+    say: ['Khá lắm! Giờ thử giao đồ ăn: giữ món nóng, đừng té xe. Xong ghé Crescent Mall một vòng cho biết chỗ, khu đó đơn nhiều lắm.', 'Nice! Now try food delivery: keep it hot, don\'t crash. Then swing by Crescent Mall — lots of orders around there.'],
+    prog: (S) => [Math.min(2, profile.totals.food - S.base.food) + (S.mall ? 1 : 0), 3], cash: 60000, xp: 150, needLv: 2 },
+  { t: ['Chương 3 · Luật là luật', 'Ch.3 · Rules are rules'], goal: ['Một ngày chạy ≥5 chuyến, không vi phạm luật', 'One day with ≥5 jobs and zero violations'],
+    say: ['Tuần trước thằng Hai bị giam xe vì vượt đèn đỏ, mất trắng cả tuần. Chú thử một ngày chạy sạch: ít nhất 5 cuốc, không vi phạm gì nhé.', 'Last week Hai had his bike impounded for a red light. Try a clean day: at least 5 jobs, no violations.'],
+    prog: (S) => [S.clean ? 1 : 0, 1], cash: 80000, xp: 200 },
+  { t: ['Chương 4 · Mưa Sài Gòn', 'Ch.4 · Saigon rain'], goal: ['Hoàn thành 2 chuyến trong lúc trời mưa', 'Finish 2 jobs while it rains'],
+    say: ['Mùa mưa tới rồi. Mưa là cuốc giá cao nhưng đường trơn. Sắm sẵn áo mưa, chạy chậm, hoàn thành 2 cuốc dưới mưa cho anh xem.', 'Rainy season is here. Rain means higher fares but slippery roads. Get a raincoat and finish 2 jobs in the rain.'],
+    prog: (S) => [S.rain, 2], cash: 100000, xp: 250 },
+  { t: ['Chương 5 · Tài xế 5 sao', 'Ch.5 · Five-star driver'], goal: ['Đạt đánh giá trung bình ≥4,8 sau ≥20 chuyến', 'Average rating ≥4.8 with ≥20 jobs'],
+    say: ['Khách quen là vốn liếng. Giữ đánh giá từ 4,8 sao trở lên sau ít nhất 20 chuyến, app sẽ ưu tiên đổ cuốc cho chú.', 'Regulars are your capital. Keep ≥4.8 stars after at least 20 jobs and the app will favour you.'],
+    prog: (S) => [profile.totalTrips >= 20 && avgRating() >= 4.8 ? 1 : 0, 1], cash: 150000, xp: 300 },
+  { t: ['Chương 6 · Giấc mơ', 'Ch.6 · The dream'], goal: ['Tiết kiệm 2.000.000đ', 'Save 2,000,000đ'],
+    say: ['Anh hỏi thật: chú chạy xe để làm gì? Má ở quê cần tiền sửa nhà phải không. Gom đủ 2 triệu tiết kiệm đi, anh tin chú làm được.', "Why do you ride? Your mum back home needs money to fix the house, right? Save 2 million — I believe in you."],
+    prog: (S) => [Math.min(profile.savings, 2000000), 2000000], cash: 300000, xp: 500 },
+];
+// anh Tư NPC next to home
+const tu = buildPassengerStanding();
+{
+  tu.userData.shirt.color.setHex(0x00b14f);
+  const e = homeSpot.E, p = edgeAt(e, e.L / 2, true), off = e.w / 2 + 2.2;
+  tu.position.set(p.x - p.dz * off + p.dx * 6, 0.06, p.z + p.dx * off + p.dz * 6); tu.rotation.y = homeSpot.h - Math.PI / 2; scene.add(tu);
+  const lb = labelSprite('👨‍🦳 anh Tư', L('Tài xế lâu năm · E để nói chuyện', 'Veteran driver · press E')); lb.position.set(tu.position.x, 3, tu.position.z); lb.scale.set(9, 2.25, 1); scene.add(lb); labels.push(lb);
+}
+const S0 = () => profile.story;
+function storyStartCh(i) { const S = S0(); S.ch = i; S.base = { bike: profile.totals.bike, food: profile.totals.food }; S.rain = 0; S.mall = false; S.clean = false; saveProfile(); }
+function storyTalk(first) {
+  const S = S0();
+  if (S.done) return showDialog({ who: '👨‍🦳 anh Tư', text: L('Chú đã làm được rồi! Giờ cứ chạy thoải mái, khi nào rảnh ghé anh uống cà phê.', 'You did it! Keep riding — come have a coffee with me anytime.'), opts: [{ t: L('☕ Dạ, cảm ơn anh Tư!', '☕ Thanks, Tư!') }] });
+  const C = STORY[S.ch], [a, b] = C.prog(S);
+  const lock = C.needLv && profile.level < C.needLv ? L(`<br><small>🔒 Cần đạt cấp ${C.needLv} để nhận đơn GrabFood.</small>`, `<br><small>🔒 Reach level ${C.needLv} to unlock GrabFood.</small>`) : '';
+  showDialog({ who: `👨‍🦳 anh Tư — ${C.t[profile.english ? 1 : 0]}`, text: `${C.say[profile.english ? 1 : 0]}<br><br>🎯 <b>${C.goal[profile.english ? 1 : 0]}</b> · ${S.ch === 5 ? fmtVND(a) + ' / ' + fmtVND(b) : a + '/' + b}${lock}<br><small>${L('Thưởng', 'Reward')}: ${fmtVND(C.cash)} · ${C.xp} XP</small>`,
+    opts: [{ t: first ? L('💪 Dạ, em làm liền!', "💪 I'm on it!") : L('👍 Dạ em nhớ rồi', '👍 Got it'), good: true }] });
+}
+function storyComplete() {
+  const S = S0(), C = STORY[S.ch];
+  earn(C.cash, 'wallet'); addXP(C.xp); ding([523, 659, 784, 1046, 1318]);
+  if (S.ch === STORY.length - 1) {
+    S.done = true; saveProfile();
+    return setTimeout(() => showOverlay(L('🎉 Hoàn thành Story Mode!', '🎉 Story complete!'), L(`<p>Bạn đã gom đủ 2 triệu gửi về quê sửa nhà cho má. Anh Tư vỗ vai: “Từ giờ chú là tài xế Quận 7 thứ thiệt rồi!”</p><p>🏅 Danh hiệu <b>Tài xế Quận 7</b> · +${fmtVND(C.cash)} · +${C.xp} XP</p><p><small>Bạn vẫn có thể tiếp tục chạy tự do, nâng cấp xe và leo bảng xếp hạng.</small></p>`, `<p>You saved 2 million to fix your mum's house. Tư pats your shoulder: "You're a real District 7 driver now!"</p><p>+${fmtVND(C.cash)} · +${C.xp} XP</p>`), L('Tiếp tục chạy', 'Keep riding'), () => { }), 1500);
+  }
+  setTimeout(() => { toast(`📖 ${L('Hoàn thành', 'Completed')}: ${C.t[profile.english ? 1 : 0]}<br><span style="font-weight:500">+${fmtVND(C.cash)} · +${C.xp} XP</span>`, 3.5); storyStartCh(S.ch + 1); setTimeout(() => game.mode === 'drive' && !game.paused && storyTalk(true), 3800); }, 1200);
+}
+let storyT = 0;
+const storyEl = document.createElement('div'); storyEl.style.cssText = 'font-size:12px;color:#fde68a;font-weight:700;margin-top:2px'; $('jam').after(storyEl);
+FRAME.push((dt) => {
+  if (game.mode !== 'drive') return;
+  const S = S0();
+  if (!S.intro && !game.paused && !game.dlgKeys && !game.order) { S.intro = true; storyStartCh(0); setTimeout(() => storyTalk(true), 800); return; }
+  storyT -= dt; if (storyT > 0) return; storyT = 1;
+  if (S.done || !S.base) { storyEl.textContent = S.done ? L('📖 Story Mode: hoàn thành ✓', '📖 Story: complete ✓') : ''; return; }
+  if (S.ch === 1 && !S.mall && Math.hypot(player.x - MALL.x, player.z - MALL.z) < MALL.r) { S.mall = true; toast(L('🛍️ Đã ghé Crescent Mall', '🛍️ Visited Crescent Mall'), 1.6); }
+  const C = STORY[S.ch], [a, b] = C.prog(S);
+  storyEl.textContent = `📖 ${C.goal[profile.english ? 1 : 0]}: ${S.ch === 5 ? Math.round(a / 1000) + 'k/' + Math.round(b / 1000) + 'k' : a + '/' + b}`;
+  if (a >= b && !game.paused && !S.pending) { S.pending = true; storyComplete(); setTimeout(() => S.pending = false, 2000); }
+});
+// hooks: rain jobs, clean day, talk
+{
+  const rainy = () => rain > 0.3;
+  const _do = dropOff; dropOff = function () { const r = rainy(); _do(); if (r && S0().ch === 3) S0().rain++; };
+  const _cs = completeSub; completeSub = function (o, sub) { const r = rainy(); const out = _cs(o, sub); if (r && S0().ch === 3) S0().rain++; return out; };
+  const _ed = endDay; endDay = function () { const S = S0(); if (S.ch === 2 && !game.dayOver && profile.today.bike + profile.today.food >= 5 && profile.today.viol === 0) S.clean = true; _ed(); };
+  const _sq = showQuests; showQuests = function () { _sq(); const S = S0(); if (!S.base && !S.done) return; const C = STORY[S.ch];
+    $('dlgText').innerHTML = `<b>📖 Story Mode</b> — ${S.done ? L('đã hoàn thành ✓', 'complete ✓') : `${C.t[profile.english ? 1 : 0]}: ${C.goal[profile.english ? 1 : 0]}`}<hr>` + $('dlgText').innerHTML; };
+}
+ACTION_HOOKS.push((opts) => { if (Math.hypot(tu.position.x - player.x, tu.position.z - player.z) < 22) opts.unshift({ t: L('💬 Nói chuyện với anh Tư', '💬 Talk to Tư'), fx: () => setTimeout(() => storyTalk(false), 50) }); });
 
 /* ================= Online: chơi cùng bạn bè (PeerJS, mã phòng) ================= */
 const NET = { peer: null, conns: [], host: false, code: '', remotes: new Map(), sendT: 0, status: 'off', mode: '' };

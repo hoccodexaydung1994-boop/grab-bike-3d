@@ -1,4 +1,4 @@
-# Grab Bike 3D – Vespa
+# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng)
 
 Game 3D chạy trên web (Three.js): tài xế xe ôm công nghệ lái Vespa quanh khu phố, đón khách và chở tới nơi.
 
@@ -15,4 +15,4 @@ Game 3D chạy trên web (Three.js): tài xế xe ôm công nghệ lái Vespa qu
 W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · H còi · G tới điểm đón/trả · P điện thoại · C đổi góc máy · V xem xe 360° · M tắt tiếng · R về nhà
 
 ## Ghi công
-Mô hình xe: "Electric scooter" – artgeorg (CGTrader, miễn phí). Thư viện: three.js r160 (tải từ cdn.jsdelivr.net).
+Bản đồ: © OpenStreetMap contributors (ODbL). Mô hình xe: "Electric scooter" – artgeorg (CGTrader, miễn phí). Thư viện: three.js r160 (tải từ cdn.jsdelivr.net).

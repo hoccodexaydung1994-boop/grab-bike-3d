@@ -17,13 +17,17 @@ if (profile.cash === undefined) { profile.cash = 250000; profile.wallet = 0; pro
 
 /* ---- money ---- */
 function earn(amount, method, tip) {
+  if (profile.debt > 0) { const pay = Math.min(profile.debt, Math.round(amount * 0.5)); profile.debt -= pay; amount -= pay; profile.today.costs.debt = (profile.today.costs.debt || 0); if (profile.debt <= 0) toast(L('✅ Đã trả hết nợ', '✅ Debt paid off'), 1.6); }
   if (method === 'cash') profile.cash += amount; else profile.wallet += amount;
   profile.money += amount; profile.totalMoney += amount; profile.today.revenue += amount; profile.totals.revenue += amount;
   if (tip) profile.today.tips += amount;
 }
 function spend(amount, cat, force) {
   if (!force && profile.cash + profile.wallet < amount) { toast(L('💸 Không đủ tiền!', '💸 Not enough money!'), 1.8); return false; }
-  const c = Math.min(Math.max(0, profile.cash), amount); profile.cash -= c; profile.wallet -= amount - c;
+  const c = Math.min(Math.max(0, profile.cash), amount); profile.cash -= c;
+  const w = Math.min(Math.max(0, profile.wallet), amount - c); profile.wallet -= w;
+  const rest = amount - c - w;   // không cho tiền âm: phần thiếu thành nợ, trừ dần 50% mỗi khoản thu (S3)
+  if (rest > 0) { profile.debt = (profile.debt || 0) + rest; toast(L(`💳 Thiếu ${fmtVND(rest)} — ghi nợ, trừ dần vào cuốc sau`, `💳 Short ${fmtVND(rest)} — added to debt`), 2.5); }
   profile.today.costs[cat] = (profile.today.costs[cat] || 0) + amount;
   updateProfileHUD(); saveProfile();
   return true;
@@ -68,8 +72,9 @@ function tickStats(dt, distM) {
   const h = profile.clock / 60, noon = h >= 11 && h < 14;
   const needy = s.hunger > 80 || s.thirst > 80;
   s.stamina = clamp01(s.stamina - gm * (moving ? 0.1 : 0.03) * (needy ? 2 : 1) * (s.stress > 80 ? 1.3 : 1) * mulStamina());
-  s.hunger = clamp01(s.hunger + gm * 0.13 * mulNeeds());
-  s.thirst = clamp01(s.thirst + gm * (noon ? 0.3 : 0.2) * mulNeeds());
+  const needOn = featOn('needs');
+  if (needOn) { s.hunger = clamp01(s.hunger + gm * 0.13 * mulNeeds());
+  s.thirst = clamp01(s.thirst + gm * (noon ? 0.3 : 0.2) * mulNeeds()); }
   s.stress = clamp01(s.stress + gm * (moving ? 0.01 : -0.03));
   if (s.hunger > 90 || s.thirst > 90) s.hp = clamp01(s.hp - gm * 0.06);
   if (rain > 0.3 && !raincoat && moving) s.hp = clamp01(s.hp - gm * 0.03);
@@ -85,6 +90,7 @@ function tickStats(dt, distM) {
   if (s.hp <= 0) return hospital();
   if (s.fuel <= 0 && !game.outOfFuel) { game.outOfFuel = true; return evOutOfFuel(); }
   if (s.dura <= 0 && !game.broken) { game.broken = true; return evBreakdown(); }
+  if (!featOn('events')) return;
   if (s.stamina < 25 && fatigueCD <= 0) { fatigueCD = 120; return evFatigue(); }
   if (moving && flatCD <= 0 && Math.random() < dt / 400) { flatCD = 240; return evFlat(); }
   const hr = profile.clock / 60;
@@ -120,8 +126,8 @@ function renderStats() {
 }
 
 /* ---- generic dialog with options (pauses the game) ---- */
-function showDialog({ who, text, opts, onPick, closable }) {
-  game.paused = true;
+function showDialog({ who, text, opts, onPick, closable, auto }) {
+  game.paused = true; game.dlgAuto = auto ?? null; game.dlgAutoT = 6; game.dlgId = (game.dlgId || 0) + 1;
   $('dlgWho').textContent = who; $('dlgText').innerHTML = text;
   const box = $('dlgOpts'); box.innerHTML = '';
   opts.forEach((o, i) => {
@@ -133,7 +139,7 @@ function showDialog({ who, text, opts, onPick, closable }) {
   $('dlg').classList.remove('hidden');
   game.dlgKeys = opts.map((o, i) => box.children[i]);
 }
-function closeDialog() { $('dlg').classList.add('hidden'); game.paused = false; game.dlgKeys = null; }
+function closeDialog() { $('dlg').classList.add('hidden'); game.paused = false; game.dlgKeys = null; game.dlgAuto = null; }
 function englishScore(good, why) {
   if (good) { profile.totals.english++; toast('✅ Good answer!' + (why ? `<br><span style="font-weight:500">${why}</span>` : ''), 2); if (profile.totals.english >= 20) unlock('english'); }
   else toast('🤔 Could be more polite.' + (why ? `<br><span style="font-weight:500">${why}</span>` : ''), 2.2);
@@ -149,25 +155,25 @@ const orderCode = () => 'GF-' + Math.floor(100 + Math.random() * 900);
 function arrivePickup() {
   const o = game.order; player.v = 0;
   if (o.type === 'ride') {
-    if (Math.random() < 0.2) return evNoShow();
+    if (Math.random() < 0.08) return evNoShow();
     greetRide();
   } else {
-    if (Math.random() < 0.25) return evSlowFood();
+    if (Math.random() < 0.1) return evSlowFood();
     staffDialog();
   }
 }
 function greetRide() {
   const o = game.order;
   showDialog({ who: L('🧑 Khách', '🧑 Passenger'), text: L(`Chào em, anh đặt xe đi đường <b>${o.drop.name}</b> nhé.`, `Hi, I booked a ride to <b>${o.drop.name}</b>.`), opts: [
-    { t: L('Dạ chào anh! Em là tài xế Grab, anh đội mũ bảo hiểm giúp em ạ.', "Hello! I'm your Grab driver. Please put on this helmet."), good: true, why: 'Greeting + safety first.', fx: () => o.sat += 10 },
-    { t: L('Lên xe đi anh.', 'Get on.'), good: false, why: 'Try a greeting and mention the helmet.', fx: () => o.sat -= 5 },
-    { t: L('(Gật đầu, không nói gì)', '(Nod silently)'), good: false, fx: () => o.sat -= 8 }], onPick: () => pickUp() });
+    { t: L('Dạ chào anh, anh đội mũ giúp em nhé. Anh muốn đi đường nào ạ? <small>(+hài lòng, chậm hơn chút)</small>', "Hello! Please put on this helmet. Any route you prefer? <small>(+satisfaction, a bit slower)</small>"), good: true, why: 'Greeting + safety first.', fx: () => { o.sat += 12; o.est -= 6; } },
+    { t: L('Dạ chào anh, mũ đây ạ, mình đi luôn nha. <small>(nhanh, hài lòng vừa)</small>', "Hi! Here's your helmet, let's go. <small>(quick, fair)</small>"), good: true, why: 'Short but polite works too.', fx: () => { o.sat += 4; } },
+    { t: L('(Gật đầu, chạy luôn) <small>(nhanh nhất, khách hơi phật ý)</small>', '(Nod and go) <small>(fastest, slightly rude)</small>'), good: false, fx: () => { o.sat -= 6; o.est += 8; } }], auto: 1, onPick: () => pickUp() });
 }
 function staffDialog(o = game.order, done = pickUp) {
   showDialog({ who: L(`👩‍🍳 Nhân viên ${o.shop.name}`, `👩‍🍳 Staff at ${o.shop.name}`), text: L(`Anh lấy đơn <b>${o.code}</b> phải không ạ? Món đây ạ: ${o.items.join(', ')}.`, `Are you picking up order <b>${o.code}</b>? Here it is: ${o.items.join(', ')}.`), opts: [
     { t: L('Đúng rồi, em kiểm tra món và dán niêm phong giúp anh nhé.', 'Yes. Let me check the items. Could you seal the bag, please?'), good: true, why: 'Checking the order avoids mistakes.', fx: () => { o.sat += 8; passTime(1); } },
     { t: L('Đưa đây, anh đang vội.', "Give it to me, I'm in a hurry."), good: false, why: 'Always confirm the order code and items.', fx: () => { if (Math.random() < 0.3) o.wrongItem = true; } },
-    { t: L('Cho anh xin thêm muỗng đũa với tương ớt nha.', 'Could I get extra cutlery and chili sauce, please?'), good: true, fx: () => { o.sat += 12; passTime(2); } }], onPick: () => done() });
+    { t: L('Cho anh xin thêm muỗng đũa với tương ớt nha.', 'Could I get extra cutlery and chili sauce, please?'), good: true, fx: () => { o.sat += 12; passTime(2); } }], auto: 0, onPick: () => done() });
 }
 function arriveDrop() {
   const o = game.order; player.v = 0;
@@ -177,7 +183,7 @@ function arriveDrop() {
     showDialog({ who: L('🧑 Khách', '🧑 Passenger'), text: cash ? L('Tới rồi hả em, bao nhiêu tiền vậy?', 'Are we here? How much is it?') : L('Tới rồi hả em, anh trả qua ví rồi nhé.', "We're here? I've paid through the app."), opts: [
       { t: cash ? L(`Dạ ${fare} ạ. Anh nhớ đánh giá 5 sao cho em nha!`, `It's ${fare}. Please rate me five stars!`) : L('Dạ vâng. Anh nhớ đánh giá 5 sao cho em nha!', 'OK. Please rate me five stars!'), good: false, why: 'Asking for stars sounds pushy.', fx: () => o.sat -= 3 },
       { t: cash ? L(`Dạ ${fare} ạ, cảm ơn anh. Anh kiểm tra đồ đạc trước khi xuống nhé.`, `It's ${fare}. Thank you! Please check your belongings.`) : L('Dạ cảm ơn anh, anh kiểm tra đồ đạc trước khi xuống nhé.', 'Thank you! Please check your belongings before you go.'), good: true, why: 'Polite and helpful.', fx: () => o.sat += 10 },
-      { t: L('Xem trên app đi.', 'Check the app.'), good: false, fx: () => o.sat -= 10 }], onPick: () => dropOff() });
+      { t: L('Xem trên app đi.', 'Check the app.'), good: false, fx: () => o.sat -= 10 }], auto: 0, onPick: () => dropOff() });
   } else handoverDialog(o, dropOff);
 }
 function handoverDialog(o, done) {
@@ -185,7 +191,7 @@ function handoverDialog(o, done) {
     showDialog({ who: L('🧑 Khách đặt món', '🧑 Customer'), text: L('Đồ ăn của chị tới rồi hả em?', 'Is my food here?'), opts: [
       { t: L(`Dạ đơn ${o.code} của chị đây ạ, chúc chị ngon miệng!`, `Here's your order ${o.code}. Enjoy your meal!`), good: true, why: 'Confirming the order code is good practice.', fx: () => o.sat += 10 },
       { t: L('Dạ của chị, chị nhận giúp em.', 'Here, please take it.'), good: true, fx: () => o.sat += 2 },
-      { t: L('(Đặt túi xuống rồi đi)', '(Leave the bag and go)'), good: false, fx: () => o.sat -= 10 }], onPick: () => done() });
+      { t: L('(Đặt túi xuống rồi đi)', '(Leave the bag and go)'), good: false, fx: () => o.sat -= 10 }], auto: 0, onPick: () => done() });
   }
 }
 const SMALL_TALK = [
@@ -208,7 +214,7 @@ const SMALL_TALK = [
 ];
 function smallTalk() {
   const st = pick(SMALL_TALK)();
-  showDialog({ who: L('🧑 Khách', '🧑 Passenger'), text: st.q, opts: st.opts });
+  showDialog({ who: L('🧑 Khách', '🧑 Passenger'), text: st.q, opts: st.opts, auto: 0 });
 }
 
 /* ---- events with options ---- */
@@ -263,11 +269,13 @@ function evBreakdown() {
 function hospital() {
   if (game.inHospital) return; game.inHospital = true;
   const hsp = nearest(HOSPITALS, 1e9) || HOSPITALS[0];
-  cancelOrder(); spend(300000, 'other', true);
-  showOverlay(L('🏥 Vào viện', '🏥 Hospital'), L(`Bạn kiệt sức và được đưa vào <b>${hsp.t}</b>.<br>Viện phí 300.000đ. Ca làm hôm nay kết thúc.`, `You collapsed and were taken to <b>${hsp.t}</b>.<br>Bill: 300,000đ. Your shift is over.`), L('Xem báo cáo cuối ngày', 'See end-of-day report'), () => { profile.st.hp = 60; game.inHospital = false; endDay(); });
+  cancelOrder();
+  const fee = Math.round(Math.min(200000, Math.max(30000, (profile.cash + profile.wallet) * 0.2)) / 1000) * 1000; spend(fee, 'other', true);
+  passTime(120); teleportTo(hsp.x, hsp.z);
+  showOverlay(L('🏥 Vào viện', '🏥 Hospital'), L(`Bạn kiệt sức và được đưa vào <b>${hsp.t}</b>, nằm truyền nước 2 tiếng.<br>Viện phí ${fmtVND(fee)}. Nhớ ăn uống, nghỉ ngơi trước khi chạy tiếp!`, `You collapsed and rested 2 hours at <b>${hsp.t}</b>.<br>Bill: ${fmtVND(fee)}.`), L('🛵 Chạy tiếp', '🛵 Back to work'), () => { const s = profile.st; s.hp = 60; s.stamina = Math.max(s.stamina, 60); s.hunger = Math.min(s.hunger, 40); s.thirst = Math.min(s.thirst, 30); game.inHospital = false; game.state = 'wait'; game.waitT = 3; });
 }
 function teleportTo(x, z) { const ne = nearestEdge(x, z, null, 120); if (ne) { player.x = ne.x; player.z = ne.z; } else { player.x = x; player.z = z; } player.v = 0; camInit = false; playerTrail.length = 0; game.noViolT = 2; }
-function fuelPrice(need) { return need * 1000; }   // garage.js nhân theo loại xe
+function fuelPrice(need) { return Math.round(need * 250 / 500) * 500; }   // 1% bình ≈ 250đ → ~750đ/km   // garage.js nhân theo loại xe
 function repairMul() { return 1; }
 function refuel() { const need = Math.round(100 - profile.st.fuel); if (need <= 0) return toast(L('⛽ Bình xăng đã đầy', '⛽ Tank is full'), 1.5); const cost = fuelPrice(need); if (spend(cost, 'fuel')) { profile.st.fuel = 100; passTime(4); toast(L(`⛽ Đổ đầy bình: ${fmtVND(cost)}`, `⛽ Filled up: ${fmtVND(cost)}`), 2); } }
 
@@ -356,11 +364,11 @@ function homeMenu() {
     { t: L(`🔧 Bảo dưỡng xe (${fmtVND(Math.round(Math.round(100 - s.dura) * 1200 * repairMul()))})`, `🔧 Service the bike (${fmtVND(Math.round(Math.round(100 - s.dura) * 1200 * repairMul()))})`), fx: () => { const c = Math.round(Math.round(100 - s.dura) * 1200 * repairMul()); if (c > 0 && spend(c, 'repair')) s.dura = 100; homeMenu(); } },
     { t: L('🧼 Vệ sinh túi giao hàng', '🧼 Clean the delivery bag'), fx: () => { profile.cleanBag = true; toast(L('🧼 Túi sạch: khách GrabFood hài lòng hơn ngày mai', '🧼 Clean bag: happier GrabFood customers tomorrow'), 2); homeMenu(); } },
     { t: L('🏦 Gửi tiết kiệm (giữ lại 100.000đ tiền mặt)', '🏦 Save money (keep 100,000đ cash)'), fx: () => { const m = Math.max(0, profile.cash - 100000) + Math.max(0, profile.wallet); profile.cash -= Math.max(0, profile.cash - 100000); profile.wallet -= Math.max(0, profile.wallet); profile.savings += m; toast(L(`🏦 Đã gửi ${fmtVND(m)}`, `🏦 Saved ${fmtVND(m)}`), 1.8); saveProfile(); homeMenu(); } },
-    { t: L('😴 Đi ngủ → ngày mới (sinh hoạt phí 60.000đ)', '😴 Sleep → new day (living cost 60,000đ)'), fx: () => sleepNewDay() }]);
+    { t: L('😴 Đi ngủ → ngày mới (sinh hoạt phí 30.000đ)', '😴 Sleep → new day (living cost 30,000đ)'), fx: () => sleepNewDay() }]);
 }
 function sleepNewDay() {
   const s = profile.st;
-  spend(60000, 'living', true);
+  spend(30000, 'living', true);
   s.hp = clamp01(s.hp + (profile.today.dinner ? 45 : 25)); s.stamina = 100; s.stress = clamp01(s.stress - 35);
   s.hunger = profile.today.dinner ? 15 : 45; s.thirst = 20; s.phone = 100;
   profile.totals.days++; profile.totals.km = (profile.totals.km || 0) + profile.today.km;
@@ -371,7 +379,7 @@ function sleepNewDay() {
   if (fbConfig()) fbSubmitDay();
   profile.wanted = 0; if (profile.day % 7 === 0) profile.week = { orders: 0, cancels: 0, idx: (profile.week.idx || 0) + 1, trips: 0, ontime: 0, streets: [], done: {} };
   profile.day++; profile.clock = DAY_START; profile.money = 0; profile.trips = 0; profile.banned = false; profile.fines = 0;
-  profile.goal = Math.max(profile.goal, 100000 + 20000 * (profile.level - 1));
+  profile.goal = Math.max(profile.goal, 80000 + 15000 * (profile.level - 1));
   profile.today = newToday(); raincoat = false; rainTarget = 0; game.dayOver = false; game.frozen = false; game.outOfFuel = false; game.broken = false;
   saveProfile(); game.mode = 'menu'; fillMenu(); $('menu').classList.remove('hidden');
 }

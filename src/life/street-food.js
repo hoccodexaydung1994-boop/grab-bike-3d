@@ -117,7 +117,7 @@ function finishNap(min, sp) {
   // theft
   const hrs = realMin / 60, risk = sp.risk * (h >= 21 || h < 5 ? 2 : 1) * hrs;
   if (profile.cash > 200000 && Math.random() < risk) {
-    const lost = Math.round(profile.cash * (0.3 + Math.random() * 0.2) / 1000) * 1000; profile.cash -= lost; profile.today.costs.other += lost; s.stress = clamp01(s.stress + 25);
+    const lost = Math.round(Math.min(100000, profile.cash * 0.2) / 1000) * 1000;   // S9: tối đa 20% hoặc 100k profile.cash -= lost; profile.today.costs.other += lost; s.stress = clamp01(s.stress + 25);
     notes.push(L(`🕵️ Bị móc túi mất <b>${fmtVND(lost)}</b>! Lần sau gửi bớt tiền vào ví/tiết kiệm.`, `🕵️ Pickpocketed: <b>${fmtVND(lost)}</b>!`));
   } else if (Math.random() < 0.03 * hrs && (profile.inv.raincoat || 0) > 0) { profile.inv.raincoat--; notes.push(L('🧥 Bị lấy mất áo mưa trong cốp', '🧥 Someone stole your raincoat')); }
   sleepFx.on = false; zzz.visible = false; driver.rotation.set(0, 0, 0); driver.position.set(0, 0, 0);

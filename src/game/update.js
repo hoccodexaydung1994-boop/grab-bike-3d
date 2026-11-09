@@ -6,7 +6,10 @@ function updateGame(dt) {
   game.bumpCD -= dt; game.noViolT -= dt;
   if (!game.dayOver) {
     profile.clock += dt * MIN_PER_SEC;
-    if (profile.clock >= dayEnd() && !game.frozen) { profile.clock = dayEnd(); endDay(); }
+    if (profile.clock >= dayEnd() && !game.frozen) {
+      if (game.order) { if (!game.lastCall) { game.lastCall = true; toast(L('🌙 Hết giờ nhận cuốc — chạy nốt chuyến này rồi về nhé', '🌙 Shift over — finish this job first'), 3); } if (game.offer) declineOffer(); }
+      else { game.lastCall = false; endDay(); }
+    }
   }
   applyDaylight(profile.clock);
   saveT -= dt; if (saveT <= 0) { saveT = 5; saveProfile(); }
@@ -14,7 +17,7 @@ function updateGame(dt) {
   if (game.paused || game.dayOver) return;
   if (profile.banned || game.dayOver) return;
   if (game.state === 'wait' && phoneDead()) { }
-  else if (game.state === 'wait') { game.waitT -= dt * (SK().tho >= 3 ? 1.43 : 1) * (acceptRate() < 0.5 ? 0.66 : 1); if (game.waitT <= 0 && !police.active) showOffer(makeOffer()); }
+  else if (game.state === 'wait') { game.waitT -= dt * (SK().tho >= 3 ? 1.43 : 1) * (acceptRate() < 0.5 ? 0.66 : 1); if (game.waitT <= 0 && !police.active && profile.clock < dayEnd()) showOffer(makeOffer()); }
   else if (game.state === 'offer') { game.offer.expire -= dt; if (game.offer.expire <= 0) { declineOffer(); toast('⌛ Cuốc đã hết hạn', 1.5); } }
   else if (game.state === 'pickup' || game.state === 'ride') {
     if (game.state === 'ride') game.tripT += dt;

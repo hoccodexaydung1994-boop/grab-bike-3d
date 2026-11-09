@@ -9,6 +9,7 @@ BOOT.push(() => {
 const FR = { target: null, waveCD: 0 };
 function remoteBikeMesh(bk) {
   const B = BIKES[bk] || BIKES.vespa;
+  if (B.model === 'sh' && SH.model) { const c = SH.model.clone(true); c.visible = true; return c; }
   if (B.model === 'vespa') return bike.model ? bike.model.clone(true) : new THREE.Mesh(new THREE.BoxGeometry(0.6, 1, 1.8), std(0x00b14f));
   const m = B.model === 'underbone' ? buildUnderbone(parseInt(B.color.slice(1), 16)) : buildScooter(parseInt(B.color.slice(1), 16));
   m.position.y = B.model === 'underbone' ? -0.12 : -0.05; return m;
@@ -20,7 +21,7 @@ FRAME.push((dt) => {
     const d = r.data || {};
     // bike model follows what the friend rides
     const bk = d.bk || 'vespa';
-    if (r.bk !== bk && (bk !== 'vespa' || bike.model)) { r.bk = bk; const old = r.lean.children[0]; if (old) r.lean.remove(old); r.lean.add(remoteBikeMesh(bk)); r.lean.children.unshift(r.lean.children.pop()); }
+    if (r.bk !== bk && (bk === 'vespa' ? bike.model : BIKES[bk]?.model === 'sh' ? SH.model : true)) { r.bk = bk; const old = r.lean.children[0]; if (old) r.lean.remove(old); r.lean.add(remoteBikeMesh(bk)); r.lean.children.unshift(r.lean.children.pop()); }
     // real height (bridges) + passenger when carrying a customer
     r.y = (r.y ?? 0.07) + (((d.y ?? 0.07)) - (r.y ?? 0.07)) * Math.min(1, dt * 8); r.g.position.y = r.y;
     // remember friends

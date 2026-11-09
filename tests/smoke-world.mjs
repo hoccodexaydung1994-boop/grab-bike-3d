@@ -51,7 +51,7 @@ g.document = { getElementById: el, createElement: (t) => t === 'button' ? { inne
 g.innerWidth = 1280; g.innerHeight = 720; g.devicePixelRatio = 1;
 g.addEventListener = (t, f) => (handlers[t] ||= []).push(f);
 g.matchMedia = () => ({ matches: false });
-let raf = null; g.requestAnimationFrame = (f) => { raf = f; };
+let raf = null; g.requestAnimationFrame = (f) => { if (f.name === 'animate' || !raf) raf = f; };
 const ls = {}; g.localStorage = { getItem: k => ls[k] ?? null, setItem: (k, v) => { ls[k] = v; } };
 g.atob = (s) => Buffer.from(s, 'base64').toString('binary');
 g.window = g;
@@ -65,6 +65,7 @@ globalThis.__hook = (h) => { H = h; };
 const run = () => { for (const f of man.files) vm.runInThisContext(fs.readFileSync(ROOT + '/src/' + f, 'utf8'), { filename: f }); vm.runInThisContext('__hook({player, game, profile, cars, police, SIGNALS, EDGES, MERCHANTS, acceptOffer, goToTarget, policeStop, refreshRoute, get route(){return route}, endDay, evRain, evFlat, openActions, makeBatchOffer, reportViolation, policeFlee, CHECKPOINTS, openPanel, closePanel, renderPanel, get panelTab(){return panelTab}, NET, unlocked, tierInfo, onCrash, triggerFall, fall, standUp, trafficLevel, makeCustomer, get nightK(){return nightK}, applyNight, homeSpot, keys, updateGame, sigState, endDay, banForDay, makeOffer, computeRoute, VENDORS, PEDS, DECKS, napMenu, startNap, perfStepDown, PERF, buildDriver2, rebuildDriver, classifyDrop, deckStep, hitPed, STORY, showOffer, dropOff, storyTalk, eatStreet, napSpot, vendorOpen, edgeAt});', { filename: 'hook' }); };
 const toasts=[];
 run();
+if (!process.env.NEWBIE) { H.profile.totals.days = 5; H.profile.settings.noAuto = true; H.profile.settings.easy = true; } // VETERAN: tests assume all features unlocked
 if (process.env.DUMP) { const names = process.env.DUMP.split('|'); const out = {}; const hasFn = (v) => typeof v === 'function' || (v && typeof v === 'object' && Object.values(v).some(hasFn));
   for (const n of names) { const v = vm.runInThisContext(n); out[n] = hasFn(v) ? '__FN__' : v; } fs.writeFileSync('/tmp/cfgdump.json', JSON.stringify(out)); process.exit(0); }
 const T = els.get('toast') || el('toast');
@@ -75,7 +76,7 @@ const dlgText = () => (els.get('dlgText')||el('dlgText')).innerHTML;
 async function pickDlg(i = 0, label) { const b = els.get('dlgOpts'); if (!H.game.paused || !b.children.length) return false; const c = b.children[Math.min(i, b.children.length - 1)]; console.log('   dlg>', label || '', '|', String(dlgText()).replace(/<[^>]+>/g,'').slice(0,70), '=>', c.innerHTML.replace(/<[^>]+>/g, '').slice(0, 70)); c.click(); await sleep(450); tr(); return true; }
 const findOpt = (re) => els.get('dlgOpts').children.findIndex(c => re.test(c.innerHTML));
 console.log('vendors', H.VENDORS.length, Object.entries(H.VENDORS.reduce((a,v)=>(a[v.kind]=(a[v.kind]||0)+1,a),{})).map(e=>e.join(':')).join(' '), 'peds', H.PEDS.length, 'decks', H.DECKS.length);
-el('bStart').onclick(); H.profile.level = 6;
+H.profile.bikePicked = true; el('bStart').onclick(); H.profile.level = 6;
 frame(5); await sleep(1000); frame(2);
 console.log('story intro shown', H.game.paused, String(dlgText()).slice(0,80)); await pickDlg(0,'intro');
 console.log('story', JSON.stringify(H.profile.story));
@@ -113,7 +114,7 @@ console.log('rare done order?', !!H.game.order, 'food', H.profile.today.food);
 const D = H.DECKS[0]; const ang = Math.atan2(D.p[2]-D.p[0], D.p[3]-D.p[1]);
 H.player.x = D.p[0] + Math.sin(ang)*2; H.player.z = D.p[1] + Math.cos(ang)*2; H.player.h = ang; H.player.v = 10; H.game.order=null; H.game.state='wait'; H.game.waitT=999;
 H.keys.KeyW = true; let maxY=0; for (let k=0;k<2500;k++){ if(H.player.deck){ const d=H.DECKS[H.player.deck.di], kk=Math.min(d.n-2,H.player.deck.k+1); H.player.h=Math.atan2(d.p[kk*2+2]-H.player.x, d.p[kk*2+3]-H.player.z);} raf(); if(H.game.paused) await pickDlg(0); maxY=Math.max(maxY,H.player.y); if(k%400===0) console.log('  bridge k',k,'deck',JSON.stringify(H.player.deck),'y',H.player.y.toFixed(2),'v',H.player.v.toFixed(1)); } H.keys.KeyW=false;
-console.log('bridge maxY', maxY.toFixed(1), 'deck', JSON.stringify(H.player.deck));
+console.log('dbg bridge', H.game.dayOver, H.profile.clock, H.game.lastCall, H.game.paused, H.game.frozen, H.game.mode, H.player.x.toFixed(1), H.player.z.toFixed(1), H.player.v.toFixed(1), H.fall.on);console.log('bridge maxY', maxY.toFixed(1), 'deck', JSON.stringify(H.player.deck));
 // ---- pedestrian
 H.player.deck=null; H.player.y=0.07; const p = H.PEDS[0]; const q=H.edgeAt(p.E,p.s,true), off2=(p.E.w/2+1.6)*p.side; H.player.x=q.x-q.dz*off2; H.player.z=q.z+q.dx*off2; H.player.v=10; const cash0=H.profile.cash+H.profile.wallet;
 frame(2); await sleep(400); console.log('ped hit dialog', H.game.paused, String(dlgText()).replace(/<[^>]+>/g,'').slice(0,60), 'money diff', H.profile.cash+H.profile.wallet-cash0); await pickDlg(0);

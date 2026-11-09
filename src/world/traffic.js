@@ -361,6 +361,7 @@ function updateCars(dt) {
     };
     for (const o of vGrid.query(p.x, p.z, look + 6, _vq)) if (o !== v && o.mesh.visible) test(o.mesh.position.x, o.mesh.position.z, o.hl, o.hw, o.mesh.rotation.y);
     test(player.x, player.z, 1.0, 0.45, null);
+    if (typeof PEDS !== 'undefined') for (const q of PEDS) if (q.cross && q.m.visible) test(q.m.position.x, q.m.position.z, 0.4, 0.4, null);   // S12
     if (police.active) test(police.x, police.z, 1.0, 0.45, null);
     // red / yellow lights ahead
     for (const s of sigGrid.query(p.x, p.z, 45, _sq)) {

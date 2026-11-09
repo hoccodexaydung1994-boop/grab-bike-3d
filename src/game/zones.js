@@ -14,17 +14,17 @@ const ZONE_NAME = CFG.shop.ZONE_NAME;   // data/config/shop.json
 function zoneDialog(o, next) {
   const z = classifyDrop(o.drop), s = profile.st, peak = isPeak();
   const go = (min, sat, extra) => () => { passTime(min); o.sat += sat; if (o.heat !== undefined) o.heat = Math.max(0, o.heat - min * 1.5); extra && extra(); setTimeout(() => next(), 350); };
-  if (z === 'apt') showDialog({ who: ZONE_NAME.apt[profile.english ? 1 : 0], text: L('Bảo vệ: “Shipper không được lên tầng nha em, gửi ở sảnh hoặc gọi khách xuống.”', 'Guard: "Couriers can\'t go upstairs. Leave it in the lobby or call the customer down."'), opts: [
+  if (z === 'apt') showDialog({ auto: 0, who: ZONE_NAME.apt[profile.english ? 1 : 0], text: L('Bảo vệ: “Shipper không được lên tầng nha em, gửi ở sảnh hoặc gọi khách xuống.”', 'Guard: "Couriers can\'t go upstairs. Leave it in the lobby or call the customer down."'), opts: [
     { t: L('📞 Gọi khách xuống sảnh nhận (~5 phút)', '📞 Call the customer down (~5 min)'), good: true, fx: go(5, -2) },
     { t: L('📦 Gửi quầy lễ tân, chụp ảnh báo khách (1 phút)', '📦 Leave it at reception and send a photo (1 min)'), good: true, why: 'Always send a photo as proof.', fx: go(1, -6) },
     { t: L('🪪 Gửi CCCD, đăng ký thẻ khách để lên tận cửa (~7 phút)', '🪪 Register a visitor pass to deliver to the door (~7 min)'), good: true, fx: go(7, 12, () => s.stamina = clamp01(s.stamina - 3)) }] });
-  else if (z === 'office') showDialog({ who: ZONE_NAME.office[profile.english ? 1 : 0], text: L(`Tòa nhà văn phòng${peak ? ' đang giờ cao điểm, thang máy kẹt cứng' : ''}. Khách ghi chú: “Giao tầng 12 giúp em”.`, `Office building${peak ? ' at rush hour, lifts are packed' : ''}. Note: "Please bring it to floor 12".`), opts: [
+  else if (z === 'office') showDialog({ auto: 1, who: ZONE_NAME.office[profile.english ? 1 : 0], text: L(`Tòa nhà văn phòng${peak ? ' đang giờ cao điểm, thang máy kẹt cứng' : ''}. Khách ghi chú: “Giao tầng 12 giúp em”.`, `Office building${peak ? ' at rush hour, lifts are packed' : ''}. Note: "Please bring it to floor 12".`), opts: [
     { t: L(`🛗 Đi thang máy lên tầng 12 (~${peak ? 12 : 7} phút)`, `🛗 Take the lift to floor 12 (~${peak ? 12 : 7} min)`), good: true, fx: go(peak ? 12 : 7, 12) },
     { t: L('💬 Nhắn khách xuống quầy lễ tân (~4 phút)', '💬 Ask them to come to reception (~4 min)'), good: true, why: 'Polite request: "Could you come down to the lobby, please?"', fx: go(4, -3) },
     { t: L('📦 Để ở quầy rồi đi luôn', '📦 Drop it at the desk and leave'), good: false, why: 'Tell the customer before leaving the order.', fx: go(1, -12) }] });
   else {
     const dog = Math.random() < 0.25;
-    showDialog({ who: ZONE_NAME.house[profile.english ? 1 : 0], text: dog ? L('Nhà trong hẻm, cổng đóng. 🐕 Một con chó sủa ầm ĩ sau cổng!', 'A house down an alley, gate closed. 🐕 A dog is barking behind the gate!') : L('Nhà trong hẻm nhỏ, cổng đóng.', 'A house down a small alley, gate closed.'), opts: [
+    showDialog({ auto: 1, who: ZONE_NAME.house[profile.english ? 1 : 0], text: dog ? L('Nhà trong hẻm, cổng đóng. 🐕 Một con chó sủa ầm ĩ sau cổng!', 'A house down an alley, gate closed. 🐕 A dog is barking behind the gate!') : L('Nhà trong hẻm nhỏ, cổng đóng.', 'A house down a small alley, gate closed.'), opts: [
       { t: L('🔔 Bấm chuông và chờ (~2 phút)', '🔔 Ring the bell and wait (~2 min)'), good: true, fx: go(2, 3, () => dog && (s.stress = clamp01(s.stress + 5))) },
       { t: L('📞 Gọi điện cho khách ra mở cổng (1 phút)', '📞 Call the customer to open the gate (1 min)'), good: true, fx: go(1, 2) },
       { t: L('🪝 Treo túi lên cổng rồi đi', '🪝 Hang the bag on the gate and leave'), good: false, why: 'Hand it over in person or confirm with the customer.', fx: go(0, -15) }] });
@@ -34,7 +34,7 @@ function zoneDialog(o, next) {
   const _hd = handoverDialog;
   handoverDialog = function (o, done) {
     if (o.zoned) return _hd(o, done);
-    o.zoned = true; zoneDialog(o, () => _hd(o, done));
+    o.zoned = true; zoneDialog(o, done);   // S5: hộp khu giao hàng thay luôn hộp trao món
   };
 }
 

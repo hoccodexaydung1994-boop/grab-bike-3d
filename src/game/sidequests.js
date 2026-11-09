@@ -48,6 +48,7 @@ function sqSetStep(i) {
   let tx = t.x, tz = t.z;
   if (s.to !== 'giver' && s.to !== 'mall') { const ne = nearestEdge(tx, tz, null, 90); if (ne) { tx = ne.x; tz = ne.z; } }   // điểm đến luôn nằm trên đường
   A.tx = tx; A.tz = tz; A.tr = t.r || 16;
+  A.lim = s.limit ? Math.max(s.limit, Math.hypot(tx - player.x, tz - player.z) / 7 * MIN_PER_SEC * 1.6) : null;   // đủ thời gian chạy thật
   if (s.pax && !game.order) seatedPax.visible = true;
 }
 function sqFinish(ok, why) {
@@ -77,11 +78,11 @@ FRAME.push((dt) => {
     sqTargetLb.visible = true; sqTargetLb.position.set(A.tx, 6, A.tz);
   }
   sqT -= dt; if (sqT > 0 || game.paused || game.dayOver) return; sqT = 0.5;
-  if (!SQ.giver && !A && profile.clock > SQ.respawnAt && profile.clock < dayEnd() - 40) sqSpawnGiver();
+  if (!SQ.giver && !A && featOn('side') && profile.clock > SQ.respawnAt && profile.clock < dayEnd() - 40) sqSpawnGiver();
   if (SQ.giver && profile.clock > SQ.giver.until) { sqRemoveGiver(); SQ.respawnAt = profile.clock + 10; }
   if (!A) { sqEl.textContent = ''; return; }
   const q = sqDef(A.id), s = q.steps[A.step], d = Math.hypot(A.tx - player.x, A.tz - player.z);
-  const left = s.limit ? Math.max(0, s.limit - (profile.clock - A.t0)) : null;
+  const lim = A.lim ?? s.limit, left = lim ? Math.max(0, lim - (profile.clock - A.t0)) : null;
   sqEl.textContent = `❗ ${s.say[profile.english ? 1 : 0]} · ${d > 1000 ? (d / 1000).toFixed(1) + ' km' : Math.round(d) + ' m'}${left !== null ? ` · ⏱️ ${Math.ceil(left)}′` : ''}`;
   if (left === 0) return sqFinish(false);
   if (d < A.tr && Math.abs(player.v) < 3 && !game.dlgKeys) {

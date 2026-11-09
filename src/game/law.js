@@ -55,6 +55,7 @@ function reportViolation(kind) {
   if (game.frozen || profile.banned || game.noViolT > 0 || game.mode !== 'drive') return;
   if ((lawCD[kind] || 0) > sigClock) return; lawCD[kind] = sigClock + (kind === 'red' ? 20 : 12);
   const law = LAW[kind];
+  if (!featOn('police')) { toast(L(`⚠️ ${law.name[0]}! Hôm nay CSGT chỉ nhắc nhở — từ ngày 3 sẽ bị phạt ${fmtVND(law.fine)}`, `⚠️ ${law.name[1]}! Warning only today — fines start on day 3`), 3); profile.st.stress = clamp01(profile.st.stress + 2); return; }
   profile.today.viol++; if (game.order) game.order.viol = true;
   profile.st.stress = clamp01(profile.st.stress + 4);
   const w = witnessed();
@@ -144,7 +145,7 @@ function trailBack(dist) {
 function behind(dist) { return { x: player.x - Math.sin(player.h) * dist, z: player.z - Math.cos(player.h) * dist }; }
 function caught() {
   police.mode = 'tow'; police.t = 0; game.frozen = true; player.v = 0;
-  const law = LAW[police.kind], fine = law.fine + 150000 * profile.wanted;
+  const law = LAW[police.kind], fine = law.fine + 50000 * profile.wanted;   // S2: phạt theo mặt bằng thu nhập trong game
   loseLicence(law.pts + 2);
   ticket(fine, `🚔 <b>${L('Bị bắt!', 'Caught!')}</b> ${L('Bỏ chạy khi CSGT yêu cầu dừng xe.', 'You fled from the police.')}<br><span style="font-weight:500">${L('Phạt', 'Fine')} ${fmtVND(fine)} · -${law.pts + 2} ${L('điểm GPLX · xe bị tạm giữ', 'licence pts · bike impounded')}</span>`);
   profile.wanted = 0;
@@ -177,9 +178,12 @@ function updateTow(dt) {
   }
   T.g.position.set(T.x, 0.07, T.z); T.g.rotation.y = T.h;
 }
-function banForDay() {
-  profile.banned = true; saveProfile();
-  showOverlay(L('⛔ Bị khóa ứng dụng', '⛔ App suspended'), L(`Xe của bạn đã bị CSGT tạm giữ.<br>Bạn <b>không thể chạy Grab đến hết ngày ${profile.day}</b>.<br><br>Thu nhập hôm nay: <b>${fmtVND(profile.money)}</b><br>Tổng tiền phạt: ${fmtVND(profile.fines)}`, `Your bike was impounded.<br>You <b>cannot drive until the end of day ${profile.day}</b>.`), L('Kết thúc ngày →', 'End the day →'), () => endDay());
+function banForDay() {   // S3: giữ xe 2 giờ + phí lấy xe, không khoá cả ngày
+  const fee = 50000; passTime(120); spend(fee, 'fine', true);
+  driver.visible = true; player.y = 0.07; game.frozen = false; game.state = 'wait'; game.waitT = 4; police.active = false;
+  { const f = nearest(FUEL, 1e9) || homeSpot; teleportTo(f.x, f.z); }
+  saveProfile();
+  return showOverlay(L('🚓 Xe bị tạm giữ 2 tiếng', '🚓 Bike impounded for 2 hours'), L(`Bạn lên phường làm biên bản và nộp phí lấy xe <b>${fmtVND(fee)}</b>.<br>Bây giờ là ${clockText(profile.clock)} — vẫn chạy tiếp được. Tổng phạt hôm nay: ${fmtVND(profile.fines)}.<br><small>Lần sau dừng xe khi CSGT ra hiệu sẽ nhẹ hơn nhiều.</small>`, `You paid a <b>${fmtVND(fee)}</b> release fee. It is now ${clockText(profile.clock)} — you can keep working.`), L('🛵 Chạy tiếp', '🛵 Back to work'), () => { });
 }
 
 /* ---- per-frame checks: speeding, wrong way, sidewalk ---- */

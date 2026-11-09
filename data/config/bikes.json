@@ -1,13 +1,34 @@
 {
  "bikes": {
+  "sh": {
+   "n": [
+    "Honda SH 160i",
+    "Honda SH 160i"
+   ],
+   "model": "sh",
+   "price": 2800000,
+   "lv": 3,
+   "speed": 1.06,
+   "fuel": 0.85,
+   "fuelCost": 1.0,
+   "comfort": 0.88,
+   "repair": 1.1,
+   "tip": 0.06,
+   "elec": false,
+   "starter": true,
+   "desc": [
+    "Tay ga cao cấp: êm, mạnh, tiết kiệm xăng, khách sang tip cao; sửa hơi đắt.",
+    "Premium scooter: smooth, strong, economical, better tips; pricier repairs."
+   ]
+  },
   "vespa": {
    "n": [
-    "Vespa Sprint (xe gốc)",
-    "Vespa Sprint (starter)"
+    "Vespa Sprint",
+    "Vespa Sprint"
    ],
    "model": "vespa",
-   "price": 0,
-   "lv": 1,
+   "price": 2500000,
+   "lv": 3,
    "speed": 1.0,
    "fuel": 1.0,
    "fuelCost": 1.0,
@@ -18,7 +39,8 @@
    "desc": [
     "Sang, êm, khách thích (tip cao hơn) nhưng sửa đắt.",
     "Stylish and comfy, better tips, pricey repairs."
-   ]
+   ],
+   "starter": true
   },
   "wave": {
    "n": [
@@ -39,7 +61,8 @@
    "desc": [
     "Xe số quốc dân: siêu tiết kiệm xăng, sửa rẻ, hơi chậm.",
     "The people's bike: very economical, cheap repairs, a bit slow."
-   ]
+   ],
+   "starter": true
   },
   "vision": {
    "n": [
@@ -60,7 +83,8 @@
    "desc": [
     "Tay ga cân bằng, dễ chạy trong phố.",
     "Balanced city scooter."
-   ]
+   ],
+   "starter": true
   },
   "feliz": {
    "n": [

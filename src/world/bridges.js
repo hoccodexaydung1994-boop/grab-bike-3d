@@ -75,7 +75,7 @@ for (let i = 0; i < PED_N; i++) { const m = makePed(i); scene.add(m); const p = 
 let pedHitCD = 0;
 function hitPed(p, sp) {
   p.down = 4; pedHitCD = 4;
-  const comp = 200000, s = profile.st;
+  const comp = 100000, s = profile.st;
   spend(comp, 'other', true); s.stress = clamp01(s.stress + 20); s.hp = clamp01(s.hp - 4);
   if (game.order) { if (game.order.subs) game.order.subs.forEach(b => b.sat -= 20); else game.order.sat -= 20; }
   profile.license = Math.max(0, profile.license - 2); profile.today.viol++;

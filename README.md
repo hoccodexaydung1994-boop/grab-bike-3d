@@ -1,4 +1,4 @@
-# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng) · v2.2
+# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng) · v2.5
 
 Game 3D chạy trên web (Three.js): làm tài xế GrabBike / GrabFood chạy Vespa quanh Phú Mỹ Hưng trên bản đồ OpenStreetMap thật.
 
@@ -35,7 +35,7 @@ grab-bike-3d/
 │       ├── english.json    bài học tiếng Anh + câu hỏi
 │       ├── chatter.json    câu tán gẫu, mẹo của tài xế ở quán cóc
 │       └── sounds.json     danh sách file âm thanh, âm lượng
-├── models/vespa.glb        Mô hình xe
+├── models/                 Mô hình xe: sh.glb (Honda SH 160i, xe mặc định), vespa.glb
 ├── assets/audio/           Âm thanh thật (xem assets/audio/README.md: tên file + link tải)
 ├── tests/                  Kiểm tra tự động bằng Node (không cần trình duyệt)
 ├── firebase-rules.json     Luật bảo mật Realtime Database (dán vào Firebase)

@@ -51,7 +51,7 @@ g.document = { getElementById: el, createElement: (t) => t === 'button' ? { inne
 g.innerWidth = 1280; g.innerHeight = 720; g.devicePixelRatio = 1;
 g.addEventListener = (t, f) => (handlers[t] ||= []).push(f);
 g.matchMedia = () => ({ matches: false });
-let raf = null; g.requestAnimationFrame = (f) => { raf = f; };
+let raf = null; g.requestAnimationFrame = (f) => { if (f.name === 'animate' || !raf) raf = f; };
 const ls = {}; g.localStorage = { getItem: k => ls[k] ?? null, setItem: (k, v) => { ls[k] = v; } };
 g.atob = (s) => Buffer.from(s, 'base64').toString('binary');
 g.window = g;
@@ -65,6 +65,7 @@ globalThis.__hook = (h) => { H = h; };
 const run = () => { for (const f of man.files) vm.runInThisContext(fs.readFileSync(ROOT + '/src/' + f, 'utf8'), { filename: f }); vm.runInThisContext('__hook({player, game, profile, cars, police, SIGNALS, EDGES, MERCHANTS, acceptOffer, goToTarget, policeStop, refreshRoute, get route(){return route}, endDay, evRain, evFlat, openActions, makeBatchOffer, reportViolation, policeFlee, CHECKPOINTS, openPanel, closePanel, renderPanel, get panelTab(){return panelTab}, NET, unlocked, tierInfo, onCrash, triggerFall, fall, standUp, trafficLevel, makeCustomer, get nightK(){return nightK}, applyNight, homeSpot, keys, updateGame, sigState, endDay, banForDay, makeOffer, computeRoute, VENDORS, PEDS, DECKS, napMenu, startNap, perfStepDown, PERF, buildDriver2, rebuildDriver, classifyDrop, deckStep, hitPed, STORY, showOffer, dropOff, storyTalk, eatStreet, napSpot, vendorOpen, edgeAt, HOTZONES, hotScore, hotHere, HANGOUTS, SQ, sqSpawnGiver, profile, LESSONS, startLesson, foreignUnlocked, BIKES, curBike, applyBikeModel, mulSpeed: () => mulSpeed(), fuelPrice: (n) => fuelPrice(n), saveSlot, slotInfo, makeBackup, readJSON, SAVE, HOME3D, DECK_CARS, homeMenu, exportProfile, sqDef, netRecv, NET, FR, frFollow, SND, sndPlay, SIDEQ_MARKS});', { filename: 'hook' }); };
 const toasts=[];
 run();
+if (!process.env.NEWBIE) { H.profile.totals.days = 5; H.profile.settings.noAuto = true; H.profile.settings.easy = true; } // VETERAN: tests assume all features unlocked
 if (process.env.DUMP) { const names = process.env.DUMP.split('|'); const out = {}; const hasFn = (v) => typeof v === 'function' || (v && typeof v === 'object' && Object.values(v).some(hasFn));
   for (const n of names) { const v = vm.runInThisContext(n); out[n] = hasFn(v) ? '__FN__' : v; } fs.writeFileSync('/tmp/cfgdump.json', JSON.stringify(out)); process.exit(0); }
 const T = els.get('toast') || el('toast');
@@ -76,7 +77,7 @@ async function pickDlg(i = 0, label) { const b = els.get('dlgOpts'); if (!H.game
 const findOpt = (re) => els.get('dlgOpts').children.findIndex(c => re.test(c.innerHTML));
 
 
-el('bStart').onclick(); frame(5); await sleep(1000); frame(2); await pickDlg(0,'intro'); H.game.waitT = 999;
+H.profile.bikePicked = true; el('bStart').onclick(); frame(5); await sleep(1000); frame(2); await pickDlg(0,'intro'); H.game.waitT = 999;
 H.netRecv({ t: 's', id: 'p2', n: 'Lan', lv: 3, x: H.player.x + 30, z: H.player.z, h: 0, l: 0, y: 6, bk: 'exciter', st: 'bike', m: 120000, lk: { g: 'f', jacket: 'pink' } }, null);
 H.netRecv({ t: 's', id: 'p3', n: 'Hai', lv: 5, x: H.player.x - 300, z: H.player.z, h: 0, l: 0, y: 0.07, bk: 'vespa', st: 'wait', m: 50000 }, null);
 frame(400);

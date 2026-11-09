@@ -51,7 +51,7 @@ g.document = { getElementById: el, createElement: (t) => t === 'button' ? { inne
 g.innerWidth = 1280; g.innerHeight = 720; g.devicePixelRatio = 1;
 g.addEventListener = (t, f) => (handlers[t] ||= []).push(f);
 g.matchMedia = () => ({ matches: false });
-let raf = null; g.requestAnimationFrame = (f) => { raf = f; };
+let raf = null; g.requestAnimationFrame = (f) => { if (f.name === 'animate' || !raf) raf = f; };
 const ls = {}; g.localStorage = { getItem: k => ls[k] ?? null, setItem: (k, v) => { ls[k] = v; } };
 g.atob = (s) => Buffer.from(s, 'base64').toString('binary');
 g.window = g;
@@ -65,6 +65,7 @@ globalThis.__hook = (h) => { H = h; };
 const run = () => { for (const f of man.files) vm.runInThisContext(fs.readFileSync(ROOT + '/src/' + f, 'utf8'), { filename: f }); vm.runInThisContext('__hook({player, game, profile, cars, police, SIGNALS, EDGES, MERCHANTS, acceptOffer, goToTarget, policeStop, refreshRoute, get route(){return route}, endDay, evRain, evFlat, openActions, makeBatchOffer, reportViolation, policeFlee, CHECKPOINTS, openPanel, closePanel, renderPanel, get panelTab(){return panelTab}, NET, unlocked, tierInfo, onCrash, triggerFall, fall, standUp, trafficLevel, makeCustomer, get nightK(){return nightK}, applyNight, homeSpot, keys, updateGame, sigState, endDay, banForDay, makeOffer, computeRoute, VENDORS, PEDS, DECKS, napMenu, startNap, perfStepDown, PERF, buildDriver2, rebuildDriver, classifyDrop, deckStep, hitPed, STORY, showOffer, dropOff, storyTalk, eatStreet, napSpot, vendorOpen, edgeAt});', { filename: 'hook' }); };
 const toasts=[];
 run();
+if (!process.env.NEWBIE) { H.profile.totals.days = 5; H.profile.settings.noAuto = true; H.profile.settings.easy = true; } // VETERAN: tests assume all features unlocked
 
 const t0=Date.now();
 console.log('init', 'edges', H.EDGES.length, 'signals', H.SIGNALS.length, 'merchants', H.MERCHANTS.length, 'cars', H.cars.length);
@@ -74,7 +75,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const frame = (n) => { for (let i = 0; i < n; i++) raf(); };
 const ovVisible = () => !els.get('overlay').classList.contains('hidden');
 async function pickDlg(i = 0, label) { const b = els.get('dlgOpts'); if (!H.game.paused || !b.children.length) return false; const c = b.children[Math.min(i, b.children.length - 1)]; console.log('   dlg>', label || '', '|', c.innerHTML.replace(/<[^>]+>/g, '').slice(0, 90)); c.click(); await sleep(650); return true; }
-el('bStart').onclick();
+H.profile.bikePicked = true; el('bStart').onclick();
 H.profile.level = 6; H.profile.sp = 5;
 console.log('unlocks', ['food', 'batch', 'premium', 'night'].map(u => u + ':' + H.unlocked(u)).join(' '), 'tier', H.tierInfo().name);
 frame(60);
@@ -128,5 +129,5 @@ if (!ovVisible() || !els.get('ovOpts').children.length) { H.endDay(); el('ovBtn'
 const ov = els.get('ovOpts'); console.log('home opts', ov.children.length);
 ov.children[ov.children.length - 1].onclick(); await sleep(50);
 console.log('new day', H.profile.day, 'mode', H.game.mode, 'history', H.profile.history.length, JSON.stringify(H.profile.history.at(-1)), 'licence', H.profile.license, 'wanted', H.profile.wanted, 'banned', H.profile.banned);
-el('bStart').onclick(); frame(30); console.log('day2 state', H.game.state, 'mode', H.game.mode);
+H.profile.bikePicked = true; el('bStart').onclick(); frame(30); console.log('day2 state', H.game.state, 'mode', H.game.mode);
 process.exit(0);

@@ -13,7 +13,10 @@ if (profile.licBan === undefined) profile.licBan = 0;
 
 const SKILLS = CFG.progression.SKILLS;   // data/config/progression.json
 const UNLOCKS = CFG.progression.UNLOCKS;   // data/config/progression.json
-const unlocked = (id) => profile.level >= (UNLOCKS.find(u => u.id === id)?.lv ?? 1);
+// S6: tính năng mở dần theo ngày chơi (người chơi lâu năm mở hết)
+const FEAT_DAY = { needs: 2, food: 2, side: 2, police: 3, events: 3 };
+const featOn = (k) => (profile.totals && profile.totals.days >= 3) || profile.day >= (FEAT_DAY[k] || 1);
+const unlocked = (id) => profile.level >= (UNLOCKS.find(u => u.id === id)?.lv ?? 1) && (id !== 'food' || featOn('food')) && (id !== 'batch' || featOn('food'));
 const UPGRADES = CFG.progression.UPGRADES;   // data/config/progression.json
 const PAINTS = CFG.progression.PAINTS;   // data/config/progression.json
 // multipliers used by the rest of the game

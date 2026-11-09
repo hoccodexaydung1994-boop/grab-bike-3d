@@ -34,7 +34,7 @@ function animate() {
   }
   netTick(dt);
   for (const f of FRAME) f(dt);
-  for (const c of CHECKPOINTS) c.lb.visible = Math.hypot(c.x - player.x, c.z - player.z) < (SK().tho >= 2 ? 450 : 90);
+  for (const c of CHECKPOINTS) c.lb.visible = Math.hypot(c.x - player.x, c.z - player.z) < (SK().tho >= 2 ? 450 : 260);
   for (const l of labels) l.visible = Math.abs(l.position.x - player.x) < 450 && Math.abs(l.position.z - player.z) < 450;
   if (eng) {
     const on = game.mode === 'drive' && !game.muted && !game.frozen && !curBike().elec;

@@ -2,10 +2,11 @@
 /* ================= Game state & profile ================= */
 const $ = (id) => document.getElementById(id);
 const fmtVND = (n) => Math.round(n).toLocaleString('vi-VN') + 'đ';
-const DAY_START = 6 * 60 + 30, DAY_END = 22 * 60, MIN_PER_SEC = 1;
+const DAY_START = 6 * 60 + 30, DAY_END = 22 * 60;
+let MIN_PER_SEC = 0.25;   // phút game mỗi giây thật — Cài đặt › Độ dài ngày (S1)
 const dayEnd = () => unlocked('night') ? 23 * 60 : DAY_END;
 const PROFILE_KEY = 'grabbike.q7.profile.v1';
-const defaultProfile = () => ({ name: 'Tài xế', day: 1, clock: DAY_START, money: 0, trips: 0, goal: 150000, banned: false,
+const defaultProfile = () => ({ name: 'Tài xế', day: 1, clock: DAY_START, money: 0, trips: 0, goal: 80000, banned: false,
   totalMoney: 0, totalTrips: 0, xp: 0, level: 1, ratings: [], fines: 0, english: false, schema: 2 });
 let profile = defaultProfile();
 try { const s = localStorage.getItem(PROFILE_KEY); if (s) profile = Object.assign(defaultProfile(), JSON.parse(s)); } catch (e) { }

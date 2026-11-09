@@ -1,5 +1,5 @@
 {
- "version": "2.2.0",
+ "version": "2.5.0",
  "files": [
   "core/renderer.js",
   "core/materials.js",
@@ -47,6 +47,7 @@
   "net/online.js",
   "net/friends.js",
   "data/savedata.js",
+  "game/polish.js",
   "boot.js"
  ],
  "config": [

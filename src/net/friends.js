@@ -21,7 +21,7 @@ FRAME.push((dt) => {
     const d = r.data || {};
     // bike model follows what the friend rides
     const bk = d.bk || 'vespa';
-    if (r.bk !== bk && (bk === 'vespa' ? bike.model : BIKES[bk]?.model === 'sh' ? SH.model : true)) { r.bk = bk; const old = r.lean.children[0]; if (old) r.lean.remove(old); r.lean.add(remoteBikeMesh(bk)); r.lean.children.unshift(r.lean.children.pop()); }
+    if (r.bk !== bk && (bk === 'vespa' ? bike.model : BIKES[bk]?.model === 'sh' ? SH.model : true)) { r.bk = bk; const old = r.lean.children[0]; if (old) r.lean.remove(old); r.lean.add(remoteBikeMesh(bk)); r.lean.children.unshift(r.lean.children.pop()); const rd = r.lean.children[1]; if (rd && rd.position) rd.position.set(0, BIKES[bk]?.model === 'sh' ? 0.19 : 0, 0); }
     // real height (bridges) + passenger when carrying a customer
     r.y = (r.y ?? 0.07) + (((d.y ?? 0.07)) - (r.y ?? 0.07)) * Math.min(1, dt * 8); r.g.position.y = r.y;
     // remember friends

@@ -1,4 +1,7 @@
 'use strict';
+// chỗ ngồi của người lái/khách theo từng xe (garage.js đặt lại khi đổi xe)
+const RIDER = { y: 0, z: 0, box: [0, 0] };
+function seatRiders() { phoneMount.position.set(0, RIDER.y, RIDER.z); foodBoxHolder.position.set(0, RIDER.box[0], RIDER.box[1]); driver.position.set(0, RIDER.y, RIDER.z); driver.rotation.set(0, 0, 0); seatedPax.position.set(0, RIDER.y, RIDER.z); seatedPax.rotation.set(0, 0, 0); }
 /* ================= Té xe (falls) & road hazards ================= */
 const fall = { on: false, t: 0, side: 1, canUp: false, slide: 0, cancelRide: false };
 function triggerFall(reason) {
@@ -33,8 +36,8 @@ function updateFall(dt) {
   const k = Math.min(1, fall.t / 0.35);
   player.lean = fall.side * 1.35 * k * k;
   const rk = Math.min(1, fall.t / 0.6);
-  driver.position.set(fall.side * -0.6 * rk, -0.35 * rk, -0.4 * rk); driver.rotation.set(-1.2 * rk, 0, fall.side * 0.4 * rk);
-  if (seatedPax.visible) { seatedPax.position.set(fall.side * -0.9 * rk, -0.4 * rk, -0.8 * rk); seatedPax.rotation.set(-1.0 * rk, 0, fall.side * 0.5 * rk); }
+  driver.position.set(fall.side * -0.6 * rk, RIDER.y - (0.35 + RIDER.y) * rk, RIDER.z - 0.4 * rk); driver.rotation.set(-1.2 * rk, 0, fall.side * 0.4 * rk);
+  if (seatedPax.visible) { seatedPax.position.set(fall.side * -0.9 * rk, RIDER.y - (0.4 + RIDER.y) * rk, RIDER.z - 0.8 * rk); seatedPax.rotation.set(-1.0 * rk, 0, fall.side * 0.5 * rk); }
   if (fall.t > 2.2 && !fall.canUp) { fall.canUp = true; $('bUp').classList.remove('hidden'); }
   if (fall.t > 7) standUp();
   return true;
@@ -42,7 +45,7 @@ function updateFall(dt) {
 function standUp() {
   if (!fall.on) return;
   fall.on = false; player.lean = 0;
-  driver.position.set(0, 0, 0); driver.rotation.set(0, 0, 0); seatedPax.position.set(0, 0, 0); seatedPax.rotation.set(0, 0, 0);
+  seatRiders();
   $('bUp').classList.add('hidden'); passTime(2);
   if (fall.cancelRide && game.order) { fall.cancelRide = false; toast(L('😠 Khách hủy chuyến sau cú té và đi xe khác.', '😠 The passenger cancelled and left.'), 3); profile.week.cancels++; cancelOrder(); }
   else toast(L('🛵 Dựng xe dậy — chạy cẩn thận nhé!', '🛵 Back on the bike — ride carefully!'), 1.6);

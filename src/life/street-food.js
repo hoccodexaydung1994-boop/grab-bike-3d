@@ -96,7 +96,7 @@ function napMenu() {
 function startNap(min, sp) {
   if (sp.k === 'vong' && !spend(15000, 'food')) return;
   game.frozen = true; game.waitT = 99; sleepFx.on = true; sleepFx.t = 0;
-  driver.rotation.set(-1.25, 0, 0); driver.position.set(0, 0.25, -0.55);
+  driver.rotation.set(-1.25, 0, 0); driver.position.set(0, 0.25 + RIDER.y, -0.55 + RIDER.z);
   zzz.visible = true;
   fadeEl.textContent = '💤'; fadeEl.style.opacity = '0.85';
   setTimeout(() => finishNap(min, sp), 2600);
@@ -120,7 +120,7 @@ function finishNap(min, sp) {
     const lost = Math.round(Math.min(100000, profile.cash * 0.2) / 1000) * 1000;   // S9: tối đa 20% hoặc 100k profile.cash -= lost; profile.today.costs.other += lost; s.stress = clamp01(s.stress + 25);
     notes.push(L(`🕵️ Bị móc túi mất <b>${fmtVND(lost)}</b>! Lần sau gửi bớt tiền vào ví/tiết kiệm.`, `🕵️ Pickpocketed: <b>${fmtVND(lost)}</b>!`));
   } else if (Math.random() < 0.03 * hrs && (profile.inv.raincoat || 0) > 0) { profile.inv.raincoat--; notes.push(L('🧥 Bị lấy mất áo mưa trong cốp', '🧥 Someone stole your raincoat')); }
-  sleepFx.on = false; zzz.visible = false; driver.rotation.set(0, 0, 0); driver.position.set(0, 0, 0);
+  sleepFx.on = false; zzz.visible = false; seatRiders();
   fadeEl.style.opacity = '0'; game.frozen = false; game.waitT = 3;
   showDialog({ who: L('⏰ Thức dậy', '⏰ Awake'), text: L(`Bạn đã ngủ ${realMin} phút ${sp.txt}. Bây giờ là ${clockText(profile.clock)}.<br>⚡ Thể lực: <b>${Math.round(s.stamina)}</b> · 😤 Stress: <b>${Math.round(s.stress)}</b>`, `You slept ${realMin} min ${sp.txt}. It is now ${clockText(profile.clock)}.<br>⚡ Stamina <b>${Math.round(s.stamina)}</b> · 😤 Stress <b>${Math.round(s.stress)}</b>`) + (notes.length ? '<br><br>' + notes.join('<br>') : ''), opts: [{ t: L('🛵 Chạy tiếp', '🛵 Back to work') }] });
   saveProfile();

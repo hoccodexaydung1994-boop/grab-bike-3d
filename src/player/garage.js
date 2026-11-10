@@ -29,7 +29,7 @@ function applyBikeModel() {
   if (SH.model) SH.model.visible = B.model === 'sh';
   if (B.model === 'sh') {
     if (bike.model) bike.model.visible = false;
-    if (SH.model) { bike.frontWheel = SH.front; bike.rearWheel = SH.rear; } bike.R = 0.25;
+    if (SH.model) { bike.frontWheel = SH.front; bike.rearWheel = SH.rear; } bike.R = 0.31;
     if (SH.model && SH.model.userData.paint !== profile.paint) { SH.model.userData.paint = profile.paint; SH.model.traverse(o => { if (o.isMesh && o.material.name === 'body') o.material.color.setHex(profile.paint || 0xffffff); }); }
   } else if (B.model === 'vespa') { if (bike.model) bike.model.visible = true; if (bike.vespaWheels) [bike.frontWheel, bike.rearWheel] = bike.vespaWheels; bike.R = 0.23; }
   else {
@@ -39,6 +39,7 @@ function applyBikeModel() {
     const m = B.model === 'underbone' ? buildUnderbone(col) : buildScooter(col);
     m.position.y = B.model === 'underbone' ? -0.12 : -0.05; shadowAll(m); altBike.add(m);
   }
+  Object.assign(RIDER, B.model === 'sh' ? { y: 0.19, z: 0, box: [0.16, -0.05] } : { y: 0, z: 0, box: [0, 0] }); if (!fall.on) seatRiders();
   const ic = $('st_fuel'); if (ic) { ic.querySelector('span').textContent = B.elec ? '🔌' : '⛽'; ic.title = B.elec ? L('Pin xe điện', 'EV battery') : L('Xăng', 'Fuel'); }
 }
 BOOT.push(applyBikeModel);

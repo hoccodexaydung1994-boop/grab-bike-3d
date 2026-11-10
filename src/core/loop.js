@@ -48,7 +48,7 @@ function animate() {
     sndEngine(on, sp, gas);
   }
   if (toastTimer > 0) { toastTimer -= dt; if (toastTimer <= 0) $('toast').classList.remove('show'); }
-  sun.position.set(player.x + 30, 55, player.z + 18);
+  { const D = GFX_HIGH ? 110 : 65; sun.position.set(player.x + SUN_DIR.x * D, SUN_DIR.y * D, player.z + SUN_DIR.z * D); }
   sun.target.position.set(player.x, 0, player.z);
-  renderer.render(scene, camera);
+  renderFrame();
 }

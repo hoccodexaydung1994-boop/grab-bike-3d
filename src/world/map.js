@@ -162,9 +162,11 @@ for (const d of MAP.deck) {
   }
 }
 meshFrom(roadBufs.wline, waterMat);
-meshFrom(roadBufs.side, std(0xcbc5b8, { roughness: 0.95 }));
+
 meshFrom(roadBufs.foot, std(0xd8cfbd, { roughness: 0.95 }));
-meshFrom(roadBufs.asphalt, std(0x44474d, { roughness: 0.92 }));
+const MAT_ASPHALT = std(0x44474d, { roughness: 0.92 }), MAT_SIDE = std(0xcbc5b8, { roughness: 0.95 });
+meshFrom(roadBufs.side, MAT_SIDE);
+meshFrom(roadBufs.asphalt, MAT_ASPHALT);
 meshFrom(roadBufs.mark, std(0xf0f0f0, { roughness: 0.6 }));
 meshFrom(roadBufs.yellow, std(0xf2c230, { roughness: 0.6 }));
 meshFrom(roadBufs.rail, std(0xbfc3c7, { roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }), true);
@@ -202,16 +204,68 @@ const shopTex = canvasTex(128, 128, (g, w, h) => {
   g.strokeStyle = '#6d7278'; g.lineWidth = 2; for (let y = 44; y < 70; y += 5) { g.beginPath(); g.moveTo(6, y); g.lineTo(w - 6, y); g.stroke(); }
   g.fillStyle = 'rgba(255,220,150,.35)'; g.fillRect(20, 80, 30, 40); g.fillRect(70, 86, 36, 34);
 });
+/* ---- HD textures (GFX_HIGH): 2×2 ô cửa mỗi tấm, mỗi ô một kiểu ---- */
+function hdFacade() {
+  const t = tileTex(512, 512, (g) => {
+    const S = 256, k = S / 128;
+    for (let c = 0; c < 4; c++) {
+      const ox = (c % 2) * S, oy = (c >> 1) * S; g.save(); g.translate(ox, oy);
+      g.fillStyle = '#ffffff'; g.fillRect(0, 0, S, S);
+      for (let i = 0; i < 500; i++) { g.fillStyle = `rgba(90,80,60,${hrand() * 0.045})`; g.fillRect(hrand() * S, hrand() * S, 3 + hrand() * 6, 2 + hrand() * 3); }
+      g.fillStyle = '#cfc8ba'; g.fillRect(0, S - 22, S, 22); g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(0, S - 24, S, 3); g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(0, S - 22, S, 2);
+      const wx = 24 * k, wy = 28 * k, ww = 80 * k, wh = 60 * k;
+      g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(wx - 12, wy - 10, ww + 24, wh + 26);          // hốc cửa
+      g.fillStyle = '#eee9de'; g.fillRect(wx - 9, wy - 8, ww + 18, wh + 16);                    // khung
+      const gr = g.createLinearGradient(0, wy, 0, wy + wh); gr.addColorStop(0, '#263a4f'); gr.addColorStop(1, '#3f5870');
+      g.fillStyle = gr; g.fillRect(wx, wy, ww, wh);
+      g.fillStyle = 'rgba(255,255,255,.16)'; g.beginPath(); g.moveTo(wx + 8, wy + wh); g.lineTo(wx + 50, wy); g.lineTo(wx + 78, wy); g.lineTo(wx + 36, wy + wh); g.fill();
+      if (c === 1) { g.fillStyle = 'rgba(235,225,200,.75)'; g.fillRect(wx, wy, ww * 0.28, wh); g.fillRect(wx + ww * 0.72, wy, ww * 0.28, wh); }   // rèm
+      if (c === 2) { g.fillStyle = '#5b7a5a'; for (let y = wy + 4; y < wy + wh; y += 9) g.fillRect(wx, y, ww / 2 - 3, 5); }                      // cửa chớp
+      g.fillStyle = '#eee9de'; g.fillRect(wx + ww / 2 - 3, wy, 6, wh); g.fillRect(wx, wy + wh * 0.3, ww, 4);
+      g.fillStyle = '#d9d3c6'; g.fillRect(wx - 16, wy + wh + 8, ww + 32, 9); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(wx - 16, wy + wh + 17, ww + 32, 4);   // bệ cửa
+      for (let i = 0; i < 5; i++) { g.fillStyle = `rgba(60,55,45,${0.04 + hrand() * 0.05})`; g.fillRect(wx + hrand() * ww, wy + wh + 21, 3 + hrand() * 5, 20 + hrand() * 30); }   // vệt nước mưa
+      if (c === 0 || c === 3) { const ax = c ? 150 : 30, ay = wy + wh + 30; g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(ax + 3, ay + 4, 70, 30); g.fillStyle = '#f2f2f0'; g.fillRect(ax, ay, 70, 30); g.fillStyle = '#b9bdc0'; g.beginPath(); g.arc(ax + 22, ay + 15, 11, 0, 7); g.fill(); g.fillStyle = '#8d9296'; for (let y = ay + 6; y < ay + 26; y += 5) g.fillRect(ax + 40, y, 24, 2); }   // cục nóng máy lạnh
+      g.restore();
+    }
+  });
+  t.repeat.set(0.5, 0.5); t.anisotropy = 8; return t;
+}
+function hdGlass() {
+  const t = tileTex(256, 256, (g, w, h) => {
+    const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#86a9c9'); gr.addColorStop(0.5, '#5d82a6'); gr.addColorStop(1, '#3f6183');
+    g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.fillStyle = 'rgba(255,255,255,.14)'; g.beginPath(); g.moveTo(20, h); g.lineTo(120, 0); g.lineTo(170, 0); g.lineTo(70, h); g.fill();
+    g.fillStyle = '#2f4358'; g.fillRect(0, h - 40, w, 22);                                   // dải sàn tối
+    g.fillStyle = '#dfe6ec'; g.fillRect(0, h - 18, w, 18); g.fillRect(0, 0, 8, h); g.fillRect(126, 0, 5, h); g.fillRect(0, h * 0.42, w, 3);
+    g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(8, 0, 2, h); g.fillRect(131, 0, 2, h);
+  }); t.anisotropy = 8; return t;
+}
+function hdShop() {
+  const t = canvasTex(512, 512, (g, w, h) => {
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, w, 130);
+    g.fillStyle = 'rgba(0,0,0,.08)'; g.fillRect(0, 0, w, 8); g.fillRect(0, 122, w, 8);
+    g.fillStyle = 'rgba(0,0,0,.55)'; g.font = '900 64px system-ui,sans-serif'; g.textBaseline = 'middle'; g.fillText('▇▇▇ ▇▇▇▇', 40, 58); g.font = '700 26px system-ui'; g.fillStyle = 'rgba(0,0,0,.4)'; g.fillText('▂▂▂▂▂ ▂▂▂ ▂▂▂▂▂▂', 44, 104);
+    g.fillStyle = '#3c3c3e'; g.fillRect(0, 130, w, 22);
+    g.fillStyle = '#1f2023'; g.fillRect(20, 152, w - 40, h - 152);
+    g.fillStyle = '#9ba1a8'; g.fillRect(20, 152, w - 40, 96); g.strokeStyle = '#737980'; g.lineWidth = 3; for (let y = 160; y < 248; y += 11) { g.beginPath(); g.moveTo(20, y); g.lineTo(w - 20, y); g.stroke(); }
+    g.fillStyle = 'rgba(255,214,140,.5)'; g.fillRect(50, 290, 130, 190); g.fillStyle = 'rgba(180,220,255,.35)'; g.fillRect(210, 300, 110, 180); g.fillStyle = 'rgba(255,190,150,.45)'; g.fillRect(350, 286, 120, 194);
+    g.fillStyle = '#5a4a3a'; for (let y = 330; y < 480; y += 48) { g.fillRect(50, y, 130, 6); g.fillRect(350, y, 120, 6); }
+    for (let i = 0; i < 40; i++) { g.fillStyle = `hsl(${hrand() * 360},70%,${45 + hrand() * 25}%)`; g.fillRect(56 + (i % 10) * 12, 300 + Math.floor(i / 10) * 48, 9, 28); g.fillRect(356 + (i % 9) * 12, 296 + Math.floor(i / 10) * 48, 9, 32); }
+    g.fillStyle = '#b8b2a6'; g.fillRect(0, h - 26, w, 26); g.fillStyle = '#8f8a80'; g.fillRect(0, h - 26, w, 4);
+    g.fillStyle = '#c9c9c9'; g.fillRect(0, 152, 20, h - 152); g.fillRect(w - 20, 152, 20, h - 152);
+  }); t.anisotropy = 8; return t;
+}
+if (GFX_HIGH) { for (const [t, f] of [[facadeTex, hdFacade], [glassTex, hdGlass], [shopTex, hdShop]]) { const n = f(); t.image = n.image; t.repeat.copy(n.repeat); t.anisotropy = 8; t.needsUpdate = true; } }
 const MAT_WIN = new THREE.MeshStandardMaterial({ map: facadeTex, vertexColors: true, roughness: 0.85 });
 const MAT_GLASS = new THREE.MeshStandardMaterial({ map: glassTex, vertexColors: true, roughness: 0.25, metalness: 0.35 });
 const MAT_SHOP = new THREE.MeshStandardMaterial({ map: shopTex, vertexColors: true, roughness: 0.8 });
-const MAT_ROOF = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95 });
+const MAT_ROOF = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, side: GFX_HIGH ? THREE.DoubleSide : THREE.FrontSide });
 const CH = 260;
 const chunks = new Map();
 function chunkOf(x, z) {
   const k = Math.floor(x / CH) + ',' + Math.floor(z / CH);
   let c = chunks.get(k);
-  if (!c) chunks.set(k, c = { win: nbc(), glass: nbc(), shop: nbc(), roof: nbc(), trees: [] });
+  if (!c) chunks.set(k, c = { win: nbc(), glass: nbc(), shop: nbc(), roof: nbc(), trees: [], tanks: [] });
   return c;
 }
 function nbc() { return { pos: [], nor: [], uv: [], col: [] }; }
@@ -225,6 +279,48 @@ const _c = new THREE.Color();
 const WALLS_OSM = [0xf3f1ea, 0xe9e4d8, 0xdfe5ea, 0xf1e6d2, 0xd8dcde, 0xe8ded6, 0xcfd8e0];
 const WALLS_FILL = [0xf6e7b8, 0xf4c7a8, 0xcfe8d4, 0xd6e4f5, 0xf7f3ea, 0xf3d1dc, 0xe9d8ff, 0xffe0a3, 0xc9e3f0, 0xfadadd];
 const SIGNS = [0xd32f2f, 0x1976d2, 0xfbc02d, 0x388e3c, 0xf57c00, 0x7b1fa2, 0xffffff, 0x00897b, 0xc2185b];
+/* ---- chi tiết HD cho nhà: lan can mái, ban công, mái hiên, hộp kỹ thuật, bồn nước ---- */
+function hdFace(buf, P, nx, ny, nz, col) {   // P = 4 điểm [x,y,z] theo vòng
+  for (const k of [0, 1, 2, 0, 2, 3]) { const q = P[k]; buf.pos.push(q[0], q[1], q[2]); buf.uv.push(0, 0); buf.nor.push(nx, ny, nz); buf.col.push(col.r, col.g, col.b); }
+}
+function hdBox(buf, x, z, y0, y1, hw, hd, a, col) {
+  const ux = Math.cos(a), uz = Math.sin(a), c = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([s, t]) => [x + ux * hw * s - uz * hd * t, z + uz * hw * s + ux * hd * t]);
+  for (let i = 0; i < 4; i++) { const A = c[i], B = c[(i + 1) % 4], dx = B[0] - A[0], dz = B[1] - A[1], L = Math.hypot(dx, dz) || 1; hdFace(buf, [[A[0], y0, A[1]], [B[0], y0, B[1]], [B[0], y1, B[1]], [A[0], y1, A[1]]], dz / L, 0, -dx / L, col); }
+  hdFace(buf, c.map(q => [q[0], y1, q[1]]), 0, 1, 0, col);
+}
+const _hc = new THREE.Color(), _hc2 = new THREE.Color();
+function hdBuildingDetails(p, h, opts, ch, ccw, wallCol, signCol, shopH, cx, cz) {
+  const n = p.length / 2, R = ch.roof;
+  const trim = _hc.copy(wallCol).multiplyScalar(0.86).clone(), dark = _hc2.copy(wallCol).multiplyScalar(0.62).clone();
+  const balc = opts.fill && h > shopH + 3 && hrand() < 0.7, awn = opts.fill && hrand() < 0.6;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n, ax = p[i * 2], az = p[i * 2 + 1], bx = p[j * 2], bz = p[j * 2 + 1], L = Math.hypot(bx - ax, bz - az); if (L < 0.5) continue;
+    const dx = (bx - ax) / L, dz = (bz - az) / L, nx = ccw ? dz : -dz, nz = ccw ? -dx : dx;
+    // lan can mái (parapet)
+    const ph = opts.fill ? 0.55 : Math.min(1.2, 0.5 + h * 0.012);
+    hdFace(R, [[ax, h, az], [bx, h, bz], [bx, h + ph, bz], [ax, h + ph, az]], nx, 0, nz, trim);
+    if (!opts.fill || (i % 2)) continue;                    // chỉ mặt trước/sau của nhà phố
+    const in0 = 0.35, x0 = ax + dx * in0, z0 = az + dz * in0, x1 = bx - dx * in0, z1 = bz - dz * in0;
+    if (awn && L > 2.5) {                                    // mái hiên trên cửa hàng
+      const d = 1.3, y = shopH - 0.15; hdFace(R, [[ax, y + 0.45, az], [bx, y + 0.45, bz], [bx + nx * d, y, bz + nz * d], [ax + nx * d, y, az + nz * d]], nx * 0.3, 0.95, nz * 0.3, signCol);
+    }
+    if (balc && L > 2.5) for (let y = shopH + (awn ? 3.3 : 0); y + 1.2 < h; y += 3.3) {   // ban công từng tầng
+      const d = 0.85, ox = nx * d, oz = nz * d;
+      hdFace(R, [[x0, y, z0], [x1, y, z1], [x1 + ox, y, z1 + oz], [x0 + ox, y, z0 + oz]], 0, 1, 0, trim);
+      hdFace(R, [[x0, y - 0.14, z0], [x1, y - 0.14, z1], [x1 + ox, y - 0.14, z1 + oz], [x0 + ox, y - 0.14, z0 + oz]], 0, -1, 0, dark);
+      hdFace(R, [[x0 + ox, y - 0.14, z0 + oz], [x1 + ox, y - 0.14, z1 + oz], [x1 + ox, y + 0.95, z1 + oz], [x0 + ox, y + 0.95, z0 + oz]], nx, 0, nz, trim);
+      hdFace(R, [[x0, y - 0.14, z0], [x0 + ox, y - 0.14, z0 + oz], [x0 + ox, y + 0.95, z0 + oz], [x0, y + 0.95, z0]], -dx, 0, -dz, trim);
+      hdFace(R, [[x1, y - 0.14, z1], [x1 + ox, y - 0.14, z1 + oz], [x1 + ox, y + 0.95, z1 + oz], [x1, y + 0.95, z1]], dx, 0, dz, trim);
+    }
+  }
+  // đồ trên mái
+  const grey = _hc.setHex(0x8e9296).clone();
+  if (opts.fill) { if (hrand() < 0.4) ch.tanks.push(cx + (hrand() - 0.5) * 1.5, h, cz + (hrand() - 0.5) * 1.5, hrand() * 3.14); else if (hrand() < 0.3) hdBox(R, cx, cz, h, h + 2.3, 1.2, 1.5, hrand() * 3.14, trim); }
+  else {
+    const bb = bboxOf(p), sx = bb[2] - bb[0], sz = bb[3] - bb[1], big = h > 30, k = big ? 2 : 1 + Math.floor(hrand() * 3);
+    for (let q = 0; q < k; q++) { const x = cx + (hrand() - 0.5) * sx * 0.35, z = cz + (hrand() - 0.5) * sz * 0.35; if (!pip(x, z, p)) continue; const s = big ? 3 + hrand() * 3 : 1 + hrand() * 1.6; hdBox(R, x, z, h, h + (big ? 3.5 : 1.2 + hrand() * 1.4), s, s * (0.6 + hrand() * 0.6), hrand() * 3.14, q ? grey : trim); }
+  }
+}
 function addBuilding(p, h, opts) {
   const n = p.length / 2; if (n < 3) return;
   let A = 0; for (let i = 0, j = n - 1; i < n; j = i++) A += p[j * 2] * p[i * 2 + 1] - p[i * 2] * p[j * 2 + 1];
@@ -261,6 +357,7 @@ function addBuilding(p, h, opts) {
     const tri = cross < 0 ? [a, b, c] : [a, c, b];
     for (const v of tri) { ch.roof.pos.push(v.x, h, v.y); ch.roof.nor.push(0, 1, 0); ch.roof.uv.push(0, 0); ch.roof.col.push(rc.r, rc.g, rc.b); }
   }
+  if (GFX_HIGH) hdBuildingDetails(p, h, opts, ch, ccw, wallCol, signCol, shopH, cx, cz);
   const bb = bboxOf(p);
   bColliders.addBox(bb[0], bb[1], bb[2], bb[3], { p, bb, h });
 }
@@ -283,8 +380,24 @@ const T = MAP.trees;
 for (let i = 0; i < T.length; i += 2) chunkOf(T[i], T[i + 1]).trees.push(T[i], T[i + 1]);
 const treeColliders = new Grid(24);
 for (let i = 0; i < T.length; i += 2) treeColliders.addBox(T[i] - 0.4, T[i + 1] - 0.4, T[i] + 0.4, T[i + 1] + 0.4, { x: T[i], z: T[i + 1] });
-const trunkGeo = new THREE.CylinderGeometry(0.14, 0.2, 2.4, 6), crownGeo = new THREE.IcosahedronGeometry(1.7, 0);
-const trunkMat = std(0x6b4a2f), crownMat = std(0xffffff, { flatShading: true, roughness: 0.9 });
+let trunkGeo = new THREE.CylinderGeometry(0.14, 0.2, 2.4, 6), crownGeo = new THREE.IcosahedronGeometry(1.7, 0);
+const trunkMat = std(0x6b4a2f, { roughness: 0.95 }), crownMat = std(0xffffff, { flatShading: !GFX_HIGH, roughness: 0.9 });
+let palmTrunkGeo = null, palmCrownGeo = null; const palmMat = std(0xffffff, { roughness: 0.85, side: THREE.DoubleSide });
+if (GFX_HIGH) {
+  // tán cây nhiều cụm lá + cành; cây cau/dừa cảnh cho 1/5 số cây
+  const blobs = [[0, 0, 0, 1.25], [0.95, -0.25, 0.2, 0.95], [-0.8, -0.3, 0.55, 0.9], [-0.15, -0.2, -0.95, 0.95], [0.2, 0.75, 0.1, 0.85]].map(([x, y, z, r]) => {
+    const g = new THREE.IcosahedronGeometry(r, 1); const P = g.attributes.position;
+    for (let i = 0; i < P.count; i++) { const k = 1 + (Math.sin(P.getX(i) * 9.1 + P.getY(i) * 7.3 + P.getZ(i) * 5.7) * 0.5) * 0.16; P.setXYZ(i, P.getX(i) * k, P.getY(i) * k * 0.85, P.getZ(i) * k); }
+    const N = g.attributes.normal; for (let i = 0; i < P.count; i++) { const l = Math.hypot(P.getX(i), P.getY(i), P.getZ(i)) || 1; N.setXYZ(i, P.getX(i) / l, P.getY(i) / l * 0.8 + 0.2, P.getZ(i) / l); }   // pháp tuyến mềm → tán lá tròn, không lộ mặt phẳng
+    g.translate(x, y, z); return g; });
+  crownGeo = mergeGeometries(blobs, false);
+  const tk = new THREE.CylinderGeometry(0.11, 0.22, 2.6, 9); const b1 = new THREE.CylinderGeometry(0.05, 0.09, 1.1, 6); b1.rotateZ(0.7); b1.translate(-0.4, 1.2, 0); const b2 = new THREE.CylinderGeometry(0.05, 0.09, 1.0, 6); b2.rotateZ(-0.6); b2.rotateY(1.2); b2.translate(0.3, 1.25, 0.15);
+  trunkGeo = mergeGeometries([tk, b1, b2], false);
+  palmTrunkGeo = new THREE.CylinderGeometry(0.1, 0.17, 5.2, 8);
+  const fr = []; for (let i = 0; i < 9; i++) { const g = new THREE.PlaneGeometry(0.55, 2.7, 1, 4); g.translate(0, 1.35, 0); const P = g.attributes.position; for (let k = 0; k < P.count; k++) { const y = P.getY(k); P.setZ(k, -y * y * 0.16); P.setX(k, P.getX(k) * (1 - y / 3.2)); } g.rotateX(0.95 + (i % 3) * 0.22); g.rotateY(i * 0.7 + 0.2); g.computeVertexNormals(); fr.push(g); }
+  palmCrownGeo = mergeGeometries(fr, false);
+}
+let hdTankGeo = null; const hdTankMat = std(0xd8dde2, { metalness: 0.9, roughness: 0.22 });
 function buildChunkMeshes() {
   const o = new THREE.Object3D(), col = new THREE.Color();
   for (const ch of chunks.values()) {
@@ -299,6 +412,26 @@ function buildChunkMeshes() {
       const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; scene.add(m);
     }
     const t = ch.trees; const n = t.length / 2; if (!n) continue;
+    if (GFX_HIGH && ch.tanks.length) {
+      if (!hdTankGeo) { const c = new THREE.CylinderGeometry(0.48, 0.48, 1.5, 14); c.rotateZ(Math.PI / 2); c.translate(0, 1.05, 0); const st = new THREE.BoxGeometry(1.2, 0.55, 0.8); st.translate(0, 0.28, 0); hdTankGeo = mergeGeometries([c, st], false); }
+      const m = ch.tanks.length / 4, tk = new THREE.InstancedMesh(hdTankGeo, hdTankMat, m);
+      for (let i = 0; i < m; i++) { o.position.set(ch.tanks[i * 4], ch.tanks[i * 4 + 1], ch.tanks[i * 4 + 2]); o.rotation.set(0, ch.tanks[i * 4 + 3], 0); o.scale.set(1, 1, 1); o.updateMatrix(); tk.setMatrixAt(i, o.matrix); }
+      tk.computeBoundingSphere(); tk.castShadow = true; scene.add(tk);
+    }
+    if (GFX_HIGH) {
+      const kinds = []; for (let i = 0; i < n; i++) kinds.push(hrand() < 0.2);
+      for (const palm of [false, true]) {
+        const ids = kinds.map((k, i) => k === palm ? i : -1).filter(i => i >= 0); if (!ids.length) continue;
+        const tr = new THREE.InstancedMesh(palm ? palmTrunkGeo : trunkGeo, trunkMat, ids.length), cr = new THREE.InstancedMesh(palm ? palmCrownGeo : crownGeo, palm ? palmMat : crownMat, ids.length);
+        ids.forEach((id, i) => {
+          const s = 0.85 + hrand() * 0.6, x = t[id * 2], z = t[id * 2 + 1];
+          if (palm) { o.position.set(x, 2.6 * s, z); o.rotation.set(0, hrand() * 6, 0); o.scale.set(s, s, s); o.updateMatrix(); tr.setMatrixAt(i, o.matrix); o.position.set(x, 5.1 * s, z); o.updateMatrix(); cr.setMatrixAt(i, o.matrix); cr.setColorAt(i, col.setHSL(0.27 + hrand() * 0.05, 0.5, 0.26 + hrand() * 0.08)); }
+          else { o.position.set(x, 1.3 * s, z); o.rotation.set(0, hrand() * 6, 0); o.scale.set(s, s, s); o.updateMatrix(); tr.setMatrixAt(i, o.matrix); o.position.set(x, 3.6 * s, z); o.scale.set(s * 1.15, s * (0.9 + hrand() * 0.3), s * 1.15); o.updateMatrix(); cr.setMatrixAt(i, o.matrix); cr.setColorAt(i, col.setHSL(0.25 + hrand() * 0.1, 0.42 + hrand() * 0.15, 0.24 + hrand() * 0.12)); }
+        });
+        tr.computeBoundingSphere(); cr.computeBoundingSphere(); tr.castShadow = cr.castShadow = true; cr.receiveShadow = true; scene.add(tr, cr);
+      }
+      continue;
+    }
     const tr = new THREE.InstancedMesh(trunkGeo, trunkMat, n), cr = new THREE.InstancedMesh(crownGeo, crownMat, n);
     for (let i = 0; i < n; i++) {
       const s = 0.8 + rand() * 0.6, x = t[i * 2], z = t[i * 2 + 1];

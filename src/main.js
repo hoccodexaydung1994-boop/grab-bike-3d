@@ -4,7 +4,11 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-Object.assign(window, { THREE, OrbitControls, GLTFLoader, mergeGeometries });
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+Object.assign(window, { THREE, OrbitControls, GLTFLoader, mergeGeometries, EffectComposer, RenderPass, UnrealBloomPass, OutputPass });
 
 const status = (t) => { const el = document.getElementById('loading'); if (el) el.textContent = t; };
 window.addEventListener('error', (e) => status('⚠️ Lỗi: ' + e.message + ' (' + (e.filename || '').split('/').slice(-2).join('/') + ':' + e.lineno + ')'));

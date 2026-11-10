@@ -44,6 +44,21 @@ function buildDriver2(look) {
     g.add(joint(hip, 0.08, pants)); g.add(limb(hip, kn, fem ? 0.072 : 0.078, pants)); g.add(joint(kn, 0.07, pants)); g.add(limb(kn, an, 0.06, pants));
     const shoe = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.14, 4, 10), std(fem ? 0xf5f5f5 : 0x1d1d1f, { roughness: 0.6 })); shoe.rotation.x = Math.PI / 2; shoe.position.set(s * 0.14, 0.31, 0.11); g.add(shoe);
   }
+  if (GFX_HIGH) {   // chi tiết thêm: mặt, cổ áo, khoá kéo, túi, băng phản quang, cổ tay, đế giày, đai lưng
+    const refl = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, metalness: 0.5, roughness: 0.25, emissive: 0x444444 });
+    const face = new THREE.Mesh(new THREE.SphereGeometry(0.105, 20, 16), skinM); face.scale.set(0.92, 1.05, 0.95); face.position.set(0, 1.6, -0.255); g.add(face);
+    const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.1, 0.085, 20, 1, true), std(J.dk, { side: THREE.DoubleSide, roughness: 0.8 })); collar.position.set(0, 1.48, -0.31); collar.rotation.x = 0.15; g.add(collar);
+    const zip = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.42, 0.012), refl); zip.position.set(0, 1.14, -0.235); zip.rotation.x = 0.21; g.add(zip);
+    for (const s of [-1, 1]) {
+      const pk = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.075, 0.012), dark); pk.position.set(s * 0.1, 1.22, -0.222); pk.rotation.x = 0.21; g.add(pk);
+      const band = new THREE.Mesh(new THREE.TorusGeometry(0.052, 0.012, 8, 20), refl); band.position.set(s * 0.302, 1.11, 0.12); band.lookAt(s * 0.31, 1.1, 0.2); g.add(band);
+      const band2 = new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.012, 8, 20), refl); band2.position.set(s * 0.25, 1.225, -0.185); band2.lookAt(s * 0.29, 1.13, -0.04); g.add(band2);
+      const cuff = new THREE.Mesh(new THREE.TorusGeometry(0.047, 0.014, 8, 20), dark); cuff.position.set(s * 0.31, 1.1, 0.19); cuff.lookAt(s * 0.32, 1.1, 0.3); g.add(cuff);
+      const sole = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.025, 0.24), std(0xf2f2f2)); sole.position.set(s * 0.14, 0.27, 0.11); g.add(sole);
+      const knee = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 10), std(0x15181d, { roughness: 0.5 })); knee.scale.set(1, 1, 0.5); knee.position.set(s * 0.17, 0.81, 0.045); g.add(knee);
+    }
+    const belt = new THREE.Mesh(new THREE.TorusGeometry(0.175, 0.018, 8, 28), std(0x111111, { roughness: 0.5 })); belt.rotation.x = Math.PI / 2 - 0.2; belt.position.set(0, 0.9, -0.425); belt.scale.set(1.14, 0.84, 1); g.add(belt);
+  }
   shadowAll(g);
   return g;
 }

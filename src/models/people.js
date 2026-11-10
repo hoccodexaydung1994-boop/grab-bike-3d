@@ -5,7 +5,7 @@ const GRAB_GREEN = 0x00b14f;
 function limb(a, b, r, mat) {
   const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b);
   const d = new THREE.Vector3().subVectors(B, A); const L = d.length();
-  const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, Math.max(0.01, L), 4, 10), mat);
+  const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, Math.max(0.01, L), GFX_HIGH ? 8 : 4, GFX_HIGH ? 20 : 10), mat);
   m.position.copy(A).addScaledVector(d, 0.5);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
   return m;

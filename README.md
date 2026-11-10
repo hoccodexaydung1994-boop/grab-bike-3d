@@ -1,4 +1,4 @@
-# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng) · v2.5
+# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng) · v3.0
 
 Game 3D chạy trên web (Three.js): làm tài xế GrabBike / GrabFood chạy Vespa quanh Phú Mỹ Hưng trên bản đồ OpenStreetMap thật.
 
@@ -55,6 +55,9 @@ Sửa file JSON trong `data/config/`, ví dụ thêm món vào `shop.json`, thê
 - **Trên máy**: phải chạy qua web server (mở thẳng `index.html` sẽ báo lỗi vì trình duyệt chặn đọc file):
   `npx serve .` hoặc `python -m http.server 8000` → mở http://localhost:8000
 - **Kiểm tra lỗi**: `node tests/smoke-core.mjs .` · `node tests/smoke-features.mjs .` · `node tests/smoke-world.mjs .` · `node tests/smoke-net.mjs .`
+
+## Đồ hoạ
+Hai mức, đổi trong Cài đặt (☰ → ⚙️ → Mức đồ hoạ): **Cao** (mặc định trên máy tính: bầu trời và mặt trời theo giờ, phản chiếu, bloom, bóng đổ 4K, nhà có ban công/mái hiên/bồn nước, cây và đèn đường chi tiết) và **Thấp** (điện thoại, máy yếu). Code: `src/world/hd.js` và các đoạn `GFX_HIGH` trong `world/map.js`, `world/night.js`, `player/character.js`.
 
 ## Âm thanh
 Tải file theo bảng trong `assets/audio/README.md`, bỏ vào `assets/audio/` rồi đẩy lên GitHub. Thiếu file nào, game dùng âm thanh tổng hợp cho phần đó.

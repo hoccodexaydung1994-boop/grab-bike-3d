@@ -35,7 +35,7 @@ Mẫu người lái có áo gọn vai, tay áo thuôn, vật liệu vải nhám 
 Mẫu mặc định trong chế độ Hẻm 15B dùng Superhero Male từ gói Standard miễn phí của Quaternius. Model đã thu gọn tỷ lệ thân và thay màu trang phục theo áo khoác tài xế. Bộ xương có 65 khớp. File GLB nhúng hình học, texture và các clip chuyển động, với kích thước khoảng 0,88 MB.
 
 - Model và bộ chuyển động gốc theo giấy phép CC0. [Universal Base Characters](https://quaternius.com/packs/universalbasecharacters.html) · [Universal Animation Library](https://quaternius.com/packs/universalanimationlibrary.html)
-- Bản thử dùng clip đứng, đi và chạy. Tư thế ngồi được tính theo điểm tay lái và đặt chân của xe. Lên và xuống xe dùng chuyển tiếp giữa các tư thế khớp.
+- Bản thử dùng clip đứng, đi và chạy. Tư thế ngồi được tính theo điểm tay lái và đặt chân của xe. Các ngón tay lấy dáng nắm từ clip lái. Lên và xuống xe dùng chuyển tiếp giữa các tư thế khớp.
 - Mẫu được bật cho ngoại hình nam mặc định trong đoạn thử 15B. Các tùy chọn trang phục khác tiếp tục dùng nhân vật dự phòng hiện có.
 
 Chromium đã tải file GLB thật và xác nhận lưới có 65 khớp. Kiểm tra thấy transform khớp thay đổi khi đứng, đi và chạy. Cả hai chuyển tiếp lên và xuống xe hiển thị đúng model, xe giữ vị trí khi người lái bước đi và vẫn chạy sau khi lên lại. Thay trang phục chuyển sang mẫu dự phòng và trả về rig khi chọn lại bộ mặc định. Ảnh và clip được quay bằng WebGL qua SwiftShader.

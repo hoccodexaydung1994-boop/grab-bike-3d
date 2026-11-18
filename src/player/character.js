@@ -287,10 +287,16 @@ function rigSeat(rig, type) {
   const headInParent = rig.head.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(headAtRest);
   rig.head.quaternion.slerp(headInParent, 0.9);
   const grip = RIDER_GRIPS[type] || RIDER_GRIPS.vespa;
-  for (const { side, arm, leg, toe } of rig.limbs) {
-    const hand = new THREE.Vector3(side * grip[0], grip[1], grip[2] - 0.036);
+  for (const { side, arm, leg, toe, gripPose } of rig.limbs) {
+    const hand = new THREE.Vector3(side * grip[0], grip[1], grip[2] - (gripPose ? 0.070 : 0.036));
     const foot = new THREE.Vector3(side * 0.15, 0.34, 0.075);
     fitRigLimb(rig.root, arm, hand, new THREE.Vector3(side * 0.58, -1, 0.14));
+    if (gripPose) {
+      const wrist = arm[2];
+      const target = rig.root.getWorldQuaternion(new THREE.Quaternion()).multiply(gripPose.wrist);
+      wrist.quaternion.copy(wrist.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(target));
+      for (const { bone, rotation } of gripPose.fingers) bone.quaternion.copy(rotation);
+    }
     fitRigLimb(rig.root, leg, foot, new THREE.Vector3(side * 0.43, 0.08, 1));
     if (toe) aimRigBone(rig.root, leg[2], toe, rigPoint(rig.root, leg[2]).add(new THREE.Vector3(0, -0.07, 0.12)));
   }
@@ -359,6 +365,30 @@ function prepareAlleyRig(gltf) {
   root.updateMatrixWorld(true);
   shadowAll(root);
   const rest = snapshotRig(bones);
+  const driving = THREE.AnimationClip.findByName(gltf.animations, 'Driving_Loop');
+  if (driving) {
+    const grip = mixer.clipAction(driving);
+    grip.play();
+    mixer.update(0);
+    root.updateMatrixWorld(true);
+    for (const limb of limbs) {
+      const hand = limb.arm[2];
+      const side = limb.side === -1 ? 'r' : 'l';
+      const knuckle = bone('middle_01_' + side), next = bone('middle_02_' + side);
+      if (!knuckle || !next) continue;
+      const p = rigPoint(root, knuckle);
+      const along = p.clone().sub(rigPoint(root, hand)).normalize();
+      const forward = new THREE.Quaternion().setFromUnitVectors(along, new THREE.Vector3(0, 0, 1));
+      const curl = rigPoint(root, next).sub(p).applyQuaternion(forward).setZ(0).normalize();
+      const down = new THREE.Quaternion().setFromUnitVectors(curl, new THREE.Vector3(0, -1, 0));
+      limb.gripPose = {
+        wrist: down.multiply(forward).multiply(hand.getWorldQuaternion(new THREE.Quaternion())),
+        fingers: bones.filter(b => b.name.endsWith('_' + side) && /^(index|middle|ring|pinky|thumb)_/.test(b.name))
+          .map(bone => ({ bone, rotation: bone.quaternion.clone() })),
+      };
+    }
+    grip.stop();
+  }
   actions.idle.play();
   mixer.update(0);
   const standing = snapshotRig(bones);

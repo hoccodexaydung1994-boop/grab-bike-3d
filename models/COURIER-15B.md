@@ -2,7 +2,7 @@
 
 `courier-15b.glb` uses Quaternius's **Superhero Male** mesh and 65-joint humanoid skeleton from **Universal Base Characters, Standard**, together with the brown eye texture and original facial colors. The official free archive provides two full-body models, Superhero Male and Superhero Female. [Official Universal Base Characters pack](https://quaternius.itch.io/universal-base-characters)
 
-Four clips are adapted from Quaternius's **Universal Animation Library, Standard**, file `UAL1_Standard.glb`. These are `Idle_Loop`, `Walk_Loop`, `Jog_Fwd_Loop`, and `Driving_Loop`. The adaptation maps joints by name, adjusts each rotation for the target rest pose, preserves relative pelvis motion, and omits the root motion and limb translation and scale tracks. The current preview drives the seated pose in the game and uses the idle, walk, and jog clips on foot. [Official Universal Animation Library pack](https://quaternius.itch.io/universal-animation-library)
+Four clips are adapted from Quaternius's **Universal Animation Library, Standard**, file `UAL1_Standard.glb`. These are `Idle_Loop`, `Walk_Loop`, `Jog_Fwd_Loop`, and `Driving_Loop`. The adaptation maps joints by name, adjusts each rotation for the target rest pose, preserves relative pelvis motion, and omits the root motion and limb translation and scale tracks. The preview samples the driving clip for the seated finger curl and uses the idle, walk, and jog clips on foot. The game fits the seated pose to the scooter. [Official Universal Animation Library pack](https://quaternius.itch.io/universal-animation-library)
 
 Both downloaded archives include the **CC0 1.0 Universal** dedication. [CC0 legal text](https://creativecommons.org/publicdomain/zero/1.0/)
 

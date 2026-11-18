@@ -43,6 +43,6 @@ Chromium desktop rendered both districts and verified the district picker, persi
 
 ## Verification limits and delivery
 
-- Hardware FPS and live Firebase or Google authentication were outside the measured coverage. Browser tests used software WebGL and mobile emulation.
+- Hardware FPS and live Firebase or Google authentication were outside the measured coverage. Browser tests used software WebGL and mobile emulation. A foreground home sign can obscure the rider at some orbit angles.
 - District 1 is a neighborhood-scale interpretation around Hẻm 15B. Its scenery uses original procedural meshes, with no new external character asset.
 - The existing Vercel check is present on main. GitHub refused feature branch writes over HTTPS and through the connected API, so the pull request and its Vercel preview could not be published from this session.

@@ -19,16 +19,17 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
 const SKY = 0xa9d8ff;
 scene.background = new THREE.Color(SKY);
-scene.fog = new THREE.Fog(SKY, 160, 680);
+scene.fog = new THREE.Fog(SKY, 105, 620);
 
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1200);
 camera.position.set(4, 2.5, 6);
 
-const hemi = new THREE.HemisphereLight(0xe4f3ff, 0x5b7a3c, 1.0); scene.add(hemi);
+const hemi = new THREE.HemisphereLight(0xe4f3ff, 0x79766d, 1.0); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff0d8, 2.3);
 sun.castShadow = true;
 sun.shadow.mapSize.set(GFX_HIGH ? 4096 : 2048, GFX_HIGH ? 4096 : 2048);
 Object.assign(sun.shadow.camera, GFX_HIGH ? { left: -60, right: 60, top: 60, bottom: -60, near: 1, far: 260 } : { left: -32, right: 32, top: 32, bottom: -32, near: 1, far: 160 });
+sun.shadow.camera.updateProjectionMatrix();
 sun.shadow.bias = -0.0004;
 sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);

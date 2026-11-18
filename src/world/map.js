@@ -79,7 +79,7 @@ areaMesh(MAP.pitch, 0.05, std(0x5f9e4a, { roughness: 1 }));
 areaMesh(MAP.water, 0.03, waterMat);
 
 /* ---- ribbons (roads, sidewalks, markings, rails) ---- */
-function ribbon(p, w, y, out, ys) {
+function ribbon(p, w, y, out, ys, offset = 0) {
   // p flat [x,z,...]; y number or per-vertex array ys
   const n = p.length / 2; if (n < 2) return;
   const base = out.pos.length / 3;
@@ -91,12 +91,10 @@ function ribbon(p, w, y, out, ys) {
     if (i === 0) { dx0 = dx1; dz0 = dz1; } if (i === n - 1) { dx1 = dx0; dz1 = dz0; }
     let nx = -(dz0 + dz1), nz = dx0 + dx1; const nl = Math.hypot(nx, nz) || 1; nx /= nl; nz /= nl;
     const cosh = Math.max(0.35, nx * -dz1 + nz * dx1);
-    const hw = (w / 2) / cosh;
+    const left = (offset + w / 2) / cosh, right = (offset - w / 2) / cosh;
     const yy = ys ? ys[i] : y;
-    out.pos.push(x + nx * hw, yy, z + nz * hw, x - nx * hw, yy, z - nz * hw);
-    if (out.uv) { const along = i === 0 ? 0 : out._acc + Math.hypot(x - p[i * 2 - 2], z - p[i * 2 - 1]); out._acc = along; out.uv.push(0, along / 6, 1, along / 6); }
+    out.pos.push(x + nx * left, yy, z + nz * left, x + nx * right, yy, z + nz * right);
   }
-  out._acc = 0;
   for (let i = 0; i < n - 1; i++) {
     const a = base + i * 2;
     out.idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
@@ -114,16 +112,23 @@ function wallStrip(p, off, y0, h, out, ys) {
     out.idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
   }
 }
-function meshFrom(out, mat, shadow = false) {
+function meshFrom(out, mat, shadow = false, tileSize = 0) {
   if (!out.idx.length) return null;
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(out.pos, 3));
-  if (out.uv) g.setAttribute('uv', new THREE.Float32BufferAttribute(out.uv, 2));
+  if (tileSize) {
+    const uv = new Float32Array(out.pos.length / 3 * 2);
+    for (let i = 0, j = 0; i < out.pos.length; i += 3, j += 2) {
+      uv[j] = out.pos[i] / tileSize;
+      uv[j + 1] = out.pos[i + 2] / tileSize;
+    }
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  }
   g.setIndex(out.idx); g.computeVertexNormals();
   const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.castShadow = shadow; scene.add(m); return m;
 }
-const nb = () => ({ pos: [], idx: [], _acc: 0 });
-const roadBufs = { asphalt: nb(), side: nb(), foot: nb(), mark: nb(), yellow: nb(), rail: nb(), deck: nb(), deckWall: nb(), wline: nb() };
+const nb = () => ({ pos: [], idx: [] });
+const roadBufs = { asphalt: nb(), side: nb(), curb: nb(), foot: nb(), mark: nb(), yellow: nb(), rail: nb(), deck: nb(), deckWall: nb(), wline: nb() };
 const deckPillars = [];
 for (const l of MAP.waterLines) ribbon(l.p, l.w, 0.032, roadBufs.wline);
 for (const r of MAP.roads) {
@@ -131,16 +136,24 @@ for (const r of MAP.roads) {
   if (r.c >= 6) { ribbon(r.p, r.w, 0.062 + (r.c === 6 ? 0.002 : 0), roadBufs.foot); continue; }
   ribbon(r.p, r.w + 3.6, 0.058, roadBufs.side);
   ribbon(r.p, r.w, 0.07 + (6 - r.c) * 0.003, roadBufs.asphalt);
+  if (r.c <= 4 && r.w >= 5 && !r.b) {
+    const curbOffset = r.w / 2 + 0.12;
+    ribbon(r.p, 0.22, 0.074, roadBufs.curb, null, curbOffset);
+    ribbon(r.p, 0.22, 0.074, roadBufs.curb, null, -curbOffset);
+  }
   if (r.b) { wallStrip(r.p, r.w / 2 + 0.4, 0.07, 1.0, roadBufs.rail); wallStrip(r.p, -(r.w / 2 + 0.4), 0.07, 1.0, roadBufs.rail); }
   // dashed centre / lane line
   if (r.w >= 6 && r.c <= 4) {
     const p = r.p; let acc = 0;
     for (let i = 0; i < p.length - 2; i += 2) {
       const ax = p[i], az = p[i + 1], bx = p[i + 2], bz = p[i + 3], L = Math.hypot(bx - ax, bz - az);
-      let t = (3 - acc % 9 + 9) % 9;
+      if (L < 0.01) continue;
+      let t = 3 - acc % 9;
+      if (t <= -3) t += 9;
       while (t < L) {
         const t1 = Math.min(L, t + 3);
-        const dash = [ax + (bx - ax) * t / L, az + (bz - az) * t / L, ax + (bx - ax) * t1 / L, az + (bz - az) * t1 / L];
+        const t0 = Math.max(0, t);
+        const dash = [ax + (bx - ax) * t0 / L, az + (bz - az) * t0 / L, ax + (bx - ax) * t1 / L, az + (bz - az) * t1 / L];
         ribbon(dash, 0.15, 0.1, (r.c <= 1 && !r.o) ? roadBufs.yellow : roadBufs.mark);
         t += 9;
       }
@@ -163,12 +176,39 @@ for (const d of MAP.deck) {
 }
 meshFrom(roadBufs.wline, waterMat);
 
-meshFrom(roadBufs.foot, std(0xd8cfbd, { roughness: 0.95 }));
-const MAT_ASPHALT = std(0x44474d, { roughness: 0.92 }), MAT_SIDE = std(0xcbc5b8, { roughness: 0.95 });
-meshFrom(roadBufs.side, MAT_SIDE);
-meshFrom(roadBufs.asphalt, MAT_ASPHALT);
-meshFrom(roadBufs.mark, std(0xf0f0f0, { roughness: 0.6 }));
-meshFrom(roadBufs.yellow, std(0xf2c230, { roughness: 0.6 }));
+const ASPHALT_COLOR = 0x565a60;
+const asphaltTex = tileTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#dedbd5'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 7000; i++) {
+    const shade = i % 4 ? 45 : 255;
+    g.fillStyle = `rgba(${shade},${shade},${shade},${0.06 + hrand() * 0.15})`;
+    g.fillRect(hrand() * w, hrand() * h, 1 + hrand() * 1.8, 1 + hrand() * 1.5);
+  }
+});
+const pavingTex = tileTex(128, 128, (g) => {
+  g.fillStyle = '#8c8983'; g.fillRect(0, 0, 128, 128);
+  for (let row = 0; row < 8; row++) {
+    for (let col = -1; col < 4; col++) {
+      const x = col * 32 + (row % 2) * 16, y = row * 16;
+      const shade = 83 + hrand() * 12;
+      g.fillStyle = `hsl(34,12%,${shade}%)`; g.fillRect(x + 1, y + 1, 30, 14);
+      g.fillStyle = 'rgba(255,255,255,.32)'; g.fillRect(x + 1, y + 1, 30, 1);
+      g.fillStyle = 'rgba(55,48,41,.12)'; g.fillRect(x + 1, y + 14, 30, 1);
+    }
+  }
+});
+const MAT_ASPHALT = std(ASPHALT_COLOR, {
+  roughness: 0.94, map: asphaltTex,
+  ...(GFX_HIGH ? { bumpMap: asphaltTex, bumpScale: 0.012 } : {})
+});
+const MAT_SIDE = std(0xbcb1a3, { roughness: 0.95, map: pavingTex });
+const MAT_ROAD_PAINT = std(0xdfded6, { roughness: 0.82 });
+meshFrom(roadBufs.foot, MAT_SIDE, false, 3.2);
+meshFrom(roadBufs.side, MAT_SIDE, false, 3.2);
+meshFrom(roadBufs.curb, std(0x9c9890, { roughness: 0.95 }));
+meshFrom(roadBufs.asphalt, MAT_ASPHALT, false, 3.2);
+meshFrom(roadBufs.mark, MAT_ROAD_PAINT);
+meshFrom(roadBufs.yellow, std(0xe9b73c, { roughness: 0.82 }));
 meshFrom(roadBufs.rail, std(0xbfc3c7, { roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }), true);
 meshFrom(roadBufs.deck, std(0x9a9da2, { roughness: 0.85, side: THREE.DoubleSide }), true);
 meshFrom(roadBufs.deckWall, std(0xd2d4d6, { roughness: 0.7, side: THREE.DoubleSide }), true);
@@ -241,19 +281,47 @@ function hdGlass() {
   }); t.anisotropy = 8; return t;
 }
 function hdShop() {
-  const t = canvasTex(512, 512, (g, w, h) => {
-    g.fillStyle = '#ffffff'; g.fillRect(0, 0, w, 130);
-    g.fillStyle = 'rgba(0,0,0,.08)'; g.fillRect(0, 0, w, 8); g.fillRect(0, 122, w, 8);
-    g.fillStyle = 'rgba(0,0,0,.55)'; g.font = '900 64px system-ui,sans-serif'; g.textBaseline = 'middle'; g.fillText('▇▇▇ ▇▇▇▇', 40, 58); g.font = '700 26px system-ui'; g.fillStyle = 'rgba(0,0,0,.4)'; g.fillText('▂▂▂▂▂ ▂▂▂ ▂▂▂▂▂▂', 44, 104);
-    g.fillStyle = '#3c3c3e'; g.fillRect(0, 130, w, 22);
-    g.fillStyle = '#1f2023'; g.fillRect(20, 152, w - 40, h - 152);
-    g.fillStyle = '#9ba1a8'; g.fillRect(20, 152, w - 40, 96); g.strokeStyle = '#737980'; g.lineWidth = 3; for (let y = 160; y < 248; y += 11) { g.beginPath(); g.moveTo(20, y); g.lineTo(w - 20, y); g.stroke(); }
-    g.fillStyle = 'rgba(255,214,140,.5)'; g.fillRect(50, 290, 130, 190); g.fillStyle = 'rgba(180,220,255,.35)'; g.fillRect(210, 300, 110, 180); g.fillStyle = 'rgba(255,190,150,.45)'; g.fillRect(350, 286, 120, 194);
-    g.fillStyle = '#5a4a3a'; for (let y = 330; y < 480; y += 48) { g.fillRect(50, y, 130, 6); g.fillRect(350, y, 120, 6); }
-    for (let i = 0; i < 40; i++) { g.fillStyle = `hsl(${hrand() * 360},70%,${45 + hrand() * 25}%)`; g.fillRect(56 + (i % 10) * 12, 300 + Math.floor(i / 10) * 48, 9, 28); g.fillRect(356 + (i % 9) * 12, 296 + Math.floor(i / 10) * 48, 9, 32); }
-    g.fillStyle = '#b8b2a6'; g.fillRect(0, h - 26, w, 26); g.fillStyle = '#8f8a80'; g.fillRect(0, h - 26, w, 4);
-    g.fillStyle = '#c9c9c9'; g.fillRect(0, 152, 20, h - 152); g.fillRect(w - 20, 152, 20, h - 152);
-  }); t.anisotropy = 8; return t;
+  return canvasTex(1024, 1024, (g) => {
+    const faces = [
+      ['CÀ PHÊ', 'CÀ PHÊ SỮA · TRÀ ĐÁ', '#244538', '#b6865b'],
+      ['CƠM TẤM', 'PHỤC VỤ TẠI CHỖ · MANG ĐI', '#822c2b', '#cf9e63'],
+      ['TẠP HÓA', 'NƯỚC UỐNG · ĐỒ GIA DỤNG', '#30445c', '#a3a99c'],
+      ['BÁNH MÌ', 'BÁNH NÓNG MỖI NGÀY', '#705125', '#c7804f']
+    ];
+    faces.forEach(([name, subtitle, sign, door], i) => {
+      g.save();
+      g.translate(i % 2 * 512, Math.floor(i / 2) * 512);
+      g.fillStyle = '#c3b9a8'; g.fillRect(0, 0, 512, 512);
+      g.fillStyle = sign; g.fillRect(16, 14, 480, 120);
+      g.strokeStyle = '#ecdbc2'; g.lineWidth = 3; g.strokeRect(23, 22, 466, 104);
+      g.fillStyle = '#f9eddf'; g.font = '800 68px system-ui'; g.textAlign = 'center';
+      g.textBaseline = 'middle'; g.fillText(name, 256, 56, 420);
+      g.font = '600 21px system-ui'; g.fillText(subtitle, 256, 103, 420);
+      const glass = g.createLinearGradient(0, 150, 0, 480);
+      glass.addColorStop(0, '#313732'); glass.addColorStop(0.64, '#544235'); glass.addColorStop(1, '#1d2728');
+      g.fillStyle = glass; g.fillRect(28, 151, 456, 326);
+      for (let y = 235; y < 415; y += 55) {
+        g.fillStyle = '#745038'; g.fillRect(44, y + 29, 148, 8);
+        for (let x = 52; x < 183; x += 14) {
+          g.fillStyle = `hsl(${25 + hrand() * 85},35%,${30 + hrand() * 30}%)`;
+          const boxHeight = 12 + hrand() * 15;
+          g.fillRect(x, y + 29 - boxHeight, 8 + hrand() * 4, boxHeight);
+        }
+      }
+      if (i % 2) {
+        g.fillStyle = '#e8c791'; g.fillRect(310, 210, 139, 85);
+        g.fillStyle = '#654634';
+        for (let y = 229; y < 282; y += 17) g.fillRect(323, y, 104, 3);
+      }
+      g.fillStyle = 'rgba(193,218,225,.15)';
+      g.beginPath(); g.moveTo(133, 153); g.lineTo(183, 153); g.lineTo(71, 469); g.lineTo(41, 469); g.fill();
+      g.fillStyle = door; g.fillRect(28, 151, 455, 12); g.fillRect(28, 464, 455, 13);
+      for (const x of [28, 200, 296, 472]) g.fillRect(x, 151, 11, 326);
+      g.fillStyle = '#d5c2a5'; g.fillRect(213, 309, 5, 36); g.fillRect(288, 309, 5, 36);
+      g.fillStyle = '#8d8275'; g.fillRect(16, 482, 480, 5);
+      g.restore();
+    });
+  });
 }
 if (GFX_HIGH) { for (const [t, f] of [[facadeTex, hdFacade], [glassTex, hdGlass], [shopTex, hdShop]]) { const n = f(); t.image = n.image; t.repeat.copy(n.repeat); t.anisotropy = 8; t.needsUpdate = true; } }
 const MAT_WIN = new THREE.MeshStandardMaterial({ map: facadeTex, vertexColors: true, roughness: 0.85 });
@@ -281,7 +349,11 @@ const WALLS_FILL = [0xf6e7b8, 0xf4c7a8, 0xcfe8d4, 0xd6e4f5, 0xf7f3ea, 0xf3d1dc, 
 const SIGNS = [0xd32f2f, 0x1976d2, 0xfbc02d, 0x388e3c, 0xf57c00, 0x7b1fa2, 0xffffff, 0x00897b, 0xc2185b];
 /* ---- chi tiết HD cho nhà: lan can mái, ban công, mái hiên, hộp kỹ thuật, bồn nước ---- */
 function hdFace(buf, P, nx, ny, nz, col) {   // P = 4 điểm [x,y,z] theo vòng
-  for (const k of [0, 1, 2, 0, 2, 3]) { const q = P[k]; buf.pos.push(q[0], q[1], q[2]); buf.uv.push(0, 0); buf.nor.push(nx, ny, nz); buf.col.push(col.r, col.g, col.b); }
+  const [ax, ay, az] = P[1].map((v, i) => v - P[0][i]);
+  const [bx, by, bz] = P[2].map((v, i) => v - P[0][i]);
+  const dot = (ay * bz - az * by) * nx + (az * bx - ax * bz) * ny + (ax * by - ay * bx) * nz;
+  const order = dot < 0 ? [0, 2, 1, 0, 3, 2] : [0, 1, 2, 0, 2, 3];
+  for (const k of order) { const q = P[k]; buf.pos.push(q[0], q[1], q[2]); buf.uv.push(0, 0); buf.nor.push(nx, ny, nz); buf.col.push(col.r, col.g, col.b); }
 }
 function hdBox(buf, x, z, y0, y1, hw, hd, a, col) {
   const ux = Math.cos(a), uz = Math.sin(a), c = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([s, t]) => [x + ux * hw * s - uz * hd * t, z + uz * hw * s + ux * hd * t]);
@@ -293,12 +365,27 @@ function hdBuildingDetails(p, h, opts, ch, ccw, wallCol, signCol, shopH, cx, cz)
   const n = p.length / 2, R = ch.roof;
   const trim = _hc.copy(wallCol).multiplyScalar(0.86).clone(), dark = _hc2.copy(wallCol).multiplyScalar(0.62).clone();
   const balc = opts.fill && h > shopH + 3 && hrand() < 0.7, awn = opts.fill && hrand() < 0.6;
+  let facadeDistance = 0;
   for (let i = 0; i < n; i++) {
-    const j = (i + 1) % n, ax = p[i * 2], az = p[i * 2 + 1], bx = p[j * 2], bz = p[j * 2 + 1], L = Math.hypot(bx - ax, bz - az); if (L < 0.5) continue;
+    const j = (i + 1) % n, ax = p[i * 2], az = p[i * 2 + 1], bx = p[j * 2], bz = p[j * 2 + 1], L = Math.hypot(bx - ax, bz - az);
+    const along = facadeDistance;
+    facadeDistance += L;
+    if (L < 0.5) continue;
     const dx = (bx - ax) / L, dz = (bz - az) / L, nx = ccw ? dz : -dz, nz = ccw ? -dx : dx;
     // lan can mái (parapet)
     const ph = opts.fill ? 0.55 : Math.min(1.2, 0.5 + h * 0.012);
     hdFace(R, [[ax, h, az], [bx, h, bz], [bx, h + ph, bz], [ax, h + ph, az]], nx, 0, nz, trim);
+    if (!opts.fill && L >= 10 && h >= 8 && h <= 30) {
+      const a = Math.atan2(dz, dx), mx = (ax + bx) / 2, mz = (az + bz) / 2;
+      // Recessed-looking bays use pilasters aligned with the facade texture's window columns.
+      for (let d = Math.ceil((along + 1.2) / 12) * 12 - along; d < L - 1.2; d += 12) {
+        hdBox(R, ax + dx * d + nx * 0.09, az + dz * d + nz * 0.09, 0.22, h - 0.1, 0.17, 0.13, a, trim);
+      }
+      hdBox(R, mx + nx * 0.09, mz + nz * 0.09, 0.07, 0.36, L / 2 - 0.06, 0.13, a, dark);
+      for (let y = 3.3; y < h - 0.45; y += 3.3) {
+        hdBox(R, mx + nx * 0.09, mz + nz * 0.09, y - 0.15, y + 0.03, L / 2 - 0.06, 0.14, a, trim);
+      }
+    }
     if (!opts.fill || (i % 2)) continue;                    // chỉ mặt trước/sau của nhà phố
     const in0 = 0.35, x0 = ax + dx * in0, z0 = az + dz * in0, x1 = bx - dx * in0, z1 = bz - dz * in0;
     if (awn && L > 2.5) {                                    // mái hiên trên cửa hàng
@@ -331,6 +418,9 @@ function addBuilding(p, h, opts) {
   const wallCol = _c.setHex(opts.color).clone();
   const signCol = new THREE.Color(opts.sign || 0xffffff);
   const shopH = opts.fill ? 3.8 : 0;
+  const shopTile = (Math.abs(Math.floor(cx * 13) ^ Math.floor(cz * 17))) % 4;
+  const shopU = shopTile % 2 * 0.5;
+  const shopV = shopTile < 2 ? 0.5 : 0;
   let acc = 0;
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
@@ -340,8 +430,16 @@ function addBuilding(p, h, opts) {
     const nx = ccw ? dz : -dz, nz = ccw ? -dx : dx;      // outward normal
     const flip = ccw;                                    // keep front faces outside
     if (opts.fill) {
-      quad(ch.shop, ax, az, bx, bz, 0, shopH, 0, 1, 0, 1, nx, nz, signCol, flip);
-      quad(ch.win, ax, az, bx, bz, shopH, h, acc / 4, (acc + L) / 4, 0, (h - shopH) / 3.3, nx, nz, wallCol, flip);
+      const shopWall = !GFX_HIGH || i % 2 === 0;
+      if (GFX_HIGH && shopWall) {
+        const left = shopU + 0.002, right = shopU + 0.498;
+        _c.setHex(0xffffff);
+        quad(ch.shop, ax, az, bx, bz, 0, shopH, flip ? right : left, flip ? left : right, shopV + 0.002, shopV + 0.498, nx, nz, _c, flip);
+      } else if (shopWall) {
+        quad(ch.shop, ax, az, bx, bz, 0, shopH, 0, 1, 0, 1, nx, nz, signCol, flip);
+      }
+      const floor = shopWall ? shopH : 0;
+      quad(ch.win, ax, az, bx, bz, floor, h, acc / 4, (acc + L) / 4, 0, (h - floor) / 3.3, nx, nz, wallCol, flip);
     } else {
       quad(tall ? ch.glass : ch.win, ax, az, bx, bz, 0, h, acc / (tall ? 3 : 4), (acc + L) / (tall ? 3 : 4), 0, h / (tall ? 3.6 : 3.3), nx, nz, wallCol, flip);
     }
@@ -546,6 +644,81 @@ function nearestEdge(x, z, filter, r = 60) {
   return best;
 }
 const edgeName = (E) => E.n >= 0 ? NAMES[E.n] : 'hẻm không tên';
+
+// Approximate zebra crossings on straight, named approaches to connected junctions.
+const crossings = nb();
+for (let node = 0; node < NODE_ALL.length; node++) {
+  const arms = NODE_ALL[node];
+  if (arms.length < 3) continue;
+  for (const { E, fwd } of arms) {
+    if (E.o || E.c > 4 || E.n < 0 || E.w < 6) continue;
+    const entry = Math.max(6, ...arms.map(({ E: arm }) => arm.w / 2 + 2));
+    if (E.L < 2 * entry + 4) continue;
+    const p = edgeAt(E, entry, fwd), next = edgeAt(E, entry + 2, fwd);
+    if (p.dx * next.dx + p.dz * next.dz < 0.98) continue;
+    for (let side = -E.w / 2 + 0.5; side < E.w / 2 - 0.3; side += 0.8) {
+      const x = p.x - p.dz * side, z = p.z + p.dx * side;
+      ribbon([x, z, x + p.dx * 2, z + p.dz * 2], 0.4, 0.105, crossings);
+    }
+  }
+}
+meshFrom(crossings, MAT_ROAD_PAINT);
+
+// Static sidewalk props are kept clear of the road graph and existing colliders.
+function buildSidewalkProps() {
+  const scooters = [], benches = [], occupied = new Grid(12), nearby = [];
+  for (const E of EDGES) {
+    if (E.c < 3 || E.c > 4 || E.L < 36 || E.w < 5.5 || E.id % 4 !== 0) continue;
+    const p = edgeAt(E, E.L * (E.id % 3 === 0 ? 0.42 : 0.58), true);
+    const side = E.id % 8 === 0 ? 1 : -1;
+    const offset = side * (E.w / 2 + 1.06);
+    const x = p.x - p.dz * offset, z = p.z + p.dx * offset;
+    let clear = true;
+    for (const along of [-0.9, 0, 0.9]) {
+      const tx = x + along * p.dx, tz = z + along * p.dz;
+      if (onRoad(tx, tz, 0.45) || pushOut(tx, tz, 0.44).hit || inWater(tx, tz)) { clear = false; break; }
+    }
+    if (!clear || occupied.query(x, z, 4, nearby).some(q => Math.hypot(q.x - x, q.z - z) < 4)) continue;
+    const pose = { x, z, heading: Math.atan2(p.dx, p.dz) };
+    (E.id % 12 === 0 ? benches : scooters).push(pose);
+    occupied.addBox(x, z, x, z, pose);
+  }
+  const o = new THREE.Object3D();
+  const color = new THREE.Color();
+  function instances(poses, parts, material, paint) {
+    if (!poses.length) return;
+    const geo = mergeGeometries(parts);
+    parts.forEach(part => part.dispose());
+    const mesh = new THREE.InstancedMesh(geo, material, poses.length);
+    poses.forEach(({ x, z, heading }, i) => {
+      o.position.set(x, 0.06, z); o.rotation.y = heading; o.updateMatrix();
+      mesh.setMatrixAt(i, o.matrix);
+      if (paint) mesh.setColorAt(i, color.setHex(paint[i % paint.length]));
+    });
+    mesh.computeBoundingSphere(); mesh.castShadow = GFX_HIGH; mesh.receiveShadow = true;
+    scene.add(mesh);
+  }
+  const tire = () => new THREE.TorusGeometry(0.2, 0.055, 6, 12).rotateY(Math.PI / 2);
+  const shell = () => new THREE.SphereGeometry(1, 10, 6);
+  instances(scooters, [
+    tire().translate(0, 0.255, 0.65), tire().translate(0, 0.255, -0.65),
+    shell().scale(0.21, 0.10, 0.48).translate(0, 0.7, -0.24),
+    new THREE.BoxGeometry(0.53, 0.06, 0.09).translate(0, 0.99, 0.52),
+    new THREE.BoxGeometry(0.36, 0.07, 0.62).translate(0, 0.30, 0.06)
+  ], std(0x292827, { roughness: 0.85 }));
+  instances(scooters, [
+    shell().scale(0.24, 0.20, 0.53).translate(0, 0.49, -0.28),
+    shell().scale(0.20, 0.38, 0.18).translate(0, 0.60, 0.53),
+    shell().scale(0.16, 0.10, 0.29).translate(0, 0.35, 0.60)
+  ], std(0xffffff, { roughness: 0.36, metalness: 0.18 }), [0x8e2727, 0xe8e0cc, 0x414855, 0x456f68, 0xcdb29a]);
+  instances(benches, [
+    new THREE.BoxGeometry(0.43, 0.07, 1.55).translate(0, 0.44, 0),
+    new THREE.BoxGeometry(0.07, 0.26, 1.55).translate(0.22, 0.68, 0),
+    new THREE.BoxGeometry(0.35, 0.43, 0.08).translate(0, 0.22, 0.58),
+    new THREE.BoxGeometry(0.35, 0.43, 0.08).translate(0, 0.22, -0.58)
+  ], std(0x706155, { roughness: 0.85 }));
+}
+buildSidewalkProps();
 
 /* ---- landmark labels ---- */
 const labels = [];

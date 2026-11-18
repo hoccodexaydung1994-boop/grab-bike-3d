@@ -23,7 +23,7 @@ if (HD.on) {
           col = mix(col, cc, c * 0.85);
           vec2 sp = d.xz / (d.y + 0.05) * 90.0; float st = step(0.9975, hash(floor(sp))) * night * (1.0 - c) * smoothstep(0.05, 0.3, d.y);
           col += vec3(st) * 1.6;
-        } else col = mix(hor, gnd, smoothstep(0.0, -0.25, d.y));
+        } else col = mix(hor, gnd, smoothstep(0.0, 0.25, -d.y));
         gl_FragColor = vec4(col, 1.0);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -65,13 +65,16 @@ if (HD.on) {
   FRAME.push((dt) => {
     skyU.time.value += dt; sky.position.copy(camera.position);
     // đường ướt khi mưa: bóng hơn, phản chiếu trời và đèn
-    MAT_ASPHALT.roughness = 0.92 - 0.62 * rain; MAT_SIDE.roughness = 0.95 - 0.4 * rain; MAT_ASPHALT.color.setHex(0x44474d).multiplyScalar(1 - 0.35 * rain);
+    MAT_ASPHALT.roughness = 0.94 - 0.56 * rain; MAT_SIDE.roughness = 0.95 - 0.4 * rain; MAT_ASPHALT.color.setHex(ASPHALT_COLOR).multiplyScalar(1 - 0.35 * rain);
   });
 
   /* ---- hậu kỳ: bloom cho đèn đường, đèn xe, biển hiệu + khử răng cưa ---- */
   try {
-    const mkRT = () => new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType, samples: 4 });
-    HD.composer = new EffectComposer(renderer, mkRT());
+    const renderTarget = new THREE.WebGLRenderTarget(innerWidth, innerHeight, {
+      type: THREE.HalfFloatType,
+      samples: Math.min(2, renderer.capabilities.maxSamples ?? 0)
+    });
+    HD.composer = new EffectComposer(renderer, renderTarget);
     HD.composer.addPass(new RenderPass(scene, camera));
     HD.bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.45, 0.7, 1.1);
     HD.composer.addPass(HD.bloom); HD.composer.addPass(new OutputPass());
@@ -81,7 +84,7 @@ if (HD.on) {
       HD.bloom.strength = 0.3 + 0.55 * nightK;
       HD.composer.render();
     };
-    addEventListener('resize', () => HD.composer.setSize(innerWidth, innerHeight));
+    addEventListener('resize', () => HD.composer?.setSize(innerWidth, innerHeight));
   } catch (e) { console.warn('post-processing off', e); HD.post = false; }
   // máy giật → tắt hậu kỳ trước khi giảm các thứ khác
   { const _ps = perfStepDown; perfStepDown = function () { if (HD.post) { HD.post = false; toast(L('⚙️ Máy hơi giật → tắt hiệu ứng ánh sáng (bloom)', '⚙️ Bloom off for performance'), 2.2); return; } _ps(); }; }

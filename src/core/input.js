@@ -8,7 +8,8 @@ addEventListener('keydown', (e) => {
   if (e.repeat) { keys[e.code] = true; return; }
   keys[e.code] = true;
   if (game.mode === 'menu') return;
-  if (e.code === 'KeyH') horn();
+  if (e.code === 'KeyH' && !player.parked) horn();
+  if (e.code === 'KeyF') toggleMount();
   if (e.code === 'KeyC') cycleCam();
   if (e.code === 'KeyM') toggleMute();
   if (e.code === 'KeyP') togglePhone();
@@ -18,10 +19,14 @@ addEventListener('keydown', (e) => {
   if (e.code === 'Digit1') policeStop();
   if (e.code === 'Digit2') policeFlee();
   if (e.code === 'KeyV') game.mode === 'showcase' ? enterDrive() : enterShowcase();
-  if (e.code === 'KeyR' && game.mode === 'drive' && !game.frozen && !police.active) { resetHome(); toast('🏠 Về nhà'); }
+  if (e.code === 'KeyR' && game.mode === 'drive' && !game.frozen && !police.active) { resetHome(); camInit = false; toast('🏠 Về nhà'); }
 });
 addEventListener('keyup', (e) => { keys[e.code] = false; });
-addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+addEventListener('blur', () => {
+  for (const k in keys) keys[k] = false;
+  for (const k in touch) touch[k] = false;
+  cameraPointers.clear();
+});
 function bindTouch(id, prop, onDown) {
   const el = $(id);
   const on = (e) => { e.preventDefault(); touch[prop] = true; el.classList.add('on'); onDown && onDown(); };
@@ -30,10 +35,65 @@ function bindTouch(id, prop, onDown) {
   el.addEventListener('pointerleave', off); el.addEventListener('pointercancel', off);
 }
 bindTouch('tGas', 'gas'); bindTouch('tBrake', 'brake'); bindTouch('tLeft', 'left'); bindTouch('tRight', 'right');
-bindTouch('tHorn', 'horn', horn);
+bindTouch('tHorn', 'horn', () => { if (!player.parked) horn(); });
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 if (isTouch) { $('touch').classList.remove('hidden'); document.body.classList.add('touch'); }
+function syncMobilityControls() {
+  const onFoot = !!player.parked;
+  const button = $('bMount');
+  button.textContent = onFoot ? L('🛵 Lên xe', '🛵 Mount') : L('🚶 Xuống xe', '🚶 Dismount');
+  button.title = button.textContent + ' (F)';
+  $('tGas').textContent = onFoot ? L('TIẾN', 'FORWARD') : L('GA', 'GAS');
+  $('tBrake').textContent = onFoot ? L('LÙI', 'BACK') : L('PHANH', 'BRAKE');
+  $('tHorn').textContent = onFoot ? '🏃' : '📯';
+  $('tHorn').title = onFoot ? L('Giữ để chạy', 'Hold to run') : L('Còi', 'Horn');
+}
+$('bMount').onclick = () => toggleMount();
+
+const cameraPointers = new Map();
+function cameraGestureAllowed() {
+  return game.mode === 'drive' && !game.paused && (!game.frozen || !towTruck.g.visible) && (game.camMode !== 2 || player.parked);
+}
+function pinchDistance(points) {
+  const [a, b] = points.values();
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+canvas.addEventListener('pointerdown', (e) => {
+  if (!cameraGestureAllowed() || e.button !== 0 || cameraPointers.size >= 2) return;
+  cameraPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove', (e) => {
+  const pt = cameraPointers.get(e.pointerId);
+  if (!pt || !cameraGestureAllowed()) return;
+  const dx = e.clientX - pt.x, dy = e.clientY - pt.y;
+  const prior = cameraPointers.size === 2 ? pinchDistance(cameraPointers) : 0;
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  if (prior > 0) {
+    const next = pinchDistance(cameraPointers);
+    if (next > 4) cameraOrbit.zoom = THREE.MathUtils.clamp(cameraOrbit.zoom * prior / next, 0.63, 1.46);
+  } else {
+    cameraOrbit.yaw = wrapAngle(cameraOrbit.yaw + dx * 0.007);
+    cameraOrbit.pitch = THREE.MathUtils.clamp(cameraOrbit.pitch + dy * 0.005, -0.21, 0.56);
+  }
+});
+for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  canvas.addEventListener(event, (e) => cameraPointers.delete(e.pointerId));
+}
+canvas.addEventListener('wheel', (e) => {
+  if (!cameraGestureAllowed()) return;
+  e.preventDefault();
+  const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);
+  cameraOrbit.zoom = THREE.MathUtils.clamp(cameraOrbit.zoom * Math.exp(delta * 0.0017), 0.63, 1.46);
+}, { passive: false });
+
 function cycleCam() {
+  if (player.parked) {
+    game.camMode = game.camMode === 1 ? 0 : 1;
+    toast(game.camMode === 1 ? L('🎥 Camera xa', '🎥 Wide follow camera') : L('🎥 Camera gần', '🎥 Close follow camera'), 1.2);
+    return;
+  }
   game.camMode = (game.camMode + 1) % 4;
   toast(['🎥 Camera sau xe', '🎥 Camera xa', '🎥 Góc nhìn tài xế', '🎥 Camera bên hông'][game.camMode], 1.2);
 }
@@ -93,6 +153,7 @@ function enterDrive() {
   initAudio(); actx && actx.resume && actx.resume();
   profile.name = $('pName').value.trim().slice(0, 24) || profile.name; saveProfile();
   game.mode = 'drive';
+  syncMobilityControls();
   controls.enabled = false; controls.autoRotate = false;
   $('menu').classList.add('hidden'); $('showcaseBar').classList.add('hidden'); $('hud').classList.remove('hidden');
   updateProfileHUD();
@@ -101,6 +162,7 @@ function enterDrive() {
   if (!game.running) { game.running = true; game.state = 'wait'; game.waitT = 1.5; toast(`🛵 Chào ${profile.name}! Bật app, chờ cuốc…`, 2); }
 }
 function enterShowcase() {
+  if (player.parked) { toast(L('Lên xe để xem góc 360°', 'Mount the bike to use the 360° view'), 1.8); return; }
   game.mode = 'showcase'; player.v = 0;
   $('menu').classList.add('hidden'); $('hud').classList.add('hidden'); $('showcaseBar').classList.remove('hidden');
   controls.enabled = true; controls.autoRotate = true; controls.autoRotateSpeed = 1.6;

@@ -1,7 +1,13 @@
 // Smoke test: run the game module in Node with a recording Proxy mock for three.js + DOM.
+import assert from 'node:assert/strict';
 import fs from 'fs';
 import vm from 'vm';
 const ROOT = process.argv[2];
+const districtArg = process.argv[3];
+const district = districtArg === '--district=q1' ? 'q1' : 'q7';
+if (districtArg && !['--district=q1', '--district=q7'].includes(districtArg)) {
+  throw new Error('Use --district=q1 or --district=q7');
+}
 const man = JSON.parse(fs.readFileSync(ROOT + '/src/manifest.json', 'utf8'));
 
 
@@ -58,13 +64,109 @@ g.window = g;
 
 
 globalThis.THREE = THREEw; globalThis.OrbitControls = mk('OrbitControls'); globalThis.GLTFLoader = mk('GLTFLoader'); globalThis.mergeGeometries = () => mk('merged'); for (const n of ['EffectComposer','RenderPass','UnrealBloomPass','OutputPass']) globalThis[n] = mk(n);
-globalThis.Q7 = JSON.parse(fs.readFileSync(ROOT + '/data/map/q7.json', 'utf8')); globalThis.GAME_VERSION = man.version;
+globalThis.Q7 = JSON.parse(fs.readFileSync(ROOT + '/data/map/' + district + '.json', 'utf8')); globalThis.GAME_VERSION = man.version;
 globalThis.CFG = Object.fromEntries((man.config || []).map(n => [n, JSON.parse(fs.readFileSync(ROOT + '/data/config/' + n + '.json', 'utf8'))]));
 let H;
 globalThis.__hook = (h) => { H = h; };
 const run = () => { for (const f of man.files) vm.runInThisContext(fs.readFileSync(ROOT + '/src/' + f, 'utf8'), { filename: f }); vm.runInThisContext('__hook({player, game, profile, cars, police, SIGNALS, EDGES, MERCHANTS, acceptOffer, goToTarget, policeStop, refreshRoute, get route(){return route}, endDay, evRain, evFlat, openActions, makeBatchOffer, reportViolation, policeFlee, CHECKPOINTS, openPanel, closePanel, renderPanel, get panelTab(){return panelTab}, NET, unlocked, tierInfo, onCrash, triggerFall, fall, standUp, trafficLevel, makeCustomer, get nightK(){return nightK}, applyNight, homeSpot, keys, updateGame, sigState, endDay, banForDay, makeOffer, computeRoute, VENDORS, PEDS, DECKS, napMenu, startNap, perfStepDown, PERF, buildDriver2, rebuildDriver, classifyDrop, deckStep, hitPed, STORY, showOffer, dropOff, storyTalk, eatStreet, napSpot, vendorOpen, edgeAt, HOTZONES, hotScore, hotHere, HANGOUTS, SQ, sqSpawnGiver, profile, LESSONS, startLesson, foreignUnlocked, BIKES, curBike, applyBikeModel, mulSpeed: () => mulSpeed(), fuelPrice: (n) => fuelPrice(n), saveSlot, slotInfo, makeBackup, readJSON, SAVE, HOME3D, DECK_CARS, homeMenu, exportProfile, sqDef, netRecv, NET, FR, frFollow, SND, sndPlay, SIDEQ_MARKS});', { filename: 'hook' }); };
 const toasts=[];
+if (districtArg) {
+  ls['grabbike.q7.profile.v1'] = JSON.stringify({
+    name: 'Returning driver', level: 7, xp: 42, english: true,
+    rooms: ['OLDQ7'], district1Rooms: ['NEWQ1'],
+    sq: { active: { id: 'tourist', step: 0, tx: 300, tz: 50 }, done: { tourist: 2 }, total: 2 },
+    story: { ch: 1, base: { bike: 0, food: 0 }, rain: 0, mall: false, intro: true, done: false }
+  });
+}
 run();
+if (districtArg) {
+  const D = vm.runInThisContext('({DISTRICT, PROFILE_KEY, MALL, activeSideQuest, sqAccept, saveProfile, pickUp, fbRoom, peerRoomId, recentRoomsKey})');
+  assert.equal(D.DISTRICT, district);
+  assert.equal(D.PROFILE_KEY, 'grabbike.q7.profile.v1');
+  assert.equal(H.profile.level, 7);
+  assert.equal(H.profile.xp, 42);
+  assert.equal(H.profile.english, true);
+  assert.equal(D.peerRoomId('TEST1'), 'grab' + district + '-TEST1');
+  assert.deepEqual(H.profile[D.recentRoomsKey], [district === 'q1' ? 'NEWQ1' : 'OLDQ7']);
+  const paths = [];
+  globalThis.__districtFirebase = {
+    uid: 'test-user',
+    api: {
+      ref(_db, path) { paths.push(path); return path; },
+      async set() {}, onValue() {}, onDisconnect() { return { remove() {} }; },
+      onChildAdded() {}, query() {}, limitToLast() {}
+    }
+  };
+  vm.runInThisContext('FB = globalThis.__districtFirebase');
+  assert.equal(await D.fbRoom('TEST1'), true);
+  const room = district === 'q1' ? 'q1-TEST1' : 'TEST1';
+  assert.deepEqual(paths, [`rooms/${room}/players/test-user`, `rooms/${room}/players`, `rooms/${room}/chat`]);
+  if (district === 'q1') {
+    assert.equal(D.activeSideQuest(), null);
+    assert.equal(D.MALL, null);
+    assert.ok(H.HOTZONES.every(zone => zone.kind !== 'mall'));
+    H.game.mode = 'drive';
+    for (let i = 0; i < 15; i++) raf();
+    assert.equal(H.profile.story.mall, false);
+    H.game.mode = 'menu';
+
+    H.profile.totals.days = 5;
+    H.profile.settings.easy = true;
+    assert.ok(H.MERCHANTS.length >= 2);
+    // Seed offer selection so this test always exercises all three dispatch types.
+    let seed = 794;
+    Math.random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const samples = new Map();
+    let servedH15B = false;
+    for (let i = 0; i < 100; i++) {
+      const order = H.makeOffer();
+      if (!samples.has(order.type)) samples.set(order.type, order);
+      const pairs = order.type === 'batch'
+        ? order.subs.map(sub => [sub.shop.spot, sub.drop])
+        : [[order.pickup, order.drop]];
+      for (const [pickup, drop] of pairs) {
+        if ([pickup, drop].some(stop => stop.name.includes('Hẻm 15B'))) servedH15B = true;
+        const route = H.computeRoute(pickup, drop.E, drop.along);
+        assert.ok(route && route.len >= 50, `${order.type}: ${pickup.name} to ${drop.name}`);
+      }
+    }
+    assert.deepEqual([...samples.keys()].sort(), ['batch', 'food', 'ride']);
+    assert.ok(servedH15B, 'Hẻm 15B appears as a mission stop');
+    H.game.mode = 'drive';
+    const trips = H.profile.totalTrips, funds = H.profile.cash + H.profile.wallet;
+    for (const type of ['ride', 'food']) {
+      H.showOffer(samples.get(type));
+      H.acceptOffer();
+      assert.equal(H.game.state, 'pickup');
+      assert.ok(H.route?.len > 0);
+      D.pickUp();
+      assert.equal(H.game.state, 'ride');
+      assert.ok(H.route?.len > 0);
+      H.dropOff();
+      assert.equal(H.game.state, 'wait');
+      assert.equal(H.game.order, null);
+    }
+    assert.equal(H.profile.totalTrips, trips + 2);
+    assert.ok(H.profile.cash + H.profile.wallet > funds);
+    H.game.mode = 'menu';
+    D.sqAccept({ q: H.sqDef('grandma_med'), x: H.player.x, z: H.player.z });
+    assert.equal(D.activeSideQuest().id, 'grandma_med');
+  } else {
+    assert.equal(D.activeSideQuest().id, 'tourist');
+    assert.ok(D.MALL);
+  }
+  D.saveProfile();
+  const saved = JSON.parse(ls[D.PROFILE_KEY]);
+  assert.equal(saved.sq.active.id, 'tourist');
+  assert.equal(saved.sq.total, 2);
+  assert.deepEqual(saved.rooms.includes('OLDQ7'), true);
+  assert.deepEqual(saved.district1Rooms.includes('NEWQ1'), true);
+  if (district === 'q1') assert.equal(saved.sq.district1Active.id, 'grandma_med');
+  assert.equal(saved.story.ch, 1);
+  assert.equal(saved.name, 'Returning driver');
+  console.log('District gameplay regression passed:', district);
+  process.exit(0);
+}
 if (!process.env.NEWBIE) { H.profile.totals.days = 5; H.profile.settings.noAuto = true; H.profile.settings.easy = true; } // VETERAN: tests assume all features unlocked
 if (process.env.DUMP) { const names = process.env.DUMP.split('|'); const out = {}; const hasFn = (v) => typeof v === 'function' || (v && typeof v === 'object' && Object.values(v).some(hasFn));
   for (const n of names) { const v = vm.runInThisContext(n); out[n] = hasFn(v) ? '__FN__' : v; } fs.writeFileSync('/tmp/cfgdump.json', JSON.stringify(out)); process.exit(0); }

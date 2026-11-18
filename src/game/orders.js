@@ -20,21 +20,40 @@ const game = {
 };
 
 /* ---- order points on real streets ---- */
-const NAMED_EDGES = EDGES.filter(E => E.n >= 0 && E.c >= 1 && E.c <= 4 && E.L > 30);
+const NAMED_EDGES = EDGES.filter(E => E.n >= 0 && (
+  E.c >= 1 && E.c <= 4 && E.L > 30 ||
+  DISTRICT === 'q1' && E.c === 5 && E.w >= 3 && E.L > 25
+));
 function spotOnEdge(E, s, fwd) {
   const p = edgeAt(E, s, fwd);
-  const lane = E.o ? E.w / 2 - 1.2 : E.w / 4, side = E.w / 2 + 1.7;
+  const lane = E.o ? E.w / 2 - 1.2 : E.w / 4;
+  const side = E.w / 2 + (DISTRICT === 'q1' && E.c === 5 ? 0.45 : 1.7);
   return { E, s, fwd, along: fwd ? s : E.L - s, x: p.x - p.dz * lane, z: p.z + p.dx * lane, sx: p.x - p.dz * side, sz: p.z + p.dx * side,
     h: Math.atan2(p.dx, p.dz), name: edgeName(E) };
 }
+// Preserve Q7 order distances while keeping local trips practical in a smaller district.
+const jobDistance = (distance) => DISTRICT === 'q1' ? distance * 0.4 : distance;
 function randomRoadPoint(from, minD, maxD) {
+  const min = jobDistance(minD), max = jobDistance(maxD);
+  const inset = DISTRICT === 'q1' ? 15 : 40;
+  const isUsable = (sp) => sp.x >= BX0 + inset && sp.x <= BX1 - inset && sp.z >= BZ0 + inset && sp.z <= BZ1 - inset && !inWater(sp.sx, sp.sz);
   for (let t = 0; t < 300; t++) {
     const E = NAMED_EDGES[Math.floor(Math.random() * NAMED_EDGES.length)];
     const s = E.L * (0.2 + Math.random() * 0.6), fwd = E.o ? true : Math.random() < 0.5;
     const sp = spotOnEdge(E, s, fwd);
-    if (sp.x < BX0 + 40 || sp.x > BX1 - 40 || sp.z < BZ0 + 40 || sp.z > BZ1 - 40) continue;
     const d = Math.hypot(sp.x - from.x, sp.z - from.z);
-    if (d >= minD && d <= maxD && !inWater(sp.sx, sp.sz)) return sp;
+    if (d >= min && d <= max && isUsable(sp)) return sp;
+  }
+  if (DISTRICT === 'q1') {
+    // A second pass prevents a repeated pickup as the fallback for a compact route.
+    let best = null, penalty = Infinity;
+    for (const E of NAMED_EDGES) {
+      const sp = spotOnEdge(E, E.L / 2, true);
+      const d = Math.hypot(sp.x - from.x, sp.z - from.z);
+      const score = Math.max(0, min - d, d - max);
+      if (d >= 20 && score < penalty && isUsable(sp)) { best = sp; penalty = score; }
+    }
+    if (best) return best;
   }
   return spotOnEdge(NAMED_EDGES[0], NAMED_EDGES[0].L / 2, true);
 }
@@ -62,7 +81,7 @@ function makeOffer() {
   const food = unlocked('food') && MERCHANTS.length && Math.random() < 0.45;
   let pickup, shop = null, items = null;
   if (food) {
-    const near = MERCHANTS.filter(m => { const d = Math.hypot(m.spot.x - player.x, m.spot.z - player.z); return d > 80 && d < 1300; });
+    const near = MERCHANTS.filter(m => { const d = Math.hypot(m.spot.x - player.x, m.spot.z - player.z); return d > jobDistance(80) && d < jobDistance(1300); });
     if (near.length) { shop = near[Math.floor(Math.random() * near.length)]; pickup = shop.spot;
       const menu = MENU[shop.kind] || MENU.restaurant; items = [pick(menu)]; if (Math.random() < 0.5) items.push(pick(menu)); }
   }

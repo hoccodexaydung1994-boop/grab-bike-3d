@@ -2,6 +2,7 @@
 /* ================= Story Mode: “Giấc mơ Quận 7” với anh Tư ================= */
 if (!profile.story) profile.story = { ch: 0, base: null, rain: 0, mall: false, intro: false, done: false };
 const MALL = (() => {
+  if (DISTRICT !== 'q7') return null;
   const cm = MAP.buildings.find(b => b.n !== undefined && NAMES[b.n] === 'Crescent Mall');
   if (cm) { let x = 0, z = 0; for (let i = 0; i < cm.p.length; i += 2) { x += cm.p[i]; z += cm.p[i + 1]; } return { x: x / (cm.p.length / 2), z: z / (cm.p.length / 2), r: 110 }; }
   const p = MAP.pois.find(p => /crescent/i.test(p.t)); return p ? { x: p.x, z: p.z, r: 80 } : { x: homeSpot.x, z: homeSpot.z, r: 150 };
@@ -18,8 +19,8 @@ const STORY_PROG = [
 ];
 const STORY = CFG.story.chapters.map((c, i) => ({ ...c, prog: STORY_PROG[i] }));
 // anh Tư NPC next to home
-const tu = buildPassengerStanding();
-{
+const tu = DISTRICT === 'q7' ? buildPassengerStanding() : null;
+if (tu) {
   tu.userData.shirt.color.setHex(0x00b14f);
   const e = homeSpot.E, p = edgeAt(e, e.L / 2, true), off = e.w / 2 + 2.2;
   tu.position.set(p.x - p.dz * off + p.dx * 6, 0.06, p.z + p.dx * off + p.dz * 6); tu.rotation.y = homeSpot.h - Math.PI / 2; scene.add(tu);
@@ -47,7 +48,7 @@ function storyComplete() {
 let storyT = 0;
 const storyEl = document.createElement('div'); storyEl.style.cssText = 'font-size:12px;color:#fde68a;font-weight:700;margin-top:2px'; $('jam').after(storyEl);
 FRAME.push((dt) => {
-  if (game.mode !== 'drive') return;
+  if (game.mode !== 'drive' || DISTRICT !== 'q7') return;
   const S = S0();
   if (!S.intro && !game.paused && !game.dlgKeys && !game.order) { S.intro = true; storyStartCh(0); setTimeout(() => storyTalk(true), 800); return; }
   storyT -= dt; if (storyT > 0) return; storyT = 1;
@@ -60,10 +61,15 @@ FRAME.push((dt) => {
 // hooks: rain jobs, clean day, talk
 {
   const rainy = () => rain > 0.3;
-  const _do = dropOff; dropOff = function () { const r = rainy(); _do(); if (r && S0().ch === 3) S0().rain++; };
-  const _cs = completeSub; completeSub = function (o, sub) { const r = rainy(); const out = _cs(o, sub); if (r && S0().ch === 3) S0().rain++; return out; };
-  const _ed = endDay; endDay = function () { const S = S0(); if (S.ch === 2 && !game.dayOver && profile.today.bike + profile.today.food >= 5 && profile.today.viol === 0) S.clean = true; _ed(); };
-  const _sq = showQuests; showQuests = function () { _sq(); const S = S0(); if (!S.base && !S.done) return; const C = STORY[S.ch];
+  const _do = dropOff; dropOff = function () { const r = rainy(); _do(); if (DISTRICT === 'q7' && r && S0().ch === 3) S0().rain++; };
+  const _cs = completeSub; completeSub = function (o, sub) { const r = rainy(); const out = _cs(o, sub); if (DISTRICT === 'q7' && r && S0().ch === 3) S0().rain++; return out; };
+  const _ed = endDay; endDay = function () { const S = S0(); if (DISTRICT === 'q7' && S.ch === 2 && !game.dayOver && profile.today.bike + profile.today.food >= 5 && profile.today.viol === 0) S.clean = true; _ed(); };
+  const _sq = showQuests; showQuests = function () { _sq(); const S = S0();
+    if (DISTRICT !== 'q7') {
+      $('dlgText').innerHTML = `<b>📖 Story Mode</b> — ${L('Tiếp tục tại Quận 7', 'Continue in District 7')}<hr>` + $('dlgText').innerHTML;
+      return;
+    }
+    if (!S.base && !S.done) return; const C = STORY[S.ch];
     $('dlgText').innerHTML = `<b>📖 Story Mode</b> — ${S.done ? L('đã hoàn thành ✓', 'complete ✓') : `${C.t[profile.english ? 1 : 0]}: ${C.goal[profile.english ? 1 : 0]}`}<hr>` + $('dlgText').innerHTML; };
 }
-ACTION_HOOKS.push((opts) => { if (Math.hypot(tu.position.x - player.x, tu.position.z - player.z) < 22) opts.unshift({ t: L('💬 Nói chuyện với anh Tư', '💬 Talk to Tư'), fx: () => setTimeout(() => storyTalk(false), 50) }); });
+ACTION_HOOKS.push((opts) => { if (tu && Math.hypot(tu.position.x - player.x, tu.position.z - player.z) < 22) opts.unshift({ t: L('💬 Nói chuyện với anh Tư', '💬 Talk to Tư'), fx: () => setTimeout(() => storyTalk(false), 50) }); });

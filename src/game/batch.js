@@ -6,11 +6,11 @@ for (let i = 0; i < 4; i++) {
   sp.scale.set(3, 3, 1); sp.visible = false; scene.add(sp); stopSprites.push(sp);
 }
 function makeBatchOffer() {
-  const near = MERCHANTS.filter(m => { const d = Math.hypot(m.spot.x - player.x, m.spot.z - player.z); return d > 60 && d < 1300; });
+  const near = MERCHANTS.filter(m => { const d = Math.hypot(m.spot.x - player.x, m.spot.z - player.z); return d > jobDistance(60) && d < jobDistance(1300); });
   if (near.length < 2) return null;
   const A = near[Math.floor(Math.random() * near.length)];
-  const nearA = near.filter(m => m !== A && Math.hypot(m.spot.x - A.spot.x, m.spot.z - A.spot.z) < 700);
-  const B = nearA.length ? nearA[Math.floor(Math.random() * nearA.length)] : A;
+  const nearA = near.filter(m => m !== A && Math.hypot(m.spot.x - A.spot.x, m.spot.z - A.spot.z) < jobDistance(700));
+  const B = nearA.length ? nearA[Math.floor(Math.random() * nearA.length)] : DISTRICT === 'q1' ? near.find(m => m !== A) : A;
   const subs = [A, B].map((shop, i) => {
     const drop = randomRoadPoint(shop.spot, 300, 1400);
     const r = computeRoute(shop.spot, drop.E, drop.along);

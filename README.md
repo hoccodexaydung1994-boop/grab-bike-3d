@@ -1,6 +1,6 @@
-# Grab Bike 3D – Quận 7 (Phú Mỹ Hưng) · v3.0
+# Grab Bike 3D · v3.1
 
-Game 3D chạy trên web (Three.js): làm tài xế GrabBike / GrabFood chạy Vespa quanh Phú Mỹ Hưng trên bản đồ OpenStreetMap thật.
+Game 3D chạy trên trình duyệt bằng Three.js. Làm tài xế GrabBike hoặc GrabFood, chạy xe máy và khám phá các khu phố ở TP.HCM.
 
 ## Cấu trúc thư mục
 
@@ -23,7 +23,7 @@ grab-bike-3d/
 │   ├── net/friends.js      Bạn bè: thấy đúng xe & độ cao của bạn, danh sách bạn, tìm bạn trên bản đồ
 │   └── data/savedata.js    Quản lý dữ liệu: ô lưu, sao lưu, xuất/nhập file, lưu đám mây Google
 ├── data/
-│   ├── map/q7.json         Bản đồ Quận 7 (đường, nhà, cây, đèn, quán) chuyển từ OSM
+│   ├── map/                Bản đồ Quận 7 và Quận 1 chuyển từ OSM
 │   └── config/             DỮ LIỆU GAME – sửa ở đây, không cần đụng code
 │       ├── shop.json       thực đơn quán, hàng rong, đơn hiếm, loại khách
 │       ├── law.json        lỗi vi phạm, mức phạt, trừ điểm GPLX
@@ -55,9 +55,16 @@ Sửa file JSON trong `data/config/`, ví dụ thêm món vào `shop.json`, thê
 - **Trên máy**: phải chạy qua web server (mở thẳng `index.html` sẽ báo lỗi vì trình duyệt chặn đọc file):
   `npx serve .` hoặc `python -m http.server 8000` → mở http://localhost:8000
 - **Kiểm tra lỗi**: `node tests/smoke-core.mjs .` · `node tests/smoke-features.mjs .` · `node tests/smoke-world.mjs .` · `node tests/smoke-net.mjs .`
+- **Kiểm tra khu vực**: `node tests/smoke-net.mjs . --district=q1` · `node tests/smoke-net.mjs . --district=q7`
+
+## Chọn khu vực
+
+Chọn **Quận 7 — Phú Mỹ Hưng** hoặc **Quận 1 — Lê Thánh Tôn** tại menu chính trước khi nhận cuốc. Trò chơi tải lại bản đồ và giữ chung hồ sơ, tiền, kỹ năng, lịch sử và English Mode. Nhiệm vụ phụ đang làm được lưu riêng theo khu vực. Cốt truyện anh Tư ở Quận 7, và người chơi online cần chọn cùng khu vực để vào chung phòng.
+
+Quận 1 lấy mạng đường và một số địa điểm quanh Hẻm 15B từ OpenStreetMap. Mặt tiền và cảnh phố được dựng cách điệu. Xem [nguồn và dữ liệu bản đồ](data/map/README.md).
 
 ## Đồ hoạ
-Hai mức, đổi trong Cài đặt (☰ → ⚙️ → Mức đồ hoạ): **Cao** (mặc định trên máy tính: bầu trời và mặt trời theo giờ, phản chiếu, bloom, bóng đổ 4K, nhà có ban công/mái hiên/bồn nước, cây và đèn đường chi tiết) và **Thấp** (điện thoại, máy yếu). Code: `src/world/hd.js` và các đoạn `GFX_HIGH` trong `world/map.js`, `world/night.js`, `player/character.js`.
+Hai mức, đổi trong Cài đặt (☰ → ⚙️ → Mức đồ hoạ): **Cao** (mặc định trên máy tính: bầu trời và mặt trời theo giờ, phản chiếu, bloom, bóng đổ 4K, nhà có ban công/mái hiên/bồn nước, cây và đèn đường chi tiết) và **Thấp** (điện thoại, máy yếu). Tuỳ chọn tự giảm đồ hoạ chỉ điều chỉnh phiên đang chơi và giữ nguyên sở thích đã lưu.
 
 ## Âm thanh
 Tải file theo bảng trong `assets/audio/README.md`, bỏ vào `assets/audio/` rồi đẩy lên GitHub. Thiếu file nào, game dùng âm thanh tổng hợp cho phần đó.
@@ -76,6 +83,8 @@ Bấm **💾 Dữ liệu** ở menu hoặc tab 💾 trong bảng Tab:
 
 ## Điều khiển
 W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Enter nhận cuốc · N bỏ qua · E hành động · Q nhiệm vụ · Tab bảng quản lý · 1/2/3 chọn hội thoại · H còi · G tới điểm đón/trả · C đổi góc máy · M tắt tiếng
+
+Bấm **F** hoặc nút **Lên/xuống xe** để đi bộ khi xe đã dừng và không có cuốc. Dùng **WASD** để đi, giữ **Shift** để chạy, rồi quay lại cạnh xe và bấm **F** để lên xe. Trên màn hình cảm ứng, dùng các nút di chuyển và chạy hiện trong HUD. Kéo trên cảnh để xoay camera, cuộn hoặc chụm hai ngón để chỉnh khoảng cách.
 
 ## Ghi công
 Bản đồ © OpenStreetMap contributors (ODbL) · Mô hình xe "Electric scooter" – artgeorg (CGTrader, miễn phí) · three.js r160.

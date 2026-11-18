@@ -4,7 +4,8 @@ const clock = new THREE.Clock();
 let tAcc = 0, phoneT = 0;
 function animate() {
   requestAnimationFrame(animate);
-  const dt = Math.min(clock.getDelta(), 0.05);
+  const frameTime = clock.getDelta();
+  const dt = Math.min(frameTime, 0.05);
   tAcc += dt;
   updateSignals(dt);
   if (!game.paused) updateCars(dt);
@@ -33,11 +34,11 @@ function animate() {
     if (Math.hypot(dx, dz) < 25) standPax.rotation.y = Math.atan2(dx, dz);
   }
   netTick(dt);
-  for (const f of FRAME) f(dt);
+  for (const f of FRAME) f(dt, frameTime);
   for (const c of CHECKPOINTS) c.lb.visible = Math.hypot(c.x - player.x, c.z - player.z) < (SK().tho >= 2 ? 450 : 260);
   for (const l of labels) l.visible = Math.abs(l.position.x - player.x) < 450 && Math.abs(l.position.z - player.z) < 450;
   if (eng) {
-    const on = game.mode === 'drive' && !game.muted && !game.frozen && !curBike().elec;
+    const on = game.mode === 'drive' && !player.parked && !game.muted && !game.frozen && !curBike().elec;
     const gas = keys.KeyW || keys.ArrowUp || touch.gas;
     const sp = Math.abs(player.v), gear = Math.min(4, Math.floor(sp / 6)), rpm = (sp - gear * 6) / 6;
     const f = 38 + gear * 4 + rpm * 38 + (gas ? 8 : 0);

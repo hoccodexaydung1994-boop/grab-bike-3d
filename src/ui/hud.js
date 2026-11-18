@@ -29,6 +29,10 @@ function updateHUD(dt) {
     hudT = 0.15;
     const st = $('status');
     if (profile.banned) st.textContent = '⛔ Bị khóa app hôm nay';
+    else if (player.parked) {
+      const d = Math.round(Math.hypot(player.x - player.parked.x, player.z - player.parked.z));
+      st.textContent = L(`🚶 Đi bộ · Xe cách ${d} m`, `🚶 On foot · Scooter ${d} m away`);
+    }
     else if (phoneDead()) st.innerHTML = L('📵 <b>Hết pin điện thoại!</b> Sạc ở quán (E) hoặc dùng sạc dự phòng', '📵 <b>Phone is dead!</b> Charge at a café (E)');
     else if (police.active && police.choice === 'flee') st.innerHTML = '🚨 <b>CSGT đang rượt!</b> Chạy xa >115 m để thoát';
     else if (game.state === 'wait') st.textContent = '⏳ Đang tìm cuốc gần bạn…';

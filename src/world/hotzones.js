@@ -10,15 +10,15 @@ const HOT_CURVE = {
 const HOT_NAME = { mall: ['🛍️ Khu Crescent Mall', '🛍️ Crescent Mall area'], food: ['🍜 Phố ăn uống', '🍜 Food street'], homes: ['🏢 Khu chung cư', '🏢 Apartment blocks'], health: ['🏥 Bệnh viện', '🏥 Hospital'] };
 const HOTZONES = [];
 {
-  const cell = 280, top = (pts, kind, n, r) => {
+  const cell = DISTRICT === 'q1' ? 110 : 280, top = (pts, kind, n, r) => {
     const m = new Map();
     for (const p of pts) { const k = Math.floor(p.x / cell) + ',' + Math.floor(p.z / cell); const c = m.get(k) || { x: 0, z: 0, n: 0 }; c.x += p.x; c.z += p.z; c.n++; m.set(k, c); }
-    let k = 0; for (const c of [...m.values()].sort((a, b) => b.n - a.n)) { const x = c.x / c.n, z = c.z / c.n; if (k >= n) break; if (HOTZONES.some(h => Math.hypot(h.x - x, h.z - z) < 320)) continue; HOTZONES.push({ kind, x, z, r, w: Math.min(1, 0.5 + c.n / 12) }); k++; }
+    let k = 0; for (const c of [...m.values()].sort((a, b) => b.n - a.n)) { const x = c.x / c.n, z = c.z / c.n; if (k >= n) break; if (HOTZONES.some(h => Math.hypot(h.x - x, h.z - z) < jobDistance(320))) continue; HOTZONES.push({ kind, x, z, r, w: Math.min(1, 0.5 + c.n / 12) }); k++; }
   };
-  HOTZONES.push({ kind: 'mall', x: MALL.x, z: MALL.z, r: 260, w: 1 });
-  top(MERCHANTS, 'food', 3, 220);
-  top(MAP.buildings.filter(b => b.h >= 25).map(b => ({ x: b.p[0], z: b.p[1] })), 'homes', 3, 240);
-  HOSPITALS.slice(0, 2).forEach(h => HOTZONES.push({ kind: 'health', x: h.x, z: h.z, r: 160, w: 0.7 }));
+  if (MALL) HOTZONES.push({ kind: 'mall', x: MALL.x, z: MALL.z, r: 260, w: 1 });
+  top(MERCHANTS, 'food', 3, jobDistance(220));
+  top(MAP.buildings.filter(b => b.h >= 25).map(b => ({ x: b.p[0], z: b.p[1] })), 'homes', 3, jobDistance(240));
+  HOSPITALS.slice(0, 2).forEach(h => HOTZONES.push({ kind: 'health', x: h.x, z: h.z, r: jobDistance(160), w: 0.7 }));
   for (const z of HOTZONES) { const ne = nearestEdge(z.x, z.z, (E) => E.n >= 0, 250); z.name = HOT_NAME[z.kind][profile.english ? 1 : 0] + (z.kind === 'food' || z.kind === 'homes' ? (ne ? ' · ' + edgeName(ne.E) : '') : ''); }
 }
 function hotScore(z, min = profile.clock) { const h = Math.floor(min / 60) % 24, f = (min / 60) % 1, c = HOT_CURVE[z.kind]; return z.w * (c[h] * (1 - f) + c[(h + 1) % 24] * f); }
@@ -67,7 +67,7 @@ const CHAT = CFG.chatter, HANGOUTS = [];
 }
 function fillChat(t) {
   const hz = hottest(profile.clock + 60), cp = CHECKPOINTS.length ? pick(CHECKPOINTS) : null;
-  return t.replace('{hot}', hz ? hz.name : 'Crescent Mall').replace('{cp}', cp ? (streetNameAt(cp.x, cp.z) || L('ngã tư lớn', 'a big junction')) : L('ngã tư lớn', 'a big junction'));
+  return t.replace('{hot}', hz ? hz.name : L('khu trung tâm', 'the city center')).replace('{cp}', cp ? (streetNameAt(cp.x, cp.z) || L('ngã tư lớn', 'a big junction')) : L('ngã tư lớn', 'a big junction'));
 }
 function hangoutChat(v) {
   const E = profile.english ? 1 : 0, lines = [pick(CHAT.greet)[E], fillChat(pick(CHAT.tips)[E]), pick(CHAT.gossip)[E]];

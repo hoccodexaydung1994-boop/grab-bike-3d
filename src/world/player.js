@@ -15,8 +15,18 @@ const standPax = buildPassengerStanding();
 standPax.visible = false;
 scene.add(standPax);
 
-const player = { x: 0, z: 0, y: 0.07, h: 0, v: 0, steer: 0, lean: 0 };
+const player = { x: 0, z: 0, y: 0.07, h: 0, v: 0, steer: 0, lean: 0, parked: null, foot: null };
+function clearWalking() {
+  if (!player.parked) return;
+  player.parked = null;
+  player.foot = null;
+  driver.visible = true;
+  seatRiders();
+  syncMobilityControls();
+}
 function resetHome() {
+  clearWalking();
+  player.deck = null;
   player.x = homeSpot.x; player.z = homeSpot.z; player.h = homeSpot.h; player.v = 0; player.steer = 0; player.y = 0.07;
 }
 resetHome();

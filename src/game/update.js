@@ -14,7 +14,7 @@ function updateGame(dt) {
   applyDaylight(profile.clock);
   saveT -= dt; if (saveT <= 0) { saveT = 5; saveProfile(); }
   tickStats(dt, distAcc); distAcc = 0;
-  if (game.paused || game.dayOver) return;
+  if (game.paused || game.dayOver || player.parked) return;
   if (profile.banned || game.dayOver) return;
   if (game.state === 'wait' && phoneDead()) { }
   else if (game.state === 'wait') { game.waitT -= dt * (SK().tho >= 3 ? 1.43 : 1) * (acceptRate() < 0.5 ? 0.66 : 1); if (game.waitT <= 0 && !police.active && profile.clock < dayEnd()) showOffer(makeOffer()); }

@@ -16,8 +16,14 @@
 <canvas id="c"></canvas>
 
 <div id="menu">
-  <h1><span>Grab</span> Bike 3D · Quận 7</h1>
-  <p>Chạy Vespa quanh <b>Phú Mỹ Hưng</b> trên bản đồ thật từ OpenStreetMap. Nhận cuốc GrabBike &amp; GrabFood từ các quán thật, nhớ dừng đèn đỏ kẻo CSGT “hỏi thăm”.</p>
+  <h1><span>Grab</span> Bike 3D</h1>
+  <label class="district-picker" for="districtSelect">Khu vực
+    <select id="districtSelect" disabled>
+      <option value="q7">Quận 7 — Phú Mỹ Hưng</option>
+      <option value="q1">Quận 1 — Lê Thánh Tôn</option>
+    </select>
+  </label>
+  <p><span id="districtDescription"></span><br><a class="district-source" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a></p>
   <div class="card">
     <label>Tên tài xế <input id="pName" maxlength="24" autocomplete="off"></label>
     <div id="pStats"></div>
@@ -33,7 +39,7 @@
   <div class="card" style="margin-top:4px">
     <div style="font-weight:700;margin-bottom:6px">🌐 Chơi online cùng bạn bè</div>
     <div class="goals"><button class="goal" id="bHost">➕ Tạo phòng</button><input id="joinCode" placeholder="Mã phòng" maxlength="8" style="max-width:120px;font:inherit;padding:6px 10px;border-radius:10px;border:0"><button class="goal" id="bJoin">↪ Vào phòng</button></div>
-    <div id="netStatus" style="font-size:13px;margin-top:6px;opacity:.9">Mỗi người mở game, một người tạo phòng và gửi mã cho bạn.</div>
+    <div id="netStatus" style="font-size:13px;margin-top:6px;opacity:.9">Chọn cùng khu vực, sau đó một người tạo phòng và gửi mã cho bạn.</div>
     <div id="fbLine" style="font-size:12px;margin-top:6px;opacity:.85"></div>
     <details style="margin-top:6px;font-size:13px"><summary style="cursor:pointer">⚙️ Cấu hình Firebase (dán firebaseConfig)</summary>
       <textarea id="fbCfg" rows="5" style="width:100%;margin-top:6px;border-radius:10px;border:0;padding:8px;font:12px monospace" placeholder="const firebaseConfig = { apiKey: '...', authDomain: '...', databaseURL: 'https://...firebasedatabase.app', projectId: '...', appId: '...' };"></textarea>
@@ -80,11 +86,12 @@
     <div class="obtns"><button id="offDecline">Bỏ qua (N)</button><button id="offAccept">Nhận cuốc (Enter)</button></div></div>
   <div id="police" class="hidden"><div id="polText"></div>
     <div class="obtns"><button id="polStop">🛑 Dừng xe (1)</button><button id="polFlee">🏍️ Bỏ chạy (2)</button></div></div>
+  <button class="sbtn" id="bMount" title="Lên/xuống xe (F)">🚶 Xuống xe</button>
   <button id="bGo" class="hidden">📍 Chỉ đường</button>
   <div id="speed"><div id="limit" title="Giới hạn tốc độ">50</div><b id="kmh">0</b><span>km/h</span></div>
   <div id="wanted"></div>
   <div id="lb" class="hidden"><div id="lbRows"></div><input id="chatIn" placeholder="💬 Chat… (Enter)" maxlength="120" style="width:100%;margin-top:6px;border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:12px"></div>
-  <div id="help">W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Tab hồ sơ/kỹ năng/xe · Enter nhận cuốc · N bỏ qua · E hành động (xăng, ăn uống, sửa xe, nghỉ) · Q nhiệm vụ · H còi · G chỉ đường · P điện thoại · C đổi góc máy · V xem xe 360° · M tắt tiếng · R về nhà</div>
+  <div id="help">W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Tab hồ sơ/kỹ năng/xe · Enter nhận cuốc · N bỏ qua · E hành động (xăng, ăn uống, sửa xe, nghỉ) · Q nhiệm vụ · H còi · G chỉ đường · P điện thoại · C đổi góc máy · F lên/xuống xe · Shift chạy bộ · Kéo/xoay con lăn chỉnh camera · V xem xe 360° · M tắt tiếng · R về nhà</div>
   <div id="touch" class="hidden">
     <div class="tb" id="tLeft" style="display:none">◀</div><div class="tb" id="tRight" style="display:none">▶</div><div id="joy"><div id="joyKnob"></div><span>◀ LÁI ▶</span></div>
     <div class="tb" id="tHorn">📯</div>

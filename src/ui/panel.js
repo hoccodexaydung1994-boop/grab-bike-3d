@@ -87,15 +87,33 @@ $('mpBody').addEventListener('change', (e) => {
   const b = e.target; if (!b.dataset || !b.dataset.act) return;
   const S = profile.settings;
   if (b.dataset.act === 'bar') { S.bars[b.dataset.id] = b.checked; applySettings(); }
-  if (b.dataset.act === 'set') { S[b.dataset.id] = b.checked; applySettings(); }
+  if (b.dataset.act === 'set') {
+    S[b.dataset.id] = b.checked;
+    if (typeof resetAdaptiveQuality === 'function' && ['shadows', 'hiq', 'autoQ'].includes(b.dataset.id)) resetAdaptiveQuality();
+    applySettings();
+  }
   if (b.dataset.act === 'eng') { profile.english = b.checked; renderPanel(); }
   saveProfile();
 });
+const adaptiveGraphics = { pixelRatioLimit: Infinity, shadowsDisabled: false };
+function applyGraphicsSettings() {
+  const S = profile.settings;
+  const shadows = Boolean(S.shadows && !adaptiveGraphics.shadowsDisabled);
+  if (renderer.shadowMap.enabled !== shadows) {
+    renderer.shadowMap.enabled = shadows;
+    scene.traverse(o => {
+      if (!o.material) return;
+      const materials = Array.isArray(o.material) ? o.material : [o.material];
+      for (const material of materials) material.needsUpdate = true;
+    });
+  }
+  const pixelRatio = Math.min(S.hiq ? Math.min(devicePixelRatio, 2) : 1, adaptiveGraphics.pixelRatioLimit);
+  if (renderer.getPixelRatio() !== pixelRatio) renderer.setPixelRatio(pixelRatio);
+}
 function applySettings() {
   const S = profile.settings;
   for (const [k] of STAT_DEF) { const el = $('st_' + k); if (el) el.style.display = S.bars[k] === false ? 'none' : ''; }
-  renderer.shadowMap.enabled = !!S.shadows; scene.traverse(o => { if (o.material) o.material.needsUpdate = true; });
-  renderer.setPixelRatio(S.hiq ? Math.min(devicePixelRatio, 2) : 1);
+  applyGraphicsSettings();
   if (!S.sound && !game.muted) toggleMute(); if (S.sound && game.muted) toggleMute();
 }
 addEventListener('keydown', (e) => { if ((e.code === 'Tab' || e.code === 'Escape') && game.mode === 'drive' && !game.dlgKeys) { e.preventDefault(); $('mp').classList.contains('hidden') ? openPanel() : closePanel(); } });

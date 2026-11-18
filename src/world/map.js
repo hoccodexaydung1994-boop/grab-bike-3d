@@ -1,6 +1,7 @@
 'use strict';
-/* ================= World: Phú Mỹ Hưng – Quận 7 (OpenStreetMap) ================= */
-const MAP = window.Q7;
+/* ================= District world (OpenStreetMap) ================= */
+const MAP = window.GAME_MAP || window.Q7;
+const DISTRICT = MAP.district || 'q7';
 const [BX0, BZ0, BX1, BZ1] = MAP.bounds;
 const NAMES = MAP.names;
 let seedW = 12345;
@@ -852,8 +853,10 @@ let homeSpot;
     const d = Math.hypot(E.mx - cx, E.mz - cz);
     if (d > 120 && (!best || d < best.d)) best = { E, d };
   }
-  const E = best ? best.E : EDGES[0];
-  const p = edgeAt(E, E.L / 2, true);
+  const spawn = MAP.spawn && nearestEdge(...MAP.spawn, E => NAMES[E.n] === 'Lê Thánh Tôn');
+  const E = spawn ? spawn.E : best ? best.E : EDGES[0];
+  const along = spawn ? Math.min(E.L - 2, Math.max(2, spawn.along)) : E.L / 2;
+  const p = edgeAt(E, along, true);
   const rx = -p.dz, rz = p.dx;
   homeSpot = { x: p.x + rx * E.w / 4, z: p.z + rz * E.w / 4, h: Math.atan2(p.dx, p.dz), E };
   // "NHÀ TÔI" sign on the sidewalk

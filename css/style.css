@@ -3,6 +3,11 @@
   canvas#c{display:block}
   .hidden{display:none!important}
   #menu{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:0 16px 7vh;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,20,10,.85));z-index:20;text-align:center}
+  #menu{justify-content:safe flex-end;overflow-y:auto;touch-action:pan-y}
+  #menu>*{flex-shrink:0}
+  #menu .district-picker{margin:0 0 8px;font-size:14px}
+  #districtSelect{font:inherit;color:#163123;background:#f0faf4;border:1px solid #87c9a4;border-radius:8px;padding:6px 10px}
+  #menu .district-source{font-size:12px;color:#ccebd5}
   #menu h1{margin:0 0 6px;font-size:clamp(28px,6vw,54px);letter-spacing:.5px;font-weight:800}
   #menu h1 span{color:#00c25a}
   #menu p{margin:0 0 18px;opacity:.85;font-size:15px;max-width:560px;line-height:1.45}
@@ -15,7 +20,7 @@
   #panel b{font-size:16px}
   #status{margin-top:4px;color:#ffe08a;max-width:240px;line-height:1.35}
   #street{opacity:.75;font-size:12px}
-  #nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:5;pointer-events:none}
+  #nav{position:fixed;top:49px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:5;pointer-events:none}
   #arrow{width:54px;height:54px;transition:transform .08s linear;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5))}
   #dist{font-weight:700;font-size:14px;background:rgba(0,0,0,.5);padding:2px 10px;border-radius:99px;margin-top:2px}
   #mini{position:fixed;right:12px;top:12px;border-radius:14px;background:rgba(10,20,15,.72);z-index:5;width:150px;height:150px}
@@ -96,6 +101,12 @@
   .ovc{background:#fff;color:#1d1d1f;border-radius:20px;padding:22px;max-width:440px;width:100%;text-align:center;line-height:1.5}
   .ovc h2{margin:0 0 10px}.ovc .big{margin-top:16px}
   #bGo{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:7;font:inherit;font-size:16px;font-weight:800;border:0;border-radius:999px;padding:13px 24px;color:#fff;background:#00a650;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer;white-space:nowrap}
+  #bMount{position:fixed;right:18px;bottom:155px;z-index:6}
+  body.touch #bMount{right:125px;bottom:114px}
+  body.touch #help{display:none}
+  body.touch #speed{top:171px;right:14px;bottom:auto;pointer-events:none}
+  body.touch #speed b{font-size:29px}
+  body.touch #joy span{opacity:1;color:#fff;text-shadow:0 1px 4px #000}
   #bGo.drop{background:#ff7a00}
   #bGo:active{transform:translateX(-50%) scale(.96)}
   body.touch #bGo{bottom:118px}
@@ -123,4 +134,5 @@
     #panel b{font-size:14px}
     #speed{bottom:auto;top:132px;right:14px}
     #speed b{font-size:34px}
+    body.touch #speed{top:130px}
   }

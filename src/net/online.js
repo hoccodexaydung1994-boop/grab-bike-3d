@@ -31,21 +31,25 @@ async function fbInit() {
   FB = { db: dbM.getDatabase(app), api: dbM, uid: user.uid, auth, authM, user };
   return FB;
 }
+// Keep existing Q7 room IDs and isolate district-local positions and chat.
+const roomKey = (code) => DISTRICT === 'q1' ? 'q1-' + code : code;
+const peerRoomId = (code) => 'grab' + DISTRICT + '-' + code;
 async function fbRoom(code) {
   try {
     netSetStatus('wait', L('⏳ Đang kết nối máy chủ Firebase…', '⏳ Connecting to Firebase…'));
     const F = await fbInit(); if (!F) return false;
     const { ref, set, onValue, onDisconnect, onChildAdded, query, limitToLast } = F.api;
     NET.mode = 'fb'; NET.code = code; NET.myId = F.uid;
-    NET.meRef = ref(F.db, `rooms/${code}/players/${F.uid}`);
+    const room = 'rooms/' + roomKey(code);
+    NET.meRef = ref(F.db, `${room}/players/${F.uid}`);
     await onDisconnect(NET.meRef).remove();
     await set(NET.meRef, netMsg());
-    onValue(ref(F.db, `rooms/${code}/players`), snap => {
+    onValue(ref(F.db, `${room}/players`), snap => {
       const v = snap.val() || {};
       for (const [id, d] of Object.entries(v)) if (id !== F.uid) netRecv(Object.assign({}, d, { t: 's', id }));
       for (const id of [...NET.remotes.keys()]) if (!v[id]) { scene.remove(NET.remotes.get(id).g); NET.remotes.delete(id); }
     });
-    NET.chatRef = ref(F.db, `rooms/${code}/chat`);
+    NET.chatRef = ref(F.db, `${room}/chat`);
     onChildAdded(query(NET.chatRef, limitToLast(15)), s => chatShow(s.val()));
     netSetStatus('on', L(`✅ Phòng <b>${code}</b> (Firebase) — gửi mã này cho bạn bè`, `✅ Room <b>${code}</b> (Firebase) — share this code`));
     return true;
@@ -96,7 +100,7 @@ async function netHost() {
     netSetStatus('wait', L('⏳ Đang tạo phòng…', '⏳ Creating room…'));
     const Peer = await netPeerClass();
     NET.code = Math.random().toString(36).slice(2, 7).toUpperCase(); NET.host = true;
-    NET.peer = new Peer('grabq7-' + NET.code);
+    NET.peer = new Peer(peerRoomId(NET.code));
     NET.peer.on('open', () => netSetStatus('on', L(`✅ Phòng <b>${NET.code}</b> — gửi mã này cho bạn bè`, `✅ Room <b>${NET.code}</b> — share this code`)));
     NET.peer.on('connection', c => netConn(c));
     NET.peer.on('error', e => netSetStatus('err', '⚠️ ' + (e.type || e.message || e)));
@@ -110,7 +114,7 @@ async function netJoin(code) {
     const Peer = await netPeerClass();
     NET.code = code; NET.host = false;
     NET.peer = new Peer();
-    NET.peer.on('open', () => netConn(NET.peer.connect('grabq7-' + code, { reliable: false })));
+    NET.peer.on('open', () => netConn(NET.peer.connect(peerRoomId(code), { reliable: false })));
     NET.peer.on('error', e => netSetStatus('err', '⚠️ ' + (e.type === 'peer-unavailable' ? L('Không tìm thấy phòng', 'Room not found') : (e.type || e))));
   } catch (e) { netSetStatus('err', L('⚠️ Không tải được thư viện online (cần internet)', '⚠️ Could not load the online library')); }
 }

@@ -7,7 +7,7 @@ function buildBike() {
   const lean = new THREE.Group();   // roll, pivot at ground
   root.add(lean);
   const bike = { root, lean, frontWheel: null, rearWheel: null, R: 0.23, ready: false };
-  new GLTFLoader().load('models/vespa.glb?v=' + GAME_VERSION, (gltf) => {
+  BOOT.push(() => new GLTFLoader().load('models/vespa.glb?v=' + GAME_VERSION, (gltf) => {
     const m = gltf.scene;
     m.traverse(o => {
       if (o.isMesh) {
@@ -16,15 +16,12 @@ function buildBike() {
       }
     });
     bike.model = m;
-    bike.frontWheel = m.getObjectByName('wheelFront');
-    bike.rearWheel = m.getObjectByName('wheelRear');
+    bike.vespaWheels = [m.getObjectByName('wheelFront'), m.getObjectByName('wheelRear')];
     lean.add(m);
     bike.ready = true;
     applyPaint();
-    $('loading').classList.add('hidden');
   }, undefined, (err) => {
-    console.error(err);
-    $('loading').textContent = 'Không tải được mô hình xe (vespa.glb)';
-  });
+    console.warn('Vespa model unavailable. Using the procedural scooter.', err);
+  }));
   return bike;
 }

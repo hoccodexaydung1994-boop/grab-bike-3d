@@ -274,7 +274,7 @@ function hospital() {
   passTime(120); teleportTo(hsp.x, hsp.z);
   showOverlay(L('🏥 Vào viện', '🏥 Hospital'), L(`Bạn kiệt sức và được đưa vào <b>${hsp.t}</b>, nằm truyền nước 2 tiếng.<br>Viện phí ${fmtVND(fee)}. Nhớ ăn uống, nghỉ ngơi trước khi chạy tiếp!`, `You collapsed and rested 2 hours at <b>${hsp.t}</b>.<br>Bill: ${fmtVND(fee)}.`), L('🛵 Chạy tiếp', '🛵 Back to work'), () => { const s = profile.st; s.hp = 60; s.stamina = Math.max(s.stamina, 60); s.hunger = Math.min(s.hunger, 40); s.thirst = Math.min(s.thirst, 30); game.inHospital = false; game.state = 'wait'; game.waitT = 3; });
 }
-function teleportTo(x, z) { const ne = nearestEdge(x, z, null, 120); if (ne) { player.x = ne.x; player.z = ne.z; } else { player.x = x; player.z = z; } player.v = 0; camInit = false; playerTrail.length = 0; game.noViolT = 2; }
+function teleportTo(x, z) { clearWalking(); const ne = nearestEdge(x, z, null, 120); if (ne) { player.x = ne.x; player.z = ne.z; } else { player.x = x; player.z = z; } player.v = 0; camInit = false; playerTrail.length = 0; game.noViolT = 2; }
 function fuelPrice(need) { return Math.round(need * 250 / 500) * 500; }   // 1% bình ≈ 250đ → ~750đ/km   // garage.js nhân theo loại xe
 function repairMul() { return 1; }
 function refuel() { const need = Math.round(100 - profile.st.fuel); if (need <= 0) return toast(L('⛽ Bình xăng đã đầy', '⛽ Tank is full'), 1.5); const cost = fuelPrice(need); if (spend(cost, 'fuel')) { profile.st.fuel = 100; passTime(4); toast(L(`⛽ Đổ đầy bình: ${fmtVND(cost)}`, `⛽ Filled up: ${fmtVND(cost)}`), 2); } }
@@ -289,11 +289,15 @@ function buyMenu(where, items) {
 }
 const ACTION_HOOKS = [];
 function openActions() {
-  if (game.mode !== 'drive' || game.paused || game.frozen || Math.abs(player.v) > 1.5) { if (Math.abs(player.v) > 1.5) toast(L('Dừng xe lại để thao tác', 'Stop the bike first'), 1.2); return; }
+  if (game.mode !== 'drive' || game.paused || game.frozen || player.foot?.action) return;
+  if ((player.foot?.speed ?? Math.abs(player.v)) > 1.5) {
+    toast(L('Dừng lại để thao tác', 'Stop moving to interact'), 1.2);
+    return;
+  }
   const opts = [];
   const f = nearest(FUEL, 30), r = nearest(REPAIR, 35), sh = nearest(SHOPS, 30), m = nearest(MERCHANTS, 30), home = Math.hypot(homeSpot.x - player.x, homeSpot.z - player.z) < 30;
-  if (f) opts.push({ t: L(`⛽ Đổ đầy xăng (${fmtVND(fuelPrice(Math.round(100 - profile.st.fuel)))})`, `⛽ Fill up (${fmtVND(fuelPrice(Math.round(100 - profile.st.fuel)))})`), fx: refuel });
-  if (r) { const need = Math.round(100 - profile.st.dura); opts.push({ t: L(`🔧 Sửa xe tại ${r.name} (${fmtVND(Math.round(need * 1500 * repairMul()))})`, `🔧 Repair at ${r.name} (${fmtVND(Math.round(need * 1500 * repairMul()))})`), fx: () => { if (need > 0 && spend(Math.round(need * 1500 * repairMul()), 'repair')) { profile.st.dura = 100; passTime(20); toast(L('🔧 Xe như mới!', '🔧 Good as new!'), 1.6); } } }); }
+  if (f && !player.parked) opts.push({ t: L(`⛽ Đổ đầy xăng (${fmtVND(fuelPrice(Math.round(100 - profile.st.fuel)))})`, `⛽ Fill up (${fmtVND(fuelPrice(Math.round(100 - profile.st.fuel)))})`), fx: refuel });
+  if (r && !player.parked) { const need = Math.round(100 - profile.st.dura); opts.push({ t: L(`🔧 Sửa xe tại ${r.name} (${fmtVND(Math.round(need * 1500 * repairMul()))})`, `🔧 Repair at ${r.name} (${fmtVND(Math.round(need * 1500 * repairMul()))})`), fx: () => { if (need > 0 && spend(Math.round(need * 1500 * repairMul()), 'repair')) { profile.st.dura = 100; passTime(20); toast(L('🔧 Xe như mới!', '🔧 Good as new!'), 1.6); } } }); }
   if (m) opts.push({ t: L(`🍜 Ăn uống tại ${m.name}`, `🍜 Eat & drink at ${m.name}`), fx: () => setTimeout(() => buyMenu(m.name, FOOD_MENU), 50) });
   if (m && profile.st.phone < 95) opts.push({ t: L('🔌 Sạc điện thoại tại quán (20 phút, 10.000đ, +45%)', '🔌 Charge phone here (20 min, 10,000đ, +45%)'), fx: () => chargePhone(45, 20, 10000) });
   if (profile.inv.powerbank > 0 && profile.st.phone < 95) opts.push({ t: L(`🔋 Dùng sạc dự phòng (+50%, còn ${profile.inv.powerbank})`, `🔋 Use power bank (+50%, ${profile.inv.powerbank} left)`), fx: () => { profile.inv.powerbank--; chargePhone(50, 1); } });

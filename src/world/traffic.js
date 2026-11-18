@@ -167,11 +167,29 @@ function buildTruck(color) {
 }
 
 /* ---- motorbikes ---- */
-function bikeWheel(g, z, r) {
+function bikeWheel(g, z, r, wheels) {
+  const axle = wheels ? new THREE.Group() : g;
+  if (wheels) {
+    axle.position.set(0, r, z);
+    g.add(axle);
+    wheels[z > 0 ? 'front' : 'rear'] = axle;
+  }
+  const y = wheels ? 0 : r;
+  const posZ = wheels ? 0 : z;
   const t = new THREE.Mesh(new THREE.TorusGeometry(r - 0.045, 0.045, 8, 22), VM.tire);
-  t.rotation.y = Math.PI / 2; t.position.set(0, r, z); g.add(t);
+  t.rotation.y = Math.PI / 2; t.position.set(0, y, posZ); axle.add(t);
   const rim = new THREE.Mesh(new THREE.CylinderGeometry(r - 0.07, r - 0.07, 0.05, 14), VM.rim);
-  rim.rotation.z = Math.PI / 2; rim.position.set(0, r, z); g.add(rim);
+  rim.rotation.z = Math.PI / 2; rim.position.set(0, y, posZ); axle.add(rim);
+  if (wheels) {
+    const disk = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.53, r * 0.53, 0.012, 18), flat(0x566168, 0.47, 0.62));
+    disk.rotation.z = Math.PI / 2;
+    disk.position.set(0.032, y, posZ);
+    axle.add(disk);
+    for (let i = 0; i < 6; i++) {
+      const angle = i * Math.PI / 3;
+      axle.add(vbox(0.019, 0.022, 0.022, VM.trim, 0.043, y + Math.cos(angle) * r * 0.35, posZ + Math.sin(angle) * r * 0.35));
+    }
+  }
 }
 function vnHelmet(g, pos, color, mask, maskColor) {
   const [x, y, z] = pos;
@@ -199,10 +217,10 @@ function addRider(g, P, shirtC, pantsC, helmetC, mask) {
     g.add(vbox(0.08, 0.06, 0.18, flat(pick([0x222222, 0x8b5a2b, 0xeeeeee]), 0.8), s * P.foot[0], P.foot[1] - 0.04, P.foot[2] + 0.05));
   }
 }
-function buildScooter(color) {  // xe tay ga
+function buildScooter(color, wheels) {  // xe tay ga
   const g = new THREE.Group();
   const p = paint(color);
-  bikeWheel(g, 0.6, 0.25); bikeWheel(g, -0.58, 0.25);
+  bikeWheel(g, 0.6, 0.25, wheels); bikeWheel(g, -0.58, 0.25, wheels);
   g.add(vprofile([[0.28, 0.24], [0.5, 0.3], [0.66, 0.58], [0.62, 0.98], [0.5, 1.04], [0.42, 0.88], [0.34, 0.4]], 0.4, p, 0.04)); // front shield
   g.add(vbox(0.34, 0.07, 0.48, VM.trim, 0, 0.27, 0.08)); // floorboard
   g.add(vprofile([[0.0, 0.26], [0.06, 0.62], [-0.3, 0.72], [-0.82, 0.8], [-0.92, 0.74], [-0.78, 0.5], [-0.45, 0.32]], 0.36, p, 0.04)); // rear body
@@ -222,10 +240,10 @@ function buildScooter(color) {  // xe tay ga
   g.add(vrod([-0.15, 0.3, -0.3], [-0.17, 0.42, -0.85], 0.045, VM.chrome));
   return g;
 }
-function buildUnderbone(color) {  // xe số
+function buildUnderbone(color, wheels) {  // xe số
   const g = new THREE.Group();
   const p = paint(color);
-  bikeWheel(g, 0.62, 0.29); bikeWheel(g, -0.6, 0.29);
+  bikeWheel(g, 0.62, 0.29, wheels); bikeWheel(g, -0.6, 0.29, wheels);
   g.add(vrod([0, 0.98, 0.42], [0, 0.5, 0.05], 0.03, VM.trim));
   g.add(vprofile([[0.12, 0.42], [0.42, 0.52], [0.62, 0.8], [0.56, 1.0], [0.42, 1.03], [0.3, 0.82], [0.08, 0.6]], 0.3, p, 0.035));
   g.add(vprofile([[-0.12, 0.52], [-0.06, 0.78], [-0.42, 0.85], [-0.86, 0.9], [-0.92, 0.82], [-0.6, 0.64], [-0.3, 0.5]], 0.28, p, 0.035));
@@ -301,16 +319,19 @@ function spawnVehicle(built, kind, base) {
   placeNear(v, 25, 380);
 }
 function populateTraffic() {
+  const downtown = DISTRICT === 'q1';
   const carMix = [['sedan', 7], ['hatch', 5], ['suv', 5], ['taxi', 4], ['van', 3]];
   const carColors = [0xffffff, 0x111111, 0x9aa4ae, 0xc62828, 0x1e3a8a, 0xf5f5f5, 0x5f6b73, 0x7c2d12, 0xe0e0e0];
-  for (const [type, n] of carMix) for (let i = 0; i < n; i++) {
+  for (const [type, n] of carMix) for (let i = 0; i < (downtown ? Math.ceil(n / 3) : n); i++) {
     const taxi = type === 'taxi';
     spawnVehicle(buildCar(taxi ? 'sedan' : type, taxi ? pick([0xf5f5f5, 0x1f9d55]) : pick(carColors), { taxi }), 'car', 9 + Math.random() * 5);
   }
-  for (let i = 0; i < 3; i++) spawnVehicle(buildBus(), 'car', 8);
-  spawnVehicle(buildTruck(0x1e5aa8), 'car', 8);
-  spawnVehicle(buildTruck(0xc62828), 'car', 8);
-  for (let i = 0; i < 55; i++) spawnVehicle(buildMotorbike(), 'bike', 7 + Math.random() * 4.5);
+  for (let i = 0; i < (downtown ? 1 : 3); i++) spawnVehicle(buildBus(), 'car', 8);
+  if (!downtown) {
+    spawnVehicle(buildTruck(0x1e5aa8), 'car', 8);
+    spawnVehicle(buildTruck(0xc62828), 'car', 8);
+  }
+  for (let i = 0; i < (downtown ? 27 : 55); i++) spawnVehicle(buildMotorbike(), 'bike', 7 + Math.random() * 4.5);
 }
 populateTraffic();
 

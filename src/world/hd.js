@@ -86,9 +86,8 @@ if (HD.on) {
     };
     addEventListener('resize', () => HD.composer?.setSize(innerWidth, innerHeight));
   } catch (e) { console.warn('post-processing off', e); HD.post = false; }
-  // máy giật → tắt hậu kỳ trước khi giảm các thứ khác
-  { const _ps = perfStepDown; perfStepDown = function () { if (HD.post) { HD.post = false; toast(L('⚙️ Máy hơi giật → tắt hiệu ứng ánh sáng (bloom)', '⚙️ Bloom off for performance'), 2.2); return; } _ps(); }; }
 }
+const defaultPostProcessing = HD.post;
 /* ---- nút chọn mức đồ hoạ trong Cài đặt ---- */
 {
   const _rp = renderPanel;

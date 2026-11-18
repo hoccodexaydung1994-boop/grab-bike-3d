@@ -15,38 +15,60 @@ const curBike = () => BIKES[profile.bikeId] || BIKES.sh;
 }
 const altBike = new THREE.Group(); bike.lean.add(altBike);
 /* Honda SH 160i (models/sh.glb): front = +z, ground y = 0, wheel nodes pivot at the axle */
-const SH = { model: null, front: null, rear: null };
-new GLTFLoader().load('models/sh.glb?v=' + GAME_VERSION, (gltf) => {
-  const m = gltf.scene; m.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; if (o.material.map) o.material.map.anisotropy = 8; } });
-  SH.model = m; SH.front = m.getObjectByName('wheelFront'); SH.rear = m.getObjectByName('wheelRear');
-  m.visible = false; bike.lean.add(m); applyBikeModel();
-  if (curBike().model === 'sh') $('loading').classList.add('hidden');
-}, undefined, (e) => console.error('sh.glb', e));
+const SH = { model: null, body: null, front: null, rear: null };
+BOOT.push(() => new GLTFLoader().load('models/sh.glb?v=' + GAME_VERSION, (gltf) => {
+  const m = gltf.scene;
+  m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; if (o.material.map) o.material.map.anisotropy = 8; } });
+  SH.model = m;
+  SH.body = m.getObjectByName('body');
+  if (SH.body?.isMesh) SH.body.material = SH.body.material.clone();
+  SH.front = m.getObjectByName('wheelFront');
+  SH.rear = m.getObjectByName('wheelRear');
+  bike.lean.add(m);
+  applyBikeModel();
+}, undefined, (e) => console.warn('SH model unavailable. Using the procedural scooter.', e)));
+
+let proceduralBike = null;
 function applyBikeModel() {
   const B = curBike();
-  altBike.clear();
-  if (!bike.vespaWheels && bike.model) bike.vespaWheels = [bike.frontWheel, bike.rearWheel];
-  if (SH.model) SH.model.visible = B.model === 'sh';
-  if (B.model === 'sh') {
-    if (bike.model) bike.model.visible = false;
-    if (SH.model) { bike.frontWheel = SH.front; bike.rearWheel = SH.rear; } bike.R = 0.31;
-    if (SH.model && SH.model.userData.paint !== profile.paint) { SH.model.userData.paint = profile.paint; SH.model.traverse(o => { if (o.isMesh && o.material.name === 'body') o.material.color.setHex(profile.paint || 0xffffff); }); }
-  } else if (B.model === 'vespa') { if (bike.model) bike.model.visible = true; if (bike.vespaWheels) [bike.frontWheel, bike.rearWheel] = bike.vespaWheels; bike.R = 0.23; }
-  else {
-    bike.frontWheel = bike.rearWheel = null;
-    if (bike.model) bike.model.visible = false;
-    const col = parseInt(B.color.slice(1), 16);
-    const m = B.model === 'underbone' ? buildUnderbone(col) : buildScooter(col);
-    m.position.y = B.model === 'underbone' ? -0.12 : -0.05; shadowAll(m); altBike.add(m);
+  const model = B.model === 'sh' ? SH.model : B.model === 'vespa' ? bike.model : null;
+  if (SH.model) SH.model.visible = model === SH.model;
+  if (bike.model) bike.model.visible = model === bike.model;
+  altBike.visible = !model;
+  if (model) {
+    [bike.frontWheel, bike.rearWheel] = B.model === 'sh' ? [SH.front, SH.rear] : bike.vespaWheels;
+    bike.R = B.model === 'sh' ? 0.3125 : 0.241;
+    if (B.model === 'sh' && model.userData.paint !== profile.paint) {
+      model.userData.paint = profile.paint;
+      if (SH.body?.isMesh) SH.body.material.color.setHex(profile.paint || 0xffffff);
+    }
+  } else {
+    const kind = B.model === 'underbone' ? 'underbone' : 'scooter';
+    const color = B.model === 'sh' || B.model === 'vespa' ? profile.paint || 0xf2f2ee : parseInt(B.color.slice(1), 16);
+    if (proceduralBike?.kind !== kind || proceduralBike.color !== color) {
+      if (proceduralBike) {
+        proceduralBike.mesh.traverse(o => { if (o.isMesh) o.geometry.dispose(); });
+        altBike.remove(proceduralBike.mesh);
+      }
+      const wheels = {};
+      const mesh = kind === 'underbone' ? buildUnderbone(color, wheels) : buildScooter(color, wheels);
+      shadowAll(mesh);
+      altBike.add(mesh);
+      proceduralBike = { kind, color, mesh, ...wheels };
+    }
+    bike.frontWheel = proceduralBike.front;
+    bike.rearWheel = proceduralBike.rear;
+    bike.R = kind === 'underbone' ? 0.29 : 0.25;
   }
-  Object.assign(RIDER, B.model === 'sh' ? { y: 0.19, z: 0, box: [0.16, -0.05] } : { y: 0, z: 0, box: [0, 0] }); if (!fall.on) seatRiders();
+  fitMountedDriver(model ? B.model : proceduralBike.kind);
+  Object.assign(RIDER, B.model === 'sh' && model ? { y: 0.19, z: 0, box: [0.16, -0.05] } : { y: 0, z: 0, box: [0, 0] }); if (!fall.on) seatRiders();
   const ic = $('st_fuel'); if (ic) { ic.querySelector('span').textContent = B.elec ? '🔌' : '⛽'; ic.title = B.elec ? L('Pin xe điện', 'EV battery') : L('Xăng', 'Fuel'); }
 }
-BOOT.push(applyBikeModel);
+BOOT.push(() => { applyBikeModel(); $('loading').classList.add('hidden'); });
 { const _ap = applyPaint; applyPaint = () => { _ap(); applyBikeModel(); }; }   // khi GLB tải xong
 // electric: charge at home
 ACTION_HOOKS.push((opts) => {
-  if (!curBike().elec || profile.st.fuel > 95) return;
+  if (player.parked || !curBike().elec || profile.st.fuel > 95) return;
   if (Math.hypot(homeSpot.x - player.x, homeSpot.z - player.z) < 30) opts.unshift({ t: L('🔌 Sạc xe ở nhà (60 phút, 5.000đ)', '🔌 Charge at home (60 min, 5,000đ)'), fx: () => { if (spend(5000, 'fuel')) { passTime(60); profile.st.fuel = 100; toast(L('🔋 Xe đã sạc đầy', '🔋 Fully charged'), 1.6); } } });
 });
 // garage section in the 🛵 bike tab

@@ -1,4 +1,5 @@
 // Smoke test: run the game module in Node with a recording Proxy mock for three.js + DOM.
+import assert from 'node:assert/strict';
 import fs from 'fs';
 import vm from 'vm';
 const ROOT = process.argv[2];
@@ -78,6 +79,34 @@ async function pickDlg(i = 0, label) { const b = els.get('dlgOpts'); if (!H.game
 H.profile.bikePicked = true; el('bStart').onclick();
 H.profile.level = 6; H.profile.sp = 5;
 console.log('unlocks', ['food', 'batch', 'premium', 'night'].map(u => u + ':' + H.unlocked(u)).join(' '), 'tier', H.tierInfo().name);
+// Park, walk, and remount without moving the scooter, taking a job, or using fuel.
+{
+  const { x, z } = H.player;
+  const fuel = H.profile.st.fuel;
+  const wait = H.game.waitT;
+  el('bMount').onclick();
+  assert.ok(H.player.parked, 'Dismounting parks the scooter at the starting point');
+  frame(40);
+  assert.equal(H.player.foot.action, null, 'Dismount transition finishes');
+  const beside = { x: H.player.x, z: H.player.z };
+  H.keys.KeyW = true;
+  frame(20);
+  const walkingSpeed = H.player.foot.speed;
+  assert.ok(Math.hypot(H.player.x - beside.x, H.player.z - beside.z) > 0.15, 'Walking moves the driver');
+  H.keys.ShiftLeft = true;
+  frame(18);
+  assert.ok(H.player.foot.speed > walkingSpeed + 0.8, 'Shift increases walking speed');
+  H.keys.KeyW = H.keys.ShiftLeft = false;
+  assert.deepEqual([H.player.parked.x, H.player.parked.z], [x, z]);
+  assert.equal(H.profile.st.fuel, fuel);
+  assert.equal(H.game.waitT, wait);
+  Object.assign(H.player, beside);
+  el('bMount').onclick();
+  frame(40);
+  assert.equal(H.player.parked, null, 'Mount transition returns to riding');
+  assert.deepEqual([H.player.x, H.player.z], [x, z]);
+  console.log('mobility parked, walked, sprinted, and remounted');
+}
 frame(60);
 // ---- falls / phone / traffic / night
 { H.player.v = 15; H.game.order = null; const hp0 = H.profile.st.hp; H.triggerFall('crash'); for (let k = 0; k < 200; k++) raf();

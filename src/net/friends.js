@@ -1,7 +1,8 @@
 'use strict';
 /* ================= Bạn bè online: xe & độ cao thật, bản đồ bạn bè, danh sách bạn, chỉ đường tới bạn ================= */
 if (!profile.friends) profile.friends = {};          // tên → { lv, seen, room, bk }
-if (!profile.rooms) profile.rooms = [];              // phòng đã vào gần đây
+const recentRoomsKey = DISTRICT === 'q1' ? 'district1Rooms' : 'rooms';
+if (!profile[recentRoomsKey]) profile[recentRoomsKey] = [];
 BOOT.push(() => {
   const _nm = netMsg;
   netMsg = () => Object.assign(_nm(), { y: +player.y.toFixed(2), bk: profile.bikeId, pt: game.order ? 1 : 0 });
@@ -25,10 +26,11 @@ FRAME.push((dt) => {
     // real height (bridges) + passenger when carrying a customer
     r.y = (r.y ?? 0.07) + (((d.y ?? 0.07)) - (r.y ?? 0.07)) * Math.min(1, dt * 8); r.g.position.y = r.y;
     // remember friends
-    if (d.n && frSaveT <= 0) { const f = profile.friends[d.n] || {}; Object.assign(f, { lv: d.lv, seen: Date.now(), room: NET.code, bk }); profile.friends[d.n] = f; }
+    if (d.n && frSaveT <= 0) { const f = profile.friends[d.n] || {}; Object.assign(f, { lv: d.lv, seen: Date.now(), room: NET.code, district: DISTRICT, bk }); profile.friends[d.n] = f; }
   }
   if (frSaveT <= 0) frSaveT = 5;
-  if (NET.code && profile.rooms[0] !== NET.code) { profile.rooms = [NET.code, ...profile.rooms.filter(c => c !== NET.code)].slice(0, 5); saveProfile(); }
+  const recentRooms = profile[recentRoomsKey];
+  if (NET.code && recentRooms[0] !== NET.code) { profile[recentRoomsKey] = [NET.code, ...recentRooms.filter(c => c !== NET.code)].slice(0, 5); saveProfile(); }
   // follow-a-friend waypoint
   if (FR.target) {
     const r = NET.remotes.get(FR.target);
@@ -56,8 +58,8 @@ function frJoin(code) { closePanel(); if (game.mode !== 'menu') toast(L('Về me
       return `<div class="sk"><div><b>${d.n}</b> · Lv${d.lv} · ${(BIKES[d.bk] || BIKES.vespa).n[0]}<br><small>${d.st === 'bike' ? '🛵 ' + L('đang chở khách', 'carrying a passenger') : d.st === 'food' ? '🍜 ' + L('đang giao đồ ăn', 'delivering food') : '⏳ ' + L('đang chờ cuốc', 'waiting')} · ${fmtVND(d.m)} · ${dist > 1000 ? (dist / 1000).toFixed(1) + ' km' : Math.round(dist) + ' m'}</small></div>
         <span><button data-fr="follow" data-id="${id}">📍 ${L('Tìm', 'Find')}</button> <button data-fr="wave" data-id="${d.n}">👋</button></span></div>`; }).join('') || `<p><small>${L('Chưa có ai.', 'Nobody yet.')}</small></p>`);
     const fl = Object.entries(profile.friends).sort((a, b) => b[1].seen - a[1].seen).slice(0, 20);
-    h += `<h4>📒 ${L('Đã từng chơi cùng', 'Played with')}</h4><table class="kv">${fl.map(([n, f]) => `<tr><td><b>${n}</b> · Lv${f.lv || 1}</td><td><small>${ago(f.seen)} · ${L('phòng', 'room')} ${f.room || '–'}</small> ${f.room ? `<button class="chip" data-fr="join" data-id="${f.room}">${L('Vào', 'Join')}</button>` : ''}</td></tr>`).join('') || `<tr><td>${L('Chưa có', 'None yet')}</td></tr>`}</table>`;
-    h += `<h4>🕘 ${L('Phòng gần đây', 'Recent rooms')}</h4><p>${profile.rooms.map(c => `<button class="chip" data-fr="join" data-id="${c}">${c}</button>`).join(' ') || L('Chưa có', 'None yet')}</p>`;
+    h += `<h4>📒 ${L('Đã từng chơi cùng', 'Played with')}</h4><table class="kv">${fl.map(([n, f]) => `<tr><td><b>${n}</b> · Lv${f.lv || 1}</td><td><small>${ago(f.seen)} · ${L('phòng', 'room')} ${f.room || '–'}</small> ${f.room && (f.district || 'q7') === DISTRICT ? `<button class="chip" data-fr="join" data-id="${f.room}">${L('Vào', 'Join')}</button>` : ''}</td></tr>`).join('') || `<tr><td>${L('Chưa có', 'None yet')}</td></tr>`}</table>`;
+    h += `<h4>🕘 ${L('Phòng gần đây', 'Recent rooms')}</h4><p>${profile[recentRoomsKey].map(c => `<button class="chip" data-fr="join" data-id="${c}">${c}</button>`).join(' ') || L('Chưa có', 'None yet')}</p>`;
     $('mpBody').innerHTML = h;
   };
   $('mpBody').addEventListener('click', (e) => {

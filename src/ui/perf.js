@@ -1,22 +1,58 @@
 'use strict';
-/* ================= Tối ưu điện thoại / máy yếu ================= */
-const PERF = { lvl: 3, acc: 0, n: 0, t: 0, traffic: 1, warm: 4 };
+/* ================= Adaptive graphics ================= */
+const PERF = { elapsed: 0, frames: 0, traffic: 1, warm: 4, baseFar: camera.far };
 if (isTouch && !profile.settings.mobileInit) { profile.settings.mobileInit = true; profile.settings.hiq = false; profile.settings.shadows = false; applySettings(); saveProfile(); }
-if (isTouch) PERF.lvl = 2;
 { const _tl = trafficLevel; trafficLevel = () => { const r = _tl(); return { frac: r.frac * PERF.traffic, speed: r.speed }; }; }
-function perfStepDown() {
-  const S = profile.settings;
-  if (PERF.lvl === 3) { S.hiq = false; applySettings(); toast(L('⚙️ Máy hơi giật → giảm độ nét', '⚙️ Lowering resolution for smoother play'), 2); }
-  else if (PERF.lvl === 2) { S.shadows = false; applySettings(); toast(L('⚙️ Tắt đổ bóng để mượt hơn', '⚙️ Shadows off for performance'), 2); }
-  else if (PERF.lvl === 1) { PERF.traffic = 0.55; camera.far = 700; camera.updateProjectionMatrix(); renderer.setPixelRatio(Math.min(1, devicePixelRatio) * 0.8); toast(L('⚙️ Giảm xe cộ & tầm nhìn xa', '⚙️ Less traffic & draw distance'), 2); }
-  else return;
-  PERF.lvl--; saveProfile();
+
+function resetAdaptiveQuality() {
+  PERF.elapsed = PERF.frames = 0;
+  PERF.traffic = 1;
+  PERF.warm = 4;
+  adaptiveGraphics.pixelRatioLimit = Infinity;
+  adaptiveGraphics.shadowsDisabled = false;
+  if (typeof HD !== 'undefined') HD.post = defaultPostProcessing;
+  camera.far = PERF.baseFar;
+  camera.updateProjectionMatrix();
 }
-FRAME.push((dt) => {
-  if (game.paused || document.hidden) return;
-  if (PERF.warm > 0) { PERF.warm -= dt; return; }
-  PERF.acc += dt; PERF.n++; PERF.t += dt;
-  if (PERF.t >= 3) { const avg = PERF.acc / PERF.n; PERF.acc = PERF.n = PERF.t = 0; if (avg > 0.04 && profile.settings.autoQ !== false) { perfStepDown(); PERF.warm = 3; } }
+
+function perfStepDown() {
+  let message;
+  if (HD.post) {
+    HD.post = false;
+    message = L('Tắt hiệu ứng bloom để chơi mượt hơn', 'Bloom reduced for smoother play');
+  } else if (renderer.getPixelRatio() > 1) {
+    adaptiveGraphics.pixelRatioLimit = 1;
+    message = L('Giảm độ nét để chơi mượt hơn', 'Resolution reduced for smoother play');
+  } else if (renderer.shadowMap.enabled) {
+    adaptiveGraphics.shadowsDisabled = true;
+    message = L('Tắt đổ bóng để chơi mượt hơn', 'Shadows reduced for smoother play');
+  } else if (PERF.traffic === 1) {
+    PERF.traffic = 0.6;
+    camera.far = Math.min(PERF.baseFar, 700);
+    camera.updateProjectionMatrix();
+    adaptiveGraphics.pixelRatioLimit = 0.85;
+    message = L('Giảm mật độ xe và độ nét', 'Traffic density and resolution reduced');
+  } else return;
+  applyGraphicsSettings();
+  toast('⚙️ ' + message, 2);
+}
+
+FRAME.push((_dt, frameTime) => {
+  if (game.mode !== 'drive' || game.paused || document.hidden || profile.settings.autoQ === false) {
+    PERF.elapsed = PERF.frames = 0;
+    return;
+  }
+  if (!Number.isFinite(frameTime) || frameTime <= 0) return;
+  if (PERF.warm > 0) { PERF.warm -= Math.min(frameTime, 1); return; }
+  PERF.elapsed += Math.min(frameTime, 1);
+  PERF.frames++;
+  if (PERF.elapsed < 3) return;
+  const average = PERF.elapsed / PERF.frames;
+  PERF.elapsed = PERF.frames = 0;
+  if (average > 1 / (isTouch ? 27 : 45)) {
+    perfStepDown();
+    PERF.warm = 3;
+  }
 });
 // collapsible HUD + portrait hint
 {

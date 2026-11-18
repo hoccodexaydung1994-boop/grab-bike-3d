@@ -1,4 +1,4 @@
-// Grab Bike 3D – Quận 7 · entry point
+// Grab Bike 3D · entry point
 // 1) nạp three.js, 2) nạp dữ liệu (bản đồ + cấu hình), 3) chạy lần lượt các file game trong src/manifest.json
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -18,9 +18,10 @@ const loadScript = (src) => new Promise((ok, fail) => { const s = document.creat
 try {
   const man = await getJSON('src/manifest.json', Date.now());
   window.GAME_VERSION = man.version;
-  status('Đang tải bản đồ Quận 7…');
+  const district = new URLSearchParams(location.search).get('district') === 'q1' ? 'q1' : 'q7';
+  status(district === 'q1' ? 'Đang tải bản đồ Quận 1…' : 'Đang tải bản đồ Quận 7…');
   const cfgNames = man.config || [];
-  const [map, ...cfgs] = await Promise.all([getJSON('data/map/q7.json', man.version), ...cfgNames.map(n => getJSON('data/config/' + n + '.json', man.version))]);
-  window.Q7 = map; window.CFG = Object.fromEntries(cfgNames.map((n, i) => [n, cfgs[i]]));
+  const [map, ...cfgs] = await Promise.all([getJSON('data/map/' + district + '.json', man.version), ...cfgNames.map(n => getJSON('data/config/' + n + '.json', man.version))]);
+  window.GAME_MAP = map; window.CFG = Object.fromEntries(cfgNames.map((n, i) => [n, cfgs[i]]));
   for (let i = 0; i < man.files.length; i++) { status(`Đang khởi động… ${Math.round(i / man.files.length * 100)}%`); await loadScript('src/' + man.files[i] + '?v=' + man.version); }
 } catch (e) { status('⚠️ ' + e.message + ' — hãy mở game qua web (Vercel / npx serve), không mở file trực tiếp.'); console.error(e); }

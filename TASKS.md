@@ -9,7 +9,8 @@
 - [x] Add the District 1 world and selector. Reproduced the map from its OSM extract.
 - [x] Verify district-safe progression and missions, English Mode, and multiplayer room separation with mocks.
 - [x] Validate session-only adaptive quality and static deployment inputs.
-- [ ] Run final regressions and prepare the pull request.
+- [x] Run integrated regressions and prepare the pull request contents.
+- [ ] Push the feature branch and open the pull request. Both the Git transport and connected GitHub API returned HTTP 403 for writes. This also blocks the branch-triggered Vercel preview.
 
 ## Remaining validation and follow-up
 

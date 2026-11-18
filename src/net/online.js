@@ -47,7 +47,7 @@ async function fbRoom(code) {
     onValue(ref(F.db, `${room}/players`), snap => {
       const v = snap.val() || {};
       for (const [id, d] of Object.entries(v)) if (id !== F.uid) netRecv(Object.assign({}, d, { t: 's', id }));
-      for (const id of [...NET.remotes.keys()]) if (!v[id]) { scene.remove(NET.remotes.get(id).g); NET.remotes.delete(id); }
+      for (const id of [...NET.remotes.keys()]) if (!v[id]) { removeRemote(id); }
     });
     NET.chatRef = ref(F.db, `${room}/chat`);
     onChildAdded(query(NET.chatRef, limitToLast(15)), s => chatShow(s.val()));
@@ -139,6 +139,15 @@ function netRecv(d, from) {
   }
   r.data = d; r.seen = performance.now();
 }
+function removeRemote(id) {
+  const remote = NET.remotes.get(id);
+  scene.remove(remote.g);
+  if (remote.walker) {
+    scene.remove(remote.walker.g);
+    disposeDriver(remote.walker.g);
+  }
+  NET.remotes.delete(id);
+}
 function netTick(dt) {
   if (NET.status !== 'on' || (!NET.peer && NET.mode !== 'fb')) return;
   NET.sendT -= dt;
@@ -148,7 +157,7 @@ function netTick(dt) {
   }
   const now = performance.now(), k = 1 - Math.exp(-dt * 10);
   for (const [id, r] of NET.remotes) {
-    if (now - r.seen > 8000) { scene.remove(r.g); NET.remotes.delete(id); continue; }
+    if (now - r.seen > 8000) { removeRemote(id); continue; }
     r.x += (r.data.x - r.x) * k; r.z += (r.data.z - r.z) * k; r.h = angLerp(r.h, r.data.h, k);
     r.g.position.set(r.x, 0.07, r.z); r.g.rotation.y = r.h; r.lean.rotation.z = r.data.l || 0;
   }

@@ -14,7 +14,9 @@
 
 ## Remaining validation and follow-up
 
+- [x] Hide the home sign when it obstructs the rider in the follow view.
 - [ ] Measure native desktop and mid-range phone performance on representative hardware.
 - [ ] Verify live Firebase rooms and Google cloud saves with a configured test project.
-- [ ] Extend streetscape variation with parked cars and expand geographic coverage of District 1.
-- [ ] Publish on-foot poses to other players in a backward-compatible online update.
+- [x] Add compact parked cars and more facade colors in District 1.
+- [ ] Expand the existing District 1 geographic coverage.
+- [x] Send and render on-foot poses with backward-compatible scooter coordinates. Verified with mocked peers.

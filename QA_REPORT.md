@@ -46,3 +46,7 @@ Chromium desktop rendered both districts and verified the district picker, persi
 - Hardware FPS and live Firebase or Google authentication were outside the measured coverage. Browser tests used software WebGL and mobile emulation. A foreground home sign can obscure the rider at some orbit angles.
 - District 1 is a neighborhood-scale interpretation around Hẻm 15B. Its scenery uses original procedural meshes, with no new external character asset.
 - The existing Vercel check is present on main. GitHub refused feature branch writes over HTTPS and through the connected API, so the pull request and its Vercel preview could not be published from this session.
+
+## 3.1.1 follow-up
+
+All four original smoke suites and both district checks passed. The district checks cover remote walking and mounting pose packets, seated rider restoration, and disconnect cleanup using mocked peers. Chromium WebGL 2 opened District 1 and verified keyboard acceleration without captured page errors. This browser check used SwiftShader. Live Firebase and native hardware performance still require separate verification.

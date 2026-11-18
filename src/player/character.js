@@ -158,7 +158,10 @@ function updateWalker(dt) {
   const state = player.foot;
   if (!state) { if (walker) walker.g.visible = false; return; }
   if (!walker) walker = buildWalker(profile.look);
-  const { g, upper, pelvis, limbs } = walker;
+  poseWalker(walker, state, player, player.parked.side, RIDER.y, dt);
+}
+function poseWalker(rig, state, actor, parkSide, seatHeight, dt) {
+  const { g, upper, pelvis, limbs } = rig;
   const action = state.action;
   const ease = action ? action.t * action.t * (3 - 2 * action.t) : 0;
   const seat = action ? (action.mount ? ease : 1 - ease) : 0;
@@ -166,10 +169,10 @@ function updateWalker(dt) {
   const move = Math.min(1, state.speed / 1.4);
   state.gait = (state.gait || 0) + (move - (state.gait || 0)) * (1 - Math.exp(-dt * 12));
   const gait = state.gait, run = state.run;
-  const heading = player.h;
+  const heading = actor.h;
   const leanBack = 0.37 * seat;
   g.visible = true;
-  g.position.set(player.x - Math.sin(heading) * leanBack, player.y + RIDER.y * seat, player.z - Math.cos(heading) * leanBack);
+  g.position.set(actor.x - Math.sin(heading) * leanBack, actor.y + seatHeight * seat, actor.z - Math.cos(heading) * leanBack);
   g.rotation.y = heading;
   pelvis.position.y = 0.882 + 0.014 * Math.cos(state.phase * 2) * gait + 0.05 * seat + 0.12 * swing;
   pelvis.rotation.z = Math.sin(state.phase) * gait * 0.035;
@@ -178,7 +181,7 @@ function updateWalker(dt) {
   for (const { arm, elbow, leg, knee, foot, side } of limbs) {
     const stride = Math.sin(state.phase) * side;
     const bend = Math.max(0, Math.cos(state.phase) * side);
-    const insideLeg = side !== player.parked.side;
+    const insideLeg = side !== parkSide;
     arm.rotation.x = stride * gait * (0.32 + 0.16 * run) - 0.75 * seat;
     arm.rotation.z = side * (0.11 + 0.22 * seat);
     elbow.rotation.x = -0.08 - 0.35 * bend * gait - 0.47 * run - 0.5 * seat;
@@ -252,15 +255,55 @@ BOOT.push(() => {
   netMsg = () => {
     const message = Object.assign(_nm(), { lk: profile.look });
     const parked = player.parked;
-    if (parked) Object.assign(message, { x: +parked.x.toFixed(2), z: +parked.z.toFixed(2), h: +parked.h.toFixed(3) });
+    if (parked) {
+      const { speed, run, action } = player.foot;
+      message.walk = { x: message.x, z: message.z, h: message.h, speed, run, side: parked.side };
+      if (action) message.walk.action = { t: action.t, mount: action.mount };
+      Object.assign(message, { x: +parked.x.toFixed(2), z: +parked.z.toFixed(2), h: +parked.h.toFixed(3), l: -parked.side * 0.12 });
+    }
     return message;
   };
-  FRAME.push(() => {
+  FRAME.push((dt) => {
+    const blend = 1 - Math.exp(-dt * 12);
     for (const r of NET.remotes.values()) {
-      const lk = r.data && r.data.lk; if (!lk) continue;
-      const key = JSON.stringify(lk); if (r.lkKey === key) continue;
-      r.lkKey = key; const old = r.lean.children[1]; if (old) { r.lean.remove(old); disposeDriver(old); }
-      r.lean.add(buildDriver2(lk));
+      const lk = r.data.lk;
+      const key = JSON.stringify(lk || null);
+      if (lk && r.lkKey !== key) {
+        const old = r.lean.children[1];
+        if (old) { r.lean.remove(old); disposeDriver(old); }
+        const rider = buildDriver2(lk);
+        rider.position.y = BIKES[r.bk]?.model === 'sh' ? 0.19 : 0;
+        r.lean.add(rider);
+      }
+      const w = r.data.walk;
+      const valid = w && [w.x, w.z, w.h, w.speed, w.run].every(Number.isFinite)
+        && w.x >= BX0 - 60 && w.x <= BX1 + 60 && w.z >= BZ0 - 60 && w.z <= BZ1 + 60;
+      const rider = r.lean.children[1];
+      if (rider) rider.visible = !valid;
+      if (r.walker && r.lkKey !== key) {
+        scene.remove(r.walker.g);
+        disposeDriver(r.walker.g);
+        r.walker = null;
+      }
+      r.lkKey = key;
+      if (!valid) {
+        if (r.walker) r.walker.g.visible = false;
+        r.walkPose = null;
+        continue;
+      }
+      if (!r.walker) r.walker = buildWalker(lk || {});
+      const pose = r.walkPose ||= { x: w.x, y: 0.07, z: w.z, h: w.h, phase: 0, run: 0 };
+      const dx = (w.x - pose.x) * blend, dz = (w.z - pose.z) * blend;
+      pose.x += dx;
+      pose.z += dz;
+      pose.h = angLerp(pose.h, w.h, blend);
+      pose.speed = THREE.MathUtils.clamp(w.speed, 0, 4.4);
+      pose.run += (THREE.MathUtils.clamp(w.run, 0, 1) - pose.run) * blend;
+      pose.phase = (pose.phase + Math.hypot(dx, dz) * (5.2 - pose.run * 0.9)) % (2 * Math.PI);
+      const action = w.action;
+      pose.action = action && Number.isFinite(action.t)
+        ? { t: THREE.MathUtils.clamp(action.t, 0, 1), mount: action.mount === true } : null;
+      poseWalker(r.walker, pose, pose, w.side === -1 ? -1 : 1, rider?.position.y || 0, dt);
     }
   });
 });

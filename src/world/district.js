@@ -118,6 +118,40 @@ if (DISTRICT === 'q1') {
     scene.add(parked);
   }
 
+  // Park a few compact cars on clear roadside space away from junctions.
+  const carSpaces = [];
+  for (const edge of EDGES) {
+    if (carSpaces.length >= (GFX_HIGH ? 12 : 6)) break;
+    if (edge.c > 4 || edge.w < 7 || edge.L < 36) continue;
+    const point = edgeAt(edge, edge.L / 2, true);
+    const offset = edge.w / 2 + 1.15;
+    const x = point.x - point.dz * offset, z = point.z + point.dx * offset;
+    if (carSpaces.some(car => Math.hypot(car.x - x, car.z - z) < 19)
+      || parking.some(([px, pz]) => Math.hypot(px - x, pz - z) < 4)) continue;
+    const clear = [-2, 0, 2].every(along => {
+      const px = x + point.dx * along, pz = z + point.dz * along;
+      return !onRoad(px, pz, 0.85) && !pushOut(px, pz, 0.95).hit && !inWater(px, pz);
+    });
+    if (clear) carSpaces.push({ x, z, heading: Math.atan2(point.dx, point.dz) });
+  }
+  if (carSpaces.length) {
+    const body = paint(0xe8e8e8);
+    const car = buildCar('hatch', 0xe8e8e8).mesh;
+    for (const mesh of car.children) {
+      const parked = new THREE.InstancedMesh(mesh.geometry, mesh.material, carSpaces.length);
+      parked.receiveShadow = true;
+      carSpaces.forEach(({ x, z, heading }, i) => {
+        positioner.position.set(x, 0.073, z);
+        positioner.rotation.set(0, heading, 0);
+        positioner.scale.setScalar(1);
+        positioner.updateMatrix();
+        parked.setMatrixAt(i, positioner.matrix);
+        if (mesh.material === body) parked.setColorAt(i, new THREE.Color(BIKE_COLORS[(i + 2) % BIKE_COLORS.length]));
+      });
+      scene.add(parked);
+    }
+  }
+
   const streetSign = canvasTex(512, 192, (g, w, h) => {
     g.fillStyle = '#0a4d93'; g.fillRect(0, 0, w, h);
     g.strokeStyle = '#fff'; g.lineWidth = 6; g.strokeRect(9, 9, w - 18, h - 18);

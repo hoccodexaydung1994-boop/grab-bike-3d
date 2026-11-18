@@ -88,6 +88,25 @@ if (districtArg) {
   assert.equal(H.profile.english, true);
   assert.equal(D.peerRoomId('TEST1'), 'grab' + district + '-TEST1');
   assert.deepEqual(H.profile[D.recentRoomsKey], [district === 'q1' ? 'NEWQ1' : 'OLDQ7']);
+  const mobility = vm.runInThisContext(`(() => {
+    const parked = { x: player.x, z: player.z, h: player.h, side: -1 };
+    player.parked = parked;
+    player.foot = { speed: 4, run: 1, action: { t: 0.4, mount: false } };
+    player.x += 1;
+    const packet = netMsg();
+    player.x = parked.x; player.parked = player.foot = null;
+    netRecv({ ...packet, id: 'walker-test', t: 's' });
+    for (const hook of FRAME) hook(0.016);
+    const remote = NET.remotes.get('walker-test');
+    const walking = remote.walker?.g.visible && remote.lean.children[1].visible === false;
+    netRecv({ ...packet, walk: null, id: 'walker-test', t: 's' });
+    for (const hook of FRAME) hook(0.016);
+    const mounted = !remote.walker?.g.visible && remote.lean.children[1].visible;
+    removeRemote('walker-test');
+    return { parked: packet.x, walkingX: packet.walk.x, walking, mounted, removed: !NET.remotes.has('walker-test') };
+  })()`);
+  assert(Math.abs(mobility.walkingX - mobility.parked - 1) < 0.02);
+  assert(mobility.walking && mobility.mounted && mobility.removed);
   const paths = [];
   globalThis.__districtFirebase = {
     uid: 'test-user',

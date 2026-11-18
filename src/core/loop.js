@@ -14,6 +14,7 @@ function animate() {
     if (!game.paused) { updatePlayer(dt); updateGame(dt); updatePolice(dt); updateTow(dt); }
     updateCamera(dt); updateHUD(dt);
   } else {
+    homeSign.board.visible = homeSign.pole.visible = true;
     player.v *= 0.9;
     if (game.mode === 'menu') {
       const a = tAcc * 0.25;

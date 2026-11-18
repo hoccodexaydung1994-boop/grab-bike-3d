@@ -460,9 +460,12 @@ function addBuilding(p, h, opts) {
   const bb = bboxOf(p);
   bColliders.addBox(bb[0], bb[1], bb[2], bb[3], { p, bb, h });
 }
+const mappedFacadeColors = DISTRICT === 'q1'
+  ? [0xe6d4b4, 0xc3a392, 0xd0c5a7, 0xb6c5bd, 0xb4c3cb, 0xe4d6c9, 0xe1c2ad]
+  : WALLS_OSM;
 for (const b of MAP.buildings) {
   const tall = b.h > 30;
-  addBuilding(b.p, b.h, { color: tall ? pick([0xdfe8f0, 0xcfdbe6, 0xe8eef2]) : pick(WALLS_OSM), roof: pick([0x8f8f8c, 0xa3a39f, 0x7d8085]) });
+  addBuilding(b.p, b.h, { color: tall ? pick([0xdfe8f0, 0xcfdbe6, 0xe8eef2]) : pick(mappedFacadeColors), roof: pick([0x8f8f8c, 0xa3a39f, 0x7d8085]) });
 }
 const F = MAP.fill;
 for (let i = 0; i < F.length; i += 6) {
@@ -842,7 +845,7 @@ function updateSignals(dt) {
 }
 
 /* ---- home spot: a residential street near Crescent Mall ---- */
-let homeSpot;
+let homeSpot, homeSign;
 {
   let cx = 0, cz = 0;
   const cm = MAP.buildings.find(b => b.n !== undefined && NAMES[b.n] === 'Crescent Mall');
@@ -867,4 +870,5 @@ let homeSpot;
     new THREE.MeshStandardMaterial({ map: canvasTex(256, 96, (g, w, h) => { g.fillStyle = '#00b14f'; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.font = '900 46px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('NHÀ TÔI 🏠', w / 2, h / 2 + 3); }) }),
     new THREE.MeshStandardMaterial({ map: canvasTex(256, 96, (g, w, h) => { g.fillStyle = '#00b14f'; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.font = '900 46px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('NHÀ TÔI 🏠', w / 2, h / 2 + 3); }) })]));
   board.position.set(sx, 2.7, sz); board.rotation.y = homeSpot.h + Math.PI / 2; board.castShadow = true; scene.add(board);
+  homeSign = { pole, board };
 }

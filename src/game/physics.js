@@ -226,6 +226,10 @@ function updateCamera(dt) {
   else { camPos.lerp(cameraWanted, 1 - Math.exp(-dt * 6)); camLook.lerp(cameraAim, 1 - Math.exp(-dt * 8)); }
   const cameraGoal = jumped ? cameraWanted : camPos;
   camera.position.copy(firstPerson ? cameraGoal : avoidCameraWalls(cameraAnchor, cameraGoal, cameraSafe));
+  const sign = segProj(homeSign.board.position.x, homeSign.board.position.z, camera.position.x, camera.position.z, player.x, player.z);
+  const viewHeight = camera.position.y + (player.y + 1.2 - camera.position.y) * sign.t;
+  homeSign.board.visible = !(sign.t > 0 && sign.t < 1 && sign.d < 1.05 && Math.abs(viewHeight - homeSign.board.position.y) < 0.5);
+  homeSign.pole.visible = !(sign.t > 0 && sign.t < 1 && sign.d < 0.18 && viewHeight < 2.7);
   camera.lookAt(camLook);
   if (fall.on && fall.t < 0.5) { camera.position.x += (Math.random() - 0.5) * 0.35; camera.position.y += (Math.random() - 0.5) * 0.35; }
   if (firstPerson) camera.rotateZ(-player.lean * 0.6);

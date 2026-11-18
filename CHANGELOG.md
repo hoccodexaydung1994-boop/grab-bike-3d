@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.1
+
+- Added remote walk, sprint, and mounting poses while preserving the original scooter coordinates for older clients.
+- Added compact parked cars and a wider facade palette around Lê Thánh Tôn.
+- Hid the home sign when it crosses the view between the camera and rider.
+
 ## 3.1.0 · In development
 
 - Audited the static Three.js architecture, shared profile, map and routing contract, production hosting and baseline smoke tests.

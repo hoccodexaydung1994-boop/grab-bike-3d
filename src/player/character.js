@@ -125,7 +125,7 @@ function alleyHelmet(position, color, skinMaterial) {
     return mesh;
   }
   add(new THREE.SphereGeometry(0.143, 24, 15, 0, Math.PI * 2, 0, 1.94), shell, 0, 0.022, -0.012).scale.set(1, 1.06, 1.15);
-  add(new THREE.SphereGeometry(0.105, 18, 13), skinMaterial, 0, -0.058, 0.025).scale.set(0.88, 1.06, 0.95);
+  if (skinMaterial) add(new THREE.SphereGeometry(0.105, 18, 13), skinMaterial, 0, -0.058, 0.025).scale.set(0.88, 1.06, 0.95);
   const rim = add(new THREE.TorusGeometry(0.134, 0.009, 6, 26), rubber, 0, -0.032, -0.012);
   rim.rotation.x = Math.PI / 2 - 0.1; rim.scale.set(1, 1.14, 1);
   // Sphere U=0.25 faces forward (+Z).
@@ -220,6 +220,234 @@ function buildDriver2(look, bikeType = 'vespa') {
   return g;
 }
 let walker = null;
+// The preview avatar uses the same game-space anchor as the procedural rider.
+let alleyRig = null;
+const RIG_HEIGHT = 1.74;
+const RIG_ASSET = 'models/courier-15b.glb';
+function rigPoint(root, bone) {
+  return root.worldToLocal(bone.getWorldPosition(new THREE.Vector3()));
+}
+function aimRigBone(root, bone, next, target) {
+  const start = bone.worldToLocal(next.getWorldPosition(new THREE.Vector3())).normalize();
+  const end = bone.worldToLocal(root.localToWorld(target.clone())).normalize();
+  if (start.lengthSq() > 0 && end.lengthSq() > 0) {
+    bone.quaternion.multiply(new THREE.Quaternion().setFromUnitVectors(start, end));
+    bone.updateWorldMatrix(true, true);
+  }
+}
+
+function fitRigLimb(root, [upper, lower, tip], target, bend) {
+  const start = rigPoint(root, upper);
+  const middle = rigPoint(root, lower);
+  const end = rigPoint(root, tip);
+  const first = start.distanceTo(middle);
+  const second = middle.distanceTo(end);
+  const direction = target.clone().sub(start);
+  const distance = THREE.MathUtils.clamp(direction.length(), Math.abs(first - second) + 0.001, first + second - 0.001);
+  direction.normalize();
+  bend.addScaledVector(direction, -bend.dot(direction)).normalize();
+  const along = (first * first - second * second + distance * distance) / (2 * distance);
+  const offset = Math.sqrt(Math.max(0, first * first - along * along));
+  const joint = start.clone().addScaledVector(direction, along).addScaledVector(bend, offset);
+  aimRigBone(root, upper, lower, joint);
+  aimRigBone(root, lower, tip, start.addScaledVector(direction, distance));
+}
+
+function snapshotRig(bones) {
+  return bones.map(bone => ({ position: bone.position.clone(), quaternion: bone.quaternion.clone(), scale: bone.scale.clone() }));
+}
+function setRigPose(rig, pose, weight = 1, from = rig.rest) {
+  for (let i = 0; i < rig.bones.length; i++) {
+    const bone = rig.bones[i];
+    const rest = from[i], next = pose[i];
+    bone.position.copy(rest.position).lerp(next.position, weight);
+    bone.quaternion.copy(rest.quaternion).slerp(next.quaternion, weight);
+    bone.scale.copy(rest.scale).lerp(next.scale, weight);
+  }
+  rig.model.position.copy(rig.ground);
+  rig.root.updateWorldMatrix(true, true);
+}
+
+function rigSeat(rig, type) {
+  if (rig.seats.has(type)) return rig.seats.get(type);
+  setRigPose(rig, rig.rest);
+  const forwardBars = type === 'scooter' || type === 'underbone';
+  const highSeat = type === 'sh';
+  const pelvis = new THREE.Vector3(0, highSeat ? 0.86 : 0.88, forwardBars ? -0.23 : highSeat ? -0.25 : -0.32);
+  const adjust = pelvis.sub(rigPoint(rig.root, rig.hips));
+  rig.model.position.add(adjust);
+  rig.root.updateWorldMatrix(true, true);
+
+  const headAtRest = rig.head.getWorldQuaternion(new THREE.Quaternion());
+  const spine = rigPoint(rig.root, rig.spine);
+  const chest = rigPoint(rig.root, rig.chest);
+  const lean = chest.sub(spine).applyAxisAngle(new THREE.Vector3(1, 0, 0), forwardBars ? 0.69 : highSeat ? 0.64 : 0.49).add(spine);
+  aimRigBone(rig.root, rig.spine, rig.chest, lean);
+  // Keep the rider looking along the road while the shoulders reach for the grips.
+  const headInParent = rig.head.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(headAtRest);
+  rig.head.quaternion.slerp(headInParent, 0.9);
+  const grip = RIDER_GRIPS[type] || RIDER_GRIPS.vespa;
+  for (const { side, arm, leg, toe } of rig.limbs) {
+    const hand = new THREE.Vector3(side * grip[0], grip[1], grip[2] - 0.036);
+    const foot = new THREE.Vector3(side * 0.15, 0.34, 0.075);
+    fitRigLimb(rig.root, arm, hand, new THREE.Vector3(side * 0.58, -1, 0.14));
+    fitRigLimb(rig.root, leg, foot, new THREE.Vector3(side * 0.43, 0.08, 1));
+    if (toe) aimRigBone(rig.root, leg[2], toe, rigPoint(rig.root, leg[2]).add(new THREE.Vector3(0, -0.07, 0.12)));
+  }
+
+  const seated = { adjust, pose: snapshotRig(rig.bones) };
+  rig.seats.set(type, seated);
+  return seated;
+}
+
+function prepareAlleyRig(gltf) {
+  const model = gltf.scene;
+  const root = new THREE.Group();
+  root.name = 'Alley15bLocalRider';
+  const bones = [], byName = new Map();
+  let skin = null;
+  model.traverse(node => {
+    if (node.isBone) { bones.push(node); byName.set(node.name, node); }
+    if (node.isSkinnedMesh) { skin = node; node.frustumCulled = false; }
+  });
+  if (!skin || !bones.length) throw new Error('Preview rider has no skin or skeleton');
+  const bone = name => byName.get(name);
+  const hips = bone('pelvis'), spine = bone('spine_01'), chest = bone('spine_02'), head = bone('Head');
+  const limbs = [-1, 1].map(side => {
+    const d = side === -1 ? '_r' : '_l';
+    return {
+      side,
+      arm: ['upperarm', 'lowerarm', 'hand'].map(name => bone(name + d)),
+      leg: ['thigh', 'calf', 'foot'].map(name => bone(name + d)),
+      toe: bone('ball' + d),
+    };
+  });
+  if ([hips, spine, chest, head, ...limbs.flatMap(({ arm, leg }) => [...arm, ...leg])].some(value => !value)) {
+    throw new Error('Preview rider is missing a required bone');
+  }
+
+  root.add(model);
+  root.updateMatrixWorld(true);
+  // The imported character is normalized to the same ventral +Z axis as the scooter.
+  const bounds = new THREE.Box3().setFromObject(model, true);
+  const bodyHeight = bounds.max.y - bounds.min.y;
+  if (!Number.isFinite(bodyHeight) || bodyHeight < 0.1) throw new Error('Preview rider has invalid bounds');
+  const scale = RIG_HEIGHT / bodyHeight;
+  model.scale.multiplyScalar(scale);
+  model.position.y -= bounds.min.y * scale;
+  root.updateMatrixWorld(true);
+  for (const { arm, leg } of limbs) {
+    for (const [upper, lower, end] of [arm, leg]) {
+      const middle = rigPoint(root, lower);
+      if (middle.distanceTo(rigPoint(root, upper)) < 0.001 || middle.distanceTo(rigPoint(root, end)) < 0.001) {
+        throw new Error('Preview rider has a collapsed limb');
+      }
+    }
+  }
+  const mixer = new THREE.AnimationMixer(model);
+  const actions = {};
+  for (const [key, name] of Object.entries({ idle: 'Idle_Loop', walk: 'Walk_Loop', run: 'Jog_Fwd_Loop' })) {
+    const clip = THREE.AnimationClip.findByName(gltf.animations, name);
+    if (!clip) throw new Error('Preview rider has no compatible ' + key + ' clip');
+    actions[key] = mixer.clipAction(clip);
+  }
+  const helmet = alleyHelmet([0, 0, 0], HELMET_LOOKS.grab.c, null);
+  helmet.position.copy(rigPoint(root, head)).add(new THREE.Vector3(0, 0.095, -0.018));
+  root.add(helmet);
+  root.updateWorldMatrix(true, true);
+  head.attach(helmet);
+  root.updateMatrixWorld(true);
+  shadowAll(root);
+  const rest = snapshotRig(bones);
+  actions.idle.play();
+  mixer.update(0);
+  const standing = snapshotRig(bones);
+  actions.idle.stop();
+  return {
+    root, model, mixer, actions, bones, hips, spine, chest, head, limbs, rest, standing,
+    ground: model.position.clone(), seats: new Map(), activeClip: null, poseMode: '',
+  };
+}
+
+function hideAlleyRig() {
+  if (!alleyRig || !alleyRig.root.visible) return;
+  const rig = alleyRig;
+  rig.root.removeFromParent();
+  rig.root.visible = false;
+  for (const part of driver.children) part.visible = true;
+  rig.mixer.stopAllAction();
+  rig.activeClip = null;
+  rig.poseMode = '';
+}
+
+function updateAlleyRig(foot, dt) {
+  const rig = alleyRig;
+  const look = profile.look;
+  const supportedLook = look.g === 'm' && look.skin === 0 && look.jacket === 'grab' && look.helmet === 'grab' && look.acc === 'none';
+  if (!rig || !supportedLook) { hideAlleyRig(); return false; }
+  if (walker) walker.g.visible = false;
+  rig.root.visible = true;
+  const onFoot = Boolean(foot);
+  const parent = onFoot ? scene : driver;
+  if (rig.root.parent !== parent) {
+    parent.add(rig.root);
+    for (const part of driver.children) if (part !== rig.root) part.visible = onFoot;
+  }
+
+  if (onFoot) {
+    const move = foot.action;
+    const t = move ? move.t * move.t * (3 - 2 * move.t) : 0;
+    const seatedWeight = move ? (move.mount ? t : 1 - t) : 0;
+    rig.root.position.set(player.x, player.y + RIDER.y * seatedWeight, player.z);
+    rig.root.rotation.set(0, player.h, 0);
+    if (move) {
+      if (rig.poseMode !== 'transition') {
+        rig.transitionPose = move.mount ? snapshotRig(rig.bones) : rig.standing;
+        rig.mixer.stopAllAction();
+        rig.activeClip = null;
+      }
+      const seat = rigSeat(rig, mountedDriverType);
+      setRigPose(rig, seat.pose, seatedWeight, rig.transitionPose);
+      rig.model.position.addScaledVector(seat.adjust, seatedWeight);
+      rig.model.position.y += Math.sin(t * Math.PI) * 0.11;
+      rig.poseMode = 'transition';
+      return true;
+    }
+    if (rig.poseMode !== 'foot') setRigPose(rig, rig.rest);
+    const next = foot.speed < 0.16 ? 'idle' : foot.run > 0.55 && foot.speed > 2.5 ? 'run' : 'walk';
+    if (next !== rig.activeClip) {
+      const action = rig.actions[next].reset().setEffectiveWeight(1).play();
+      if (rig.activeClip) rig.actions[rig.activeClip].crossFadeTo(action, 0.18, false);
+      rig.activeClip = next;
+    }
+    const playSpeed = next === 'run' ? foot.speed / 4.4 : next === 'walk' ? foot.speed / 1.85 : 1;
+    rig.actions[next].setEffectiveTimeScale(THREE.MathUtils.clamp(playSpeed, 0.45, 1.3));
+    rig.mixer.update(game.paused ? 0 : dt);
+    rig.poseMode = 'foot';
+  } else {
+    rig.root.position.set(0, 0, 0);
+    rig.root.rotation.set(0, 0, 0);
+    if (rig.poseMode !== mountedDriverType) {
+      if (rig.activeClip) {
+        rig.mixer.stopAllAction();
+        rig.activeClip = null;
+      }
+      const seat = rigSeat(rig, mountedDriverType);
+      setRigPose(rig, seat.pose);
+      rig.model.position.add(seat.adjust);
+      rig.poseMode = mountedDriverType;
+    }
+  }
+  return true;
+}
+
+if (ALLEY_PREVIEW) BOOT.push(() => {
+  new GLTFLoader().load(RIG_ASSET + '?v=' + GAME_VERSION, (gltf) => {
+    try { alleyRig = prepareAlleyRig(gltf); }
+    catch (err) { console.warn('Could not prepare the 15B rider. Using the procedural rider.', err); }
+  }, undefined, err => console.warn('Could not load the 15B rider. Using the procedural rider.', err));
+});
+
 function buildWalker(look) {
   const J = JACKETS[look.jacket] || JACKETS.grab;
   const H = HELMET_LOOKS[look.helmet] || HELMET_LOOKS.grab;
@@ -318,6 +546,7 @@ function buildWalker(look) {
 }
 function updateWalker(dt) {
   const state = player.foot;
+  if (ALLEY_PREVIEW && updateAlleyRig(state, dt)) return;
   if (!state) { if (walker) walker.g.visible = false; return; }
   if (!walker) walker = buildWalker(profile.look);
   poseWalker(walker, state, player, player.parked.side, RIDER.y, dt);
@@ -361,6 +590,7 @@ function disposeDriver(root) {
   });
 }
 function replaceMountedDriver() {
+  if (alleyRig?.root.parent === driver) alleyRig.root.removeFromParent();
   const ng = buildDriver2(profile.look, mountedDriverType);
   disposeDriver(driver);
   driver.clear();

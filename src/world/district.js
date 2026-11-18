@@ -159,7 +159,7 @@ if (DISTRICT === 'q1') {
     g.font = 'bold 60px sans-serif'; g.fillText('HẺM 15B', w / 2, 87);
     g.font = 'bold 44px sans-serif'; g.fillText('LÊ THÁNH TÔN', w / 2, 145);
   });
-  const alleySign = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 0.79), std(0xffffff, { map: streetSign, side: THREE.DoubleSide }));
+  const alleySign = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 0.79), std(0xffffff, { map: streetSign, side: ALLEY_PREVIEW ? THREE.FrontSide : THREE.DoubleSide }));
   const entrance = nearestEdge(...MAP.spawn, E => NAMES[E.n] === 'Lê Thánh Tôn');
   if (entrance) {
     const side = edgeAt(entrance.E, entrance.along, true);
@@ -170,5 +170,11 @@ if (DISTRICT === 'q1') {
     alleySign.rotation.y = Math.atan2(-side.dz, side.dx);
     pole.position.set(x, 1.59, z);
     scene.add(alleySign, pole);
+    if (ALLEY_PREVIEW) {
+      const back = new THREE.Mesh(alleySign.geometry, alleySign.material);
+      back.position.copy(alleySign.position);
+      back.rotation.y = alleySign.rotation.y + Math.PI;
+      scene.add(back);
+    }
   }
 }

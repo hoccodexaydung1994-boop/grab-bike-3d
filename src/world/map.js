@@ -2,6 +2,7 @@
 /* ================= District world (OpenStreetMap) ================= */
 const MAP = window.GAME_MAP || window.Q7;
 const DISTRICT = MAP.district || 'q7';
+const ALLEY_PREVIEW = DISTRICT === 'q1' && window.ENABLE_ALLEY_PREVIEW === true;
 const [BX0, BZ0, BX1, BZ1] = MAP.bounds;
 const NAMES = MAP.names;
 let seedW = 12345;

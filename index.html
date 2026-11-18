@@ -75,7 +75,7 @@
     <button class="sbtn" id="bMenu" title="Hồ sơ · Kỹ năng · Xe · Tài chính · Cài đặt (Tab)">☰</button>
     <button class="sbtn" id="bAct" title="Hành động (E)">🛠</button>
     <button class="sbtn" id="bQuest" title="Nhiệm vụ (Q)">📋</button>
-    <button class="sbtn" id="bPhone">📱</button>
+    <button class="sbtn" id="bPhone" aria-label="Điện thoại" aria-controls="phoneUI" title="Điện thoại (P)">📱</button>
     <button class="sbtn" id="bView2">🔄</button>
   </div>
   <div id="sig" class="sig hidden"></div>
@@ -92,6 +92,12 @@
   <div id="wanted"></div>
   <div id="lb" class="hidden"><div id="lbRows"></div><input id="chatIn" placeholder="💬 Chat… (Enter)" maxlength="120" style="width:100%;margin-top:6px;border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:12px"></div>
   <div id="help">W/↑ ga · S/↓ phanh · A D/← → lái · Space phanh tay · Tab hồ sơ/kỹ năng/xe · Enter nhận cuốc · N bỏ qua · E hành động (xăng, ăn uống, sửa xe, nghỉ) · Q nhiệm vụ · H còi · G chỉ đường · P điện thoại · C đổi góc máy · F lên/xuống xe · Shift chạy bộ · Kéo/xoay con lăn chỉnh camera · V xem xe 360° · M tắt tiếng · R về nhà</div>
+  <details id="alleyHelp">
+    <summary>Phím điều khiển</summary>
+    <p>WASD hoặc mũi tên để di chuyển · F lên/xuống xe · Shift chạy bộ · Space phanh tay</p>
+    <p>Kéo chuột để xoay camera · Cuộn để đổi khoảng cách · C đổi góc nhìn</p>
+    <p>Enter nhận cuốc · N bỏ qua · G chỉ đường · E hành động · Tab hồ sơ · P điện thoại</p>
+  </details>
   <div id="touch" class="hidden">
     <div class="tb" id="tLeft" style="display:none">◀</div><div class="tb" id="tRight" style="display:none">▶</div><div id="joy"><div id="joyKnob"></div><span>◀ LÁI ▶</span></div>
     <div class="tb" id="tHorn">📯</div>

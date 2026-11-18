@@ -101,9 +101,16 @@ function toggleMute() { game.muted = !game.muted; $('bMute').textContent = game.
 $('bCam').onclick = cycleCam;
 phoneCanvas.id = 'phoneUI';
 $('hud').appendChild(phoneCanvas);
-if (isTouch) phoneCanvas.classList.add('hidden');
-const togglePhone = () => phoneCanvas.classList.toggle('hidden');
-$('bPhone').onclick = togglePhone;
+if (ALLEY_PREVIEW) document.body.classList.add('alley-preview');
+const phoneButton = $('bPhone');
+const phoneStartsHidden = isTouch || ALLEY_PREVIEW;
+if (phoneStartsHidden) phoneCanvas.classList.add('hidden');
+phoneButton.setAttribute('aria-expanded', String(!phoneStartsHidden));
+function togglePhone() {
+  phoneCanvas.classList.toggle('hidden');
+  phoneButton.setAttribute('aria-expanded', String(!phoneCanvas.classList.contains('hidden')));
+}
+phoneButton.onclick = togglePhone;
 
 let warping = false;
 function goToTarget() {

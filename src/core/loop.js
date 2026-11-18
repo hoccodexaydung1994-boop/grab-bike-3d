@@ -37,7 +37,17 @@ function animate() {
   netTick(dt);
   for (const f of FRAME) f(dt, frameTime);
   for (const c of CHECKPOINTS) c.lb.visible = Math.hypot(c.x - player.x, c.z - player.z) < (SK().tho >= 2 ? 450 : 260);
-  for (const l of labels) l.visible = Math.abs(l.position.x - player.x) < 450 && Math.abs(l.position.z - player.z) < 450;
+  const alleyHud = ALLEY_PREVIEW ? alley15bBlend(player.x, player.z) : 0;
+  const labelRange = 450 - 417 * alleyHud;
+  for (const label of labels) {
+    const dx = label.position.x - player.x, dz = label.position.z - player.z;
+    if (ALLEY_PREVIEW) {
+      const base = label.userData.alleyLabelScale ||= [label.scale.x, label.scale.y, label.scale.z];
+      const scale = 1 - alleyHud * 0.66;
+      label.scale.set(base[0] * scale, base[1] * scale, base[2]);
+    }
+    label.visible = Math.abs(dx) < labelRange && Math.abs(dz) < labelRange;
+  }
   if (eng) {
     const on = game.mode === 'drive' && !player.parked && !game.muted && !game.frozen && !curBike().elec;
     const gas = keys.KeyW || keys.ArrowUp || touch.gas;

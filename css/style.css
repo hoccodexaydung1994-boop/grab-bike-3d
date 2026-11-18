@@ -136,3 +136,90 @@
     #speed b{font-size:34px}
     body.touch #speed{top:130px}
   }
+
+  #alleyHelp{display:none}
+  .alley-preview{
+    --alley-hud-bg:rgba(14,22,22,.86);
+    --alley-hud-border:rgba(222,239,230,.22);
+    --alley-hud-text:#f4f8f6;
+    --alley-hud-accent:#a8edcf;
+    --alley-hud-muted:#d0dbd5;
+  }
+  .alley-preview #panel{
+    min-width:158px;max-width:228px;padding:9px 11px;font-size:13px;line-height:1.42;
+    color:var(--alley-hud-text);background:var(--alley-hud-bg);
+    border:1px solid var(--alley-hud-border);border-radius:10px;backdrop-filter:blur(6px);
+  }
+  .alley-preview #panel .brand{color:var(--alley-hud-accent);font-size:12px;letter-spacing:.02em}
+  .alley-preview #panel b{font-size:13px}
+  .alley-preview #status{max-width:196px;color:#f4dfb9}
+  .alley-preview #street{color:var(--alley-hud-muted);opacity:1}
+  .alley-preview #taskTicker:empty{display:none}
+  .alley-preview #mini{width:124px;height:124px;border:1px solid var(--alley-hud-border);border-radius:10px}
+  .alley-preview #topbtns{right:146px;gap:4px}
+  .alley-preview #topbtns .sbtn,
+  .alley-preview #bMount{
+    min-height:34px;background:var(--alley-hud-bg);border:1px solid var(--alley-hud-border);border-radius:8px;
+  }
+  .alley-preview #topbtns .sbtn{min-width:34px;padding:6px}
+  .alley-preview #topbtns .sbtn.pulse,
+  .alley-preview #bPhone[aria-expanded="true"]{background:#205b4a}
+  .alley-preview #bMini{
+    top:54px;left:calc(50% - 29px);transform:translateX(-100%);
+    color:var(--alley-hud-text);background:var(--alley-hud-bg);border:1px solid var(--alley-hud-border);
+  }
+  .alley-preview #arrow{width:38px;height:38px}
+  .alley-preview #arrow path{fill:#9adbbb;stroke-width:1.5}
+  .alley-preview #dist{font-size:12px;background:var(--alley-hud-bg)}
+  .alley-preview #speed b{font-size:36px;font-variant-numeric:tabular-nums}
+  .alley-preview #limit{width:29px;height:29px;border-width:3px;font-size:12px}
+  .alley-preview #bMount{bottom:123px}
+  .alley-preview #bGo{
+    font-size:14px;font-weight:700;padding:8px 15px;background:#205b4a;
+    border:1px solid var(--alley-hud-border);box-shadow:0 4px 14px rgba(0,0,0,.28);
+  }
+  .alley-preview #bGo.drop{background:#744f37}
+  .alley-preview #toast{font-size:14px;padding:8px 14px;background:var(--alley-hud-bg);border-radius:9px}
+  .alley-preview #help{display:none}
+  .alley-preview #alleyHelp{
+    display:block;position:fixed;bottom:14px;left:12px;z-index:7;max-width:min(350px,35vw);
+    padding:7px 10px;color:var(--alley-hud-text);font-size:12px;line-height:1.45;
+    background:var(--alley-hud-bg);border:1px solid var(--alley-hud-border);border-radius:8px;
+  }
+  .alley-preview #alleyHelp summary{cursor:pointer}
+  .alley-preview #alleyHelp p{margin:6px 0 0;color:var(--alley-hud-muted)}
+  .alley-preview #phoneUI{
+    width:min(156px,calc((100dvh - 70px)/2));height:min(312px,calc(100dvh - 70px));
+    top:auto;bottom:52px;border-radius:16px;border-width:4px;z-index:7;
+  }
+  body.touch.alley-preview #alleyHelp{display:none}
+  body.touch.alley-preview #panel{padding:7px 9px;max-width:194px}
+  body.touch.alley-preview #panel .st b{min-width:38px}
+  body.touch.alley-preview #speed{top:142px}
+  body.touch.alley-preview #speed b{font-size:26px}
+  body.touch.alley-preview #bMount{bottom:114px;min-height:44px}
+  body.touch.alley-preview #topbtns .sbtn{min-height:44px;min-width:44px}
+  body.touch.alley-preview #bGo{min-height:44px}
+  body.touch.alley-preview #bMini{top:auto;bottom:20px;left:50%;transform:translateX(-50%);min-height:44px;min-width:44px}
+  body.touch.alley-preview #phoneUI{
+    left:clamp(10px,23vw,200px);bottom:105px;
+    width:min(142px,calc((100dvh - 112px)/2));height:min(284px,calc(100dvh - 112px));
+  }
+  @media(max-width:700px){
+    .alley-preview #mini{width:96px;height:96px}
+    .alley-preview #topbtns{right:117px}
+    body.touch.alley-preview #speed{top:114px}
+  }
+  @media(max-width:660px){
+    body.touch.alley-preview #topbtns{max-width:188px;flex-wrap:wrap;justify-content:flex-end}
+    body.touch.alley-preview #bGo{bottom:161px}
+  }
+  @media(max-width:560px){
+    .alley-preview #panel,body.touch.alley-preview #panel{min-width:138px;max-width:160px}
+    body.touch.alley-preview #bMini{bottom:104px;left:18px;transform:none}
+  }
+  @media(max-width:560px) and (orientation:portrait){
+    .alley-preview #topbtns{top:117px;right:12px;width:92px;display:grid;grid-template-columns:repeat(2,1fr)}
+    body.touch.alley-preview #speed,.alley-preview #speed{top:318px;bottom:auto}
+    body.touch.alley-preview #phoneUI{left:12px}
+  }

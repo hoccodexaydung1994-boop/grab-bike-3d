@@ -141,8 +141,10 @@ function computeRoute(from, TE, Talong) {
   return { pts, len };
 }
 let route = null, routeT = 0, routeMesh = null;
-const routeMatG = new THREE.MeshBasicMaterial({ color: 0x00d26a, transparent: true, opacity: 0.6, depthWrite: false });
-const routeMatO = new THREE.MeshBasicMaterial({ color: 0xff8a1f, transparent: true, opacity: 0.6, depthWrite: false });
+const ROUTE_OPACITY = ALLEY_PREVIEW ? 0.48 : 0.6;
+const ROUTE_FLASH_OPACITY = ALLEY_PREVIEW ? 0.16 : 0.35;
+const routeMatG = new THREE.MeshBasicMaterial({ color: ALLEY_PREVIEW ? 0x7ce8be : 0x00d26a, transparent: true, opacity: ROUTE_OPACITY, depthWrite: false });
+const routeMatO = new THREE.MeshBasicMaterial({ color: ALLEY_PREVIEW ? 0xffbd7e : 0xff8a1f, transparent: true, opacity: ROUTE_OPACITY, depthWrite: false });
 function currentTarget() { if (!game.order) return null; if (game.order.type === 'batch') return game.order.stops ? batchTarget(game.order) : null; return game.state === 'pickup' ? game.order.pickup : game.state === 'ride' ? game.order.drop : null; }
 function refreshRoute() {
   const t = currentTarget();
@@ -150,7 +152,7 @@ function refreshRoute() {
   if (!t) { route = null; return; }
   route = computeRoute(player, t.E, t.along);
   if (!route) return;
-  const buf = nb(); ribbon(route.pts, 1.5, 0.14, buf);
+  const buf = nb(); ribbon(route.pts, ALLEY_PREVIEW ? 0.47 : 1.5, 0.14, buf);
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(buf.pos, 3)); g.setIndex(buf.idx); g.computeVertexNormals();
   routeMesh = new THREE.Mesh(g, game.state === 'pickup' ? routeMatG : routeMatO); routeMesh.renderOrder = 2; scene.add(routeMesh);
 }

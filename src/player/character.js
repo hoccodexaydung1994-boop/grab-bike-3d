@@ -21,6 +21,124 @@ function jacketTexFor(id) {
     for (let i = 0; i < 1500; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.05})`; g.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
   });
 }
+// The preview uses fitted garment panels around the unchanged rider joints.
+const alleyJackets = new Map();
+function alleyJacketMaterial(id) {
+  if (!Object.hasOwn(JACKETS, id)) id = 'grab';
+  if (!alleyJackets.has(id)) {
+    const J = JACKETS[id];
+    const tone = id === 'grab' ? ['#257e5b', '#175840', '#193e32'] : J.c;
+    const map = canvasTex2(512, 256, (g, w, h) => {
+      const dye = g.createLinearGradient(0, 0, 0, h);
+      dye.addColorStop(0, tone[0]); dye.addColorStop(1, tone[1]);
+      g.fillStyle = dye; g.fillRect(0, 0, w, h);
+      g.fillStyle = tone[2];
+      g.fillRect(0, 0, w, 43);
+      g.fillRect(0, h - 21, w, 21);
+      for (const x of [w * 0.23, w * 0.69]) g.fillRect(x, 43, w * 0.08, h - 64);
+      g.fillStyle = 'rgba(231,231,206,.65)';
+      g.fillRect(w * 0.34, 51, w * 0.32, 6);
+      g.fillStyle = 'rgba(235,231,205,.35)';
+      for (let x = 7; x < w; x += 5) g.fillRect(x, 44, 3, 1);
+      g.fillStyle = 'rgba(15,23,22,.5)';
+      g.fillRect(0, 25, 5, h - 45); g.fillRect(w - 5, 25, 5, h - 45);
+      g.fillStyle = id === 'white' ? '#285043' : '#e2e6d7';
+      g.font = '700 24px system-ui,sans-serif'; g.textAlign = 'center';
+      if (J.txt) g.fillText(J.txt, w / 2, 110);
+      for (let i = 0; i < 2500; i++) {
+        g.fillStyle = i % 2 ? 'rgba(0,0,0,.075)' : 'rgba(255,255,255,.085)';
+        g.fillRect((i * 89.111) % w, (i * 27.313) % h, 1 + i % 3, 1);
+      }
+    });
+    alleyJackets.set(id, map);
+  }
+  return std(0xffffff, { map: alleyJackets.get(id), roughness: id === 'rain' ? 0.54 : 0.94 });
+}
+function fittedJacket(material, width = 1) {
+  const profile = [
+    [-0.274, 0.128, 0.092], [-0.239, 0.171, 0.115],
+    [-0.178, 0.172, 0.122], [-0.124, 0.164, 0.116],
+    [-0.071, 0.178, 0.122], [0.012, 0.181, 0.129],
+    [0.095, 0.191, 0.131], [0.159, 0.223, 0.111],
+    [0.198, 0.201, 0.096], [0.241, 0.081, 0.070],
+    [0.249, 0.050, 0.045],
+  ];
+  const segments = 32, stride = segments + 1;
+  const positions = [], uvs = [], indices = [];
+  for (let row = 0; row < profile.length; row++) {
+    const [y, rx, rz] = profile[row];
+    for (let col = 0; col <= segments; col++) {
+      const u = col / segments;
+      const angle = u * 2 * Math.PI;
+      const fold = 1 + 0.025 * Math.cos(angle * 6 + row * 1.8);
+      positions.push(Math.sin(angle) * rx * width * fold, y, Math.cos(angle) * rz * fold);
+      uvs.push(u, (y - profile[0][0]) / (profile.at(-1)[0] - profile[0][0]));
+      if (row && col) {
+        const i = row * stride + col;
+        indices.push(i - stride - 1, i - stride, i - 1, i - stride, i, i - 1);
+      }
+    }
+  }
+  const shape = new THREE.BufferGeometry();
+  shape.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  shape.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  shape.setIndex(indices);
+  shape.computeVertexNormals();
+  const normals = shape.getAttribute('normal');
+  for (let row = 0; row < profile.length; row++) {
+    const left = row * stride, right = left + segments;
+    const x = normals.getX(left) + normals.getX(right);
+    const y = normals.getY(left) + normals.getY(right);
+    const z = normals.getZ(left) + normals.getZ(right);
+    const length = Math.hypot(x, y, z) || 1;
+    normals.setXYZ(left, x / length, y / length, z / length);
+    normals.setXYZ(right, x / length, y / length, z / length);
+  }
+  return new THREE.Mesh(shape, material);
+}
+function fittedSleeve(a, b, wide, narrow, material) {
+  const start = new THREE.Vector3(...a), end = new THREE.Vector3(...b);
+  const length = start.distanceTo(end);
+  const rings = [[0, wide * 0.78], [0.16, wide], [0.38, wide * 0.94], [0.66, narrow * 1.12], [0.83, narrow * 1.04], [1, narrow]];
+  const shape = new THREE.LatheGeometry(rings.map(([t, r]) => new THREE.Vector2(r, (t - 0.5) * length)), GFX_HIGH ? 16 : 12);
+  const mesh = new THREE.Mesh(shape, material);
+  mesh.position.copy(start).lerp(end, 0.5);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), end.sub(start).normalize());
+  return mesh;
+}
+function alleyHelmet(position, color, skinMaterial) {
+  const group = new THREE.Group();
+  group.position.set(...position);
+  const shell = new THREE.MeshPhysicalMaterial({
+    color: color === HELMET_LOOKS.grab.c ? 0x216d50 : color,
+    roughness: 0.47, clearcoat: 0.42, clearcoatRoughness: 0.34,
+  });
+  const rubber = std(0x242727, { roughness: 0.87 });
+  const detail = std(0xbcbdb0, { roughness: 0.7 });
+  const tinted = new THREE.MeshPhysicalMaterial({
+    color: 0x273638, roughness: 0.34, metalness: 0.15, clearcoat: 0.3, side: THREE.DoubleSide,
+  });
+  function add(geometry, material, x, y, z) {
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    group.add(mesh);
+    return mesh;
+  }
+  add(new THREE.SphereGeometry(0.143, 24, 15, 0, Math.PI * 2, 0, 1.94), shell, 0, 0.022, -0.012).scale.set(1, 1.06, 1.15);
+  add(new THREE.SphereGeometry(0.105, 18, 13), skinMaterial, 0, -0.058, 0.025).scale.set(0.88, 1.06, 0.95);
+  const rim = add(new THREE.TorusGeometry(0.134, 0.009, 6, 26), rubber, 0, -0.032, -0.012);
+  rim.rotation.x = Math.PI / 2 - 0.1; rim.scale.set(1, 1.14, 1);
+  // Sphere U=0.25 faces forward (+Z).
+  add(new THREE.SphereGeometry(0.148, 22, 9, 0.69, 1.77, 1.18, 0.74), tinted, 0, 0.025, -0.006).scale.set(1, 1, 1.16);
+  const rear = add(new THREE.BoxGeometry(0.097, 0.012, 0.013), detail, 0, -0.006, -0.173);
+  rear.rotation.x = 0.11;
+  for (const side of [-1, 1]) {
+    add(new THREE.SphereGeometry(0.025, 12, 8), rubber, side * 0.132, -0.030, 0.016).scale.set(0.4, 1, 1);
+    group.add(limb([side * 0.103, -0.041, 0.005], [side * 0.071, -0.122, 0.049], 0.005, rubber));
+  }
+  return group;
+}
+
 // Grip centers in rider-local coordinates. The SH seat raises its rider by 0.19 m.
 const RIDER_GRIPS = {
   vespa: [0.326, 1.101, 0.243],
@@ -35,25 +153,52 @@ function buildDriver2(look, bikeType = 'vespa') {
   const J = JACKETS[look.jacket] || JACKETS.grab, H = HELMET_LOOKS[look.helmet] || HELMET_LOOKS.grab, fem = look.g === 'f';
   const g = new THREE.Group();
   const skinM = std(SKINS[look.skin] || SKINS[0], { roughness: 0.7 });
-  const jacket = std(0xffffff, { map: jacketTexFor(look.jacket in JACKETS ? look.jacket : 'grab'), roughness: look.jacket === 'rain' ? 0.25 : 0.75 });
-  const sleeve = std(look.acc === 'sleeves' ? 0xf4f4f4 : J.sl, { roughness: 0.75 }), dark = std(J.dk, { roughness: 0.75 });
+  const jacket = ALLEY_PREVIEW ? alleyJacketMaterial(look.jacket)
+    : std(0xffffff, { map: jacketTexFor(look.jacket in JACKETS ? look.jacket : 'grab'), roughness: look.jacket === 'rain' ? 0.25 : 0.75 });
+  const sleeve = std(look.acc === 'sleeves' ? 0xf4f4f4 : ALLEY_PREVIEW && look.jacket === 'grab' ? 0x266f53 : J.sl, { roughness: ALLEY_PREVIEW ? 0.92 : 0.75 });
+  const dark = std(J.dk, { roughness: 0.75 });
   const pants = std(fem ? 0x3b3f58 : 0x232a36, { roughness: 0.9 }), glove = std(0x151515, { roughness: 0.6 });
-  const torso = limb([0, 0.92, -0.42], [0, 1.34, -0.33], fem ? 0.15 : 0.165, jacket); torso.scale.set(fem ? 1.08 : 1.18, 1, 0.82); g.add(torso);
+  if (ALLEY_PREVIEW) {
+    const torso = fittedJacket(jacket, fem ? 0.93 : 1);
+    torso.position.set(0, 1.142, -0.37);
+    torso.rotation.x = 0.21;
+    g.add(torso);
+    const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.074, 0.10, 0.063, 18), dark);
+    collar.position.set(0, 1.402, -0.316);
+    collar.rotation.x = 0.21;
+    g.add(collar);
+  } else {
+    const torso = limb([0, 0.92, -0.42], [0, 1.34, -0.33], fem ? 0.15 : 0.165, jacket);
+    torso.scale.set(fem ? 1.08 : 1.18, 1, 0.82);
+    g.add(torso);
+  }
   g.add(limb([0, 1.47, -0.31], [0, 1.55, -0.29], 0.055, skinM));
-  g.add(helmet([0, 1.67, -0.27], H.c));
+  g.add(ALLEY_PREVIEW
+    ? alleyHelmet([0, 1.652, -0.277], H.c, skinM)
+    : helmet([0, 1.67, -0.27], H.c));
   if (fem) { const tail = limb([0, 1.6, -0.43], [0, 1.4, -0.5], 0.045, std(0x1a1310, { roughness: 0.8 })); g.add(tail); }
   if (look.acc === 'mask') { const m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 10, 0, Math.PI * 2, Math.PI * 0.45, Math.PI * 0.35), std(0x5aa9e6, { roughness: 0.9, side: THREE.DoubleSide })); m.position.set(0, 1.6, -0.2); m.scale.set(1, 0.9, 0.9); g.add(m); }
   if (look.acc === 'bag') { const b = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.4, 0.16), std(0x2b2f36, { roughness: 0.8 })); b.position.set(0, 1.15, -0.56); b.rotation.x = 0.2; g.add(b); }
-  const hem = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.025, 8, 24), dark); hem.rotation.x = Math.PI / 2 - 0.2; hem.position.set(0, 0.86, -0.43); hem.scale.set(1.15, 0.85, 1); g.add(hem);
+  if (!ALLEY_PREVIEW) {
+    const hem = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.025, 8, 24), dark);
+    hem.rotation.x = Math.PI / 2 - 0.2; hem.position.set(0, 0.86, -0.43); hem.scale.set(1.15, 0.85, 1); g.add(hem);
+  }
   for (const s of [-1, 1]) {
     const sh = [s * (fem ? 0.19 : 0.21), 1.32, -0.33], el = [s * 0.29, 1.13, -0.04], wr = [s * grip[0], grip[1], grip[2]];
-    g.add(joint(sh, 0.075, sleeve)); g.add(limb(sh, el, 0.056, sleeve)); g.add(joint(el, 0.053, sleeve)); g.add(limb(el, wr, 0.048, sleeve));
+    g.add(joint(sh, 0.075, sleeve), joint(el, 0.053, sleeve));
+    if (ALLEY_PREVIEW) {
+      g.add(fittedSleeve(sh, el, 0.076, 0.054, sleeve), fittedSleeve(el, wr, 0.055, 0.038, sleeve));
+      const cuffStart = el.map((value, index) => value + (wr[index] - value) * 0.83);
+      g.add(fittedSleeve(cuffStart, wr, 0.043, 0.038, dark));
+    } else {
+      g.add(limb(sh, el, 0.056, sleeve), limb(el, wr, 0.048, sleeve));
+    }
     const hand = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 10), glove); hand.scale.set(1, 0.9, 1.25); hand.position.set(...wr); g.add(hand);
     const hip = [s * 0.1, 0.87, -0.4], kn = [s * 0.17, 0.8, -0.02], an = [s * 0.14, 0.37, 0.06];
     g.add(joint(hip, 0.08, pants)); g.add(limb(hip, kn, fem ? 0.072 : 0.078, pants)); g.add(joint(kn, 0.07, pants)); g.add(limb(kn, an, 0.06, pants));
     const shoe = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.14, 4, 10), std(fem ? 0xf5f5f5 : 0x1d1d1f, { roughness: 0.6 })); shoe.rotation.x = Math.PI / 2; shoe.position.set(s * 0.14, 0.31, 0.11); g.add(shoe);
   }
-  if (GFX_HIGH) {   // chi tiết thêm: mặt, cổ áo, khoá kéo, túi, băng phản quang, cổ tay, đế giày, đai lưng
+  if (GFX_HIGH && !ALLEY_PREVIEW) {   // chi tiết thêm: mặt, cổ áo, khoá kéo, túi, băng phản quang, cổ tay, đế giày, đai lưng
     const refl = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, metalness: 0.5, roughness: 0.25, emissive: 0x444444 });
     const face = new THREE.Mesh(new THREE.SphereGeometry(0.105, 20, 16), skinM); face.scale.set(0.92, 1.05, 0.95); face.position.set(0, 1.6, -0.255); g.add(face);
     const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.1, 0.085, 20, 1, true), std(J.dk, { side: THREE.DoubleSide, roughness: 0.8 })); collar.position.set(0, 1.48, -0.31); collar.rotation.x = 0.15; g.add(collar);
@@ -79,8 +224,9 @@ function buildWalker(look) {
   const J = JACKETS[look.jacket] || JACKETS.grab;
   const H = HELMET_LOOKS[look.helmet] || HELMET_LOOKS.grab;
   const skin = std(SKINS[look.skin] || SKINS[0], { roughness: 0.77 });
-  const jacket = std(0xffffff, { map: jacketTexFor(Object.hasOwn(JACKETS, look.jacket) ? look.jacket : 'grab'), roughness: 0.84 });
-  const sleeve = std(look.acc === 'sleeves' ? 0xf4f4f4 : J.sl, { roughness: 0.83 });
+  const jacket = ALLEY_PREVIEW ? alleyJacketMaterial(look.jacket)
+    : std(0xffffff, { map: jacketTexFor(Object.hasOwn(JACKETS, look.jacket) ? look.jacket : 'grab'), roughness: 0.84 });
+  const sleeve = std(look.acc === 'sleeves' ? 0xf4f4f4 : ALLEY_PREVIEW && look.jacket === 'grab' ? 0x266f53 : J.sl, { roughness: ALLEY_PREVIEW ? 0.92 : 0.83 });
   const dark = std(J.dk, { roughness: 0.78 });
   const pants = std(look.g === 'f' ? 0x3b3f58 : 0x232a36, { roughness: 0.9 });
   const shoes = std(look.g === 'f' ? 0xd8dce0 : 0x2b2c2e, { roughness: 0.84 });
@@ -101,21 +247,31 @@ function buildWalker(look) {
   function box(parent, w, h, d, material, x, y, z) {
     return part(parent, new THREE.BoxGeometry(w, h, d), material, x, y, z);
   }
-  const body = part(upper, new THREE.CylinderGeometry(0.191, 0.15, 0.43, 20), jacket, 0, 0.225, 0.025);
-  body.scale.set(1.12, 1, 0.76);
+  if (ALLEY_PREVIEW) {
+    const body = fittedJacket(jacket, look.g === 'f' ? 0.92 : 1);
+    body.position.set(0, 0.215, 0.022);
+    upper.add(body);
+  } else {
+    const body = part(upper, new THREE.CylinderGeometry(0.191, 0.15, 0.43, 20), jacket, 0, 0.225, 0.025);
+    body.scale.set(1.12, 1, 0.76);
+  }
   const hip = part(pelvis, new THREE.SphereGeometry(0.18, 18, 12), pants, 0, -0.02, 0);
   hip.scale.set(1.08, 0.61, 0.85);
   box(upper, 0.009, 0.32, 0.009, dark, 0, 0.2, 0.169);
   part(upper, new THREE.CylinderGeometry(0.07, 0.093, 0.06, 14), dark, 0, 0.445, 0.031);
   head.position.set(0, 0.6, 0.043);
-  const face = part(head, new THREE.SphereGeometry(0.117, 18, 14), skin, 0, -0.02, 0.025);
-  face.scale.set(0.83, 1.12, 0.91);
-  const helmetShell = part(head, new THREE.SphereGeometry(0.144, 24, 14, 0, Math.PI * 2, 0, Math.PI * 0.56), shell, 0, 0.033, 0);
-  helmetShell.scale.set(0.98, 1.01, 1.14);
-  const visor = box(head, 0.21, 0.019, 0.083, shell, 0, 0.028, 0.144);
-  visor.rotation.x = -0.17;
-  const band = box(head, 0.087, 0.022, 0.009, trim, 0, 0.043, -0.163);
-  band.rotation.x = -0.13;
+  if (ALLEY_PREVIEW) {
+    head.add(alleyHelmet([0, 0.035, 0], H.c, skin));
+  } else {
+    const face = part(head, new THREE.SphereGeometry(0.117, 18, 14), skin, 0, -0.02, 0.025);
+    face.scale.set(0.83, 1.12, 0.91);
+    const helmetShell = part(head, new THREE.SphereGeometry(0.144, 24, 14, 0, Math.PI * 2, 0, Math.PI * 0.56), shell, 0, 0.033, 0);
+    helmetShell.scale.set(0.98, 1.01, 1.14);
+    const visor = box(head, 0.21, 0.019, 0.083, shell, 0, 0.028, 0.144);
+    visor.rotation.x = -0.17;
+    const band = box(head, 0.087, 0.022, 0.009, trim, 0, 0.043, -0.163);
+    band.rotation.x = -0.13;
+  }
   if (look.acc === 'mask') {
     const mask = part(head, new THREE.SphereGeometry(0.1, 16, 10), std(0x82b8d1), 0, -0.071, 0.076);
     mask.scale.set(0.89, 0.49, 0.6);
@@ -131,8 +287,14 @@ function buildWalker(look) {
     arm.position.set(side * 0.213, 0.356, 0.018);
     elbow.position.set(0, -0.267, 0);
     upper.add(arm);
-    arm.add(elbow, limb([0, -0.03, 0], [0, -0.24, 0], 0.063, sleeve));
-    elbow.add(limb([0, -0.005, 0], [0, -0.225, 0], 0.048, sleeve));
+    arm.add(elbow);
+    if (ALLEY_PREVIEW) {
+      arm.add(joint([0, 0, 0], 0.069, sleeve), fittedSleeve([0, -0.018, 0], [0, -0.268, 0], 0.071, 0.052, sleeve));
+      elbow.add(joint([0, 0, 0], 0.054, sleeve), fittedSleeve([0, 0, 0], [0, -0.231, 0], 0.055, 0.039, sleeve));
+    } else {
+      arm.add(limb([0, -0.03, 0], [0, -0.24, 0], 0.063, sleeve));
+      elbow.add(limb([0, -0.005, 0], [0, -0.225, 0], 0.048, sleeve));
+    }
     part(elbow, new THREE.CylinderGeometry(0.049, 0.045, 0.025, 12), trim, 0, -0.172, 0);
     part(elbow, new THREE.CylinderGeometry(0.045, 0.042, 0.027, 12), dark, 0, -0.22, 0);
     part(elbow, new THREE.SphereGeometry(0.051, 14, 10), skin, 0, -0.274, 0.01).scale.set(0.72, 1.11, 0.74);

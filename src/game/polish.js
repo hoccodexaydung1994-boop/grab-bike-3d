@@ -51,7 +51,10 @@ FRAME.push((dt) => {
   const gas = keys.KeyW || keys.ArrowUp || touch.gas;
   stuckT = game.mode === 'drive' && !game.paused && (game.state === 'pickup' || game.state === 'ride') && gas && Math.abs(player.v) < 0.8 ? stuckT + dt : Math.max(0, stuckT - dt * 2);
   if (stuckT > 6 && stuckT - dt <= 6) toast(L('🚚 Bị kẹt? Bấm G để gọi cứu hộ', '🚚 Stuck? Press G for a tow'), 2.5);
-  if (routeMesh) { navFlashT = Math.max(0, navFlashT - dt); routeMesh.material.opacity = navFlashT > 0 ? 0.6 + 0.35 * Math.abs(Math.sin(navFlashT * 8)) : 0.6; }
+  if (routeMesh) {
+    navFlashT = Math.max(0, navFlashT - dt);
+    routeMesh.material.opacity = ROUTE_OPACITY + (navFlashT > 0 ? ROUTE_FLASH_OPACITY * Math.abs(Math.sin(navFlashT * 8)) : 0);
+  }
 });
 
 /* ---- S5: hộp thoại hội thoại tự chọn câu mặc định sau 6 giây ---- */
@@ -130,7 +133,7 @@ const MAIN_BARS = ['hp', 'stamina', 'fuel', 'phone'];
     if (profile.debt > 0) $('wallet').textContent += ` · 💳 -${fmtVND(profile.debt)}`;
   };
 }
-const taskEl = document.createElement('div'); taskEl.style.cssText = 'font-size:12px;font-weight:700;min-height:16px;transition:opacity .3s'; $('jam').before(taskEl);
+const taskEl = document.createElement('div'); taskEl.id = 'taskTicker'; taskEl.style.cssText = 'font-size:12px;font-weight:700;min-height:16px;transition:opacity .3s'; $('jam').before(taskEl);
 const TASK_SRC = [$('food'), $('jam'), storyEl, hotEl, sqEl];
 TASK_SRC.forEach(e => e.style.display = 'none');
 let taskT = 0, taskI = 0;

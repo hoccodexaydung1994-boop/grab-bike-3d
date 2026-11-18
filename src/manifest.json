@@ -1,5 +1,5 @@
 {
- "version": "3.1.1",
+ "version": "3.1.1-15b.1",
  "files": [
   "core/renderer.js",
   "core/materials.js",
@@ -49,6 +49,7 @@
   "data/savedata.js",
   "game/polish.js",
   "world/district.js",
+  "world/alley15b.js",
   "world/hd.js",
   "boot.js"
  ],

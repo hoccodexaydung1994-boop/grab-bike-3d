@@ -18,7 +18,9 @@ const loadScript = (src) => new Promise((ok, fail) => { const s = document.creat
 try {
   const man = await getJSON('src/manifest.json', Date.now());
   window.GAME_VERSION = man.version;
-  const district = new URLSearchParams(location.search).get('district') === 'q1' ? 'q1' : 'q7';
+  const params = new URLSearchParams(location.search);
+  const district = params.get('district') === 'q1' ? 'q1' : 'q7';
+  window.ENABLE_ALLEY_PREVIEW = district === 'q1' && params.get('art') === '15b';
   status(district === 'q1' ? 'Đang tải bản đồ Quận 1…' : 'Đang tải bản đồ Quận 7…');
   const cfgNames = man.config || [];
   const [map, ...cfgs] = await Promise.all([getJSON('data/map/' + district + '.json', man.version), ...cfgNames.map(n => getJSON('data/config/' + n + '.json', man.version))]);

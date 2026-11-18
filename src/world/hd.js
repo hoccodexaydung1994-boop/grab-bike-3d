@@ -1,6 +1,71 @@
 'use strict';
 /* ================= Đồ hoạ cao (GFX_HIGH): bầu trời, mặt trời theo giờ, phản chiếu môi trường, bloom, đường ướt ================= */
 const HD = { on: GFX_HIGH, post: GFX_HIGH, composer: null, bloom: null, envKey: -1, envRT: null, pr: 0 };
+const hasAlleyAtmosphere = typeof ALLEY_PREVIEW !== 'undefined' && ALLEY_PREVIEW;
+
+function installAlleyAtmosphere(sky) {
+  const duskSky = new THREE.Color(0x667ba8);
+  const duskHorizon = new THREE.Color(0xb8a1b1);
+  const duskSun = new THREE.Color(0xffbc87);
+  const duskFill = new THREE.Color(0xadc3f3);
+  const duskGround = new THREE.Color(0x77645c);
+  // From the Lê Thánh Tôn entrance, down the length of the alley.
+  const duskDirection = new THREE.Vector3(-0.64, 0.39, -0.66).normalize();
+  const colors = [
+    [scene.background, duskHorizon], [scene.fog.color, duskHorizon],
+    [sun.color, duskSun], [hemi.color, duskFill], [hemi.groundColor, duskGround]
+  ];
+  if (sky) colors.push([sky.top.value, duskSky], [sky.hor.value, duskHorizon], [sky.sunCol.value, duskSun]);
+  const dayColors = colors.map(([color]) => color.clone());
+  const dayDirection = SUN_DIR.clone();
+  const daySkyDirection = sky?.sunDir.value.clone();
+  let daySun = sun.intensity;
+  let dayFill = hemi.intensity;
+  let active = false;
+
+  function restoreDaylight() {
+    colors.forEach(([color], i) => color.copy(dayColors[i]));
+    SUN_DIR.copy(dayDirection);
+    if (sky) sky.sunDir.value.copy(daySkyDirection);
+    sun.intensity = daySun;
+    hemi.intensity = dayFill;
+  }
+
+  const daylight = applyDaylight;
+  applyDaylight = function (minute) {
+    // Daylight and its reflection pass always run with their unmodified inputs.
+    if (active) restoreDaylight();
+    daylight(minute);
+    colors.forEach(([color], i) => dayColors[i].copy(color));
+    dayDirection.copy(SUN_DIR);
+    if (sky) daySkyDirection.copy(sky.sunDir.value);
+    daySun = sun.intensity;
+    dayFill = hemi.intensity;
+  };
+
+  FRAME.push(() => {
+    const corridor = game.mode === 'home' ? 0 : alley15bBlend(player.x, player.z);
+    const evening = Math.max(0, Math.min(1, (nightK - 0.65) / 0.32));
+    const blend = corridor * (1 - evening * evening * (3 - 2 * evening));
+    if (blend <= 0) {
+      if (active) restoreDaylight();
+      active = false;
+      return;
+    }
+    active = true;
+    colors.forEach(([color, dusk], i) => color.copy(dayColors[i]).lerp(dusk, blend));
+    SUN_DIR.copy(dayDirection).lerp(duskDirection, blend).normalize();
+    if (sky) sky.sunDir.value.copy(daySkyDirection).lerp(duskDirection, blend).normalize();
+    const duskKey = 1.16 * (1 - 0.6 * rain);
+    const duskAmbient = (sky ? 0.72 : 1.06) * (1 - 0.35 * rain);
+    sun.intensity = daySun + (duskKey - daySun) * blend;
+    hemi.intensity = dayFill + (duskAmbient - dayFill) * blend;
+    // Weather resets the base fog range before FRAME hooks on every frame.
+    scene.fog.near += (23 - scene.fog.near) * blend;
+    scene.fog.far += (153 - 39 * rain - scene.fog.far) * blend;
+  });
+}
+
 if (HD.on) {
   /* ---- bầu trời: dải màu theo giờ + mặt trời + mây + sao ---- */
   const skyU = { top: { value: new THREE.Color(0.16, 0.4, 0.85) }, hor: { value: new THREE.Color(0.62, 0.78, 0.95) }, gnd: { value: new THREE.Color(0.25, 0.27, 0.25) },
@@ -86,6 +151,10 @@ if (HD.on) {
     };
     addEventListener('resize', () => HD.composer?.setSize(innerWidth, innerHeight));
   } catch (e) { console.warn('post-processing off', e); HD.post = false; }
+  if (hasAlleyAtmosphere) installAlleyAtmosphere(skyU);
+} else if (hasAlleyAtmosphere) {
+  installAlleyAtmosphere();
+  BOOT.push(() => applyDaylight(profile.clock));
 }
 const defaultPostProcessing = HD.post;
 /* ---- nút chọn mức đồ hoạ trong Cài đặt ---- */
